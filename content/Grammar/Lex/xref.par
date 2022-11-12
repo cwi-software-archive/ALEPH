@@ -1,0 +1,592 @@
+.Is
+.En
+.Rb A
+.En
+\*<absolute-size\*>: 4.1.4, \fI4.1.6\fP
+.En
+action: \fB3.2.1\fP
+.En
+\*<actual\*>: \fI3.3.2\fP
+.En
+actual address space: \fB4.1.4\fP
+.En
+\*<actual-affix\*>: \fI3.3.2\fP
+.En
+\*<actual-affix-sequence\*>: \fI3.3.2\fP
+.En
+\*<actual-rule\*>: 3.2.2, 3.5
+.En
+\*{add\*}: \fB5.2.1\fP
+.En
+address space: \fB4.1.4\fP
+.En
+affix grammars: 1.2
+.En
+affix mechanism: \fB3.5\fP
+.En
+\*<affix-form\*>: \fB3.5\fP, 3.9.1
+.En
+ALEPH compiler: 0
+.En
+ALGOL 68: 1.2, 1.4
+.En
+ALICE: 0
+.En
+\*<alternative\*>: \fI3.2.2\fP
+.En
+\*<alternative-series\*>: \fI3.2.2\fP, 3.9.2
+.En
+\*<area\*>: \fB3.8\fP, 4.2, 4.2.2
+.En
+.Rb B
+.En
+\*{back file\*}: \fB5.2.5\fP
+.En
+\*{background\*}: \fB6.1\fP
+.En
+bits: 5.2.2
+.En
+block: 3.4.1, 3.4.3, 4.1.5.2
+.En
+\*{bool and\*}: \fB5.2.2\fP
+.En
+\*{bool invert\*}: \fB5.2.2\fP
+.En
+\*{bool or\*}: \fB5.2.2\fP
+.En
+\*{bool xor\*}: \fB5.2.2\fP
+.En
+.Rb C
+.En
+calibre: 3.4.3, 4.1.4, \fB4.1.5.2\fP, 4.1.6
+.En
+\*<calibre\*>: \fI4.1.7\fP
+.En
+calibre match: 0, 3.4.3, 3.5
+.En
+call: 3.2.2, 3.2.3, 3.3, 3.3.2, 3.5, 3.6, 3.7, 5.1
+.En
+\*<character\*>: \fB7.2\fP
+.En
+\*<character-denotation\*>: \fI3.4\fP, \fB3.4.1\fP
+.En
+charfile: 4, \fB4.2.1\fP, 5.2.5
+.En
+\*<classification\*>: \fB3.8\fP, 3.9.2
+.En
+\*{clear elem\*}: \fB5.2.2\fP
+.En
+comment: 7.1
+.En
+\*{compare string\*}: \fB5.2.3\fP
+.En
+COMPASS: 0
+.En
+\*{compile\*}: \fB6.1\fP
+.En
+compiler-pragmat: \fB6.1\fP
+.En
+\*<compound-block\*>: \fI4.1.5\fP, 4.1.5.2
+.En
+\*<compound-member\*>: 3.6, \fI3.7\fP
+.En
+constant: 1.3, 3.4.1, 4, 4.1.1, \fB4.1.2\fP, 4.1.5.2, 4.1.7, 5.1, 5.2.5
+.En
+\*<constant-declaration\*>: \fI4.1.2\fP
+.En
+\*<constant-description\*>: \fI4.1.2\fP
+.En
+\*<constant-tag\*>: 3.4.1, \fI4.1.2\fP
+.En
+context-free grammar: 2.2
+.En
+control integer: \fB4.2.1\fP, 5.2.5
+.En
+\*{count\*}: \fB6.1\fP
+.En
+.Rb D
+.En
+\*<data-declaration\*>: 3.1.1, \fI4\fP
+.En
+datafile: 4, \fB4.2.2\fP, 5.2.5
+.En
+data-item: \fB4.2.2\fP
+.En
+\*{date\*}: \fB5.2.1\fP
+.En
+\*{decr\*}: \fB5.2.1\fP, 8.1, 8.2, 8.4, 8.5
+.En
+\*{delete\*}: 4.1.4, \fB5.2.4\fP
+.En
+\*<digit\*>: 3.4.1, \fB7.2\fP
+.En
+\*{divrem\*}: \fB5.2.1\fP
+.En
+dollar-sign: 7.1
+.En
+\*<dummy-symbol\*>: 3.4.1
+.En
+\*{dump\*}: \fB6.1\fP
+.En
+.Rb E
+.En
+\*{equal\*}: \fB5.2.1\fP, 8.3
+.En
+error: 3.2.2
+.En
+execution: 1.2, 3.1.1
+.En
+\*<exit\*>: 3.3.1, \fI3.6\fP
+.En
+\*<expression\*>: \fI4.1.1\fP
+.En
+extension: 1.2, 4.1.4, 5.2.1, 5.2.2, 5.2.3, 5.2.5
+.En
+\*<extension\*>: 0, 3.4, \fB3.4.3\fP
+.En
+\*<external-constant-declaration\*>: \fI5.1\fP
+.En
+\*<external-constant-description\*>: \fI5.1\fP
+.En
+\*<external-declaration\*>: \fI5.1\fP
+.En
+\*<external-rule-description\*>: \fI5.1\fP
+.En
+\*{extract bits\*}: \fB5.2.2\fP
+.En
+.Rb F
+.En
+failure: 3.2.2, \fB3.9.2\fP
+.En
+\*<failure-symbol\*>: 3.3.1, \fB3.6\fP
+.En
+\*{false\*}: \fB5.2.2\fP
+.En
+\*<field\*>: \fI4.1.5\fP
+.En
+\*<field-list\*>: \fI4.1.5\fP
+.En
+\*<field-list-pack\*>: \fI4.1.5\fP
+.En
+\*<field-transport\*>: \fI3.4\fP
+.En
+\*<field-transport-list\*>: \fI3.4\fP
+.En
+file: 3.3.1, 3.5, 4, \fB4.2\fP, 5.2.5
+.En
+\*<file-declaration\*>: \fI4.2\fP
+.En
+\*<file-description\*>: \fI4.2\fP
+.En
+\*<file-tag\*>: \fI4.2\fP
+.En
+\*<filling\*>: \fI4.1.5\fP, 4.1.5.2
+.En
+\*<filling-list\*>: 4.1.4, \fI4.1.5\fP
+.En
+\*<filling-list-pack\*>: \fI4.1.5\fP
+.En
+\*{first col\*}: \fB6.1\fP, 7.1
+.En
+\*{first true\*}: \fB5.2.2\fP
+.En
+\*<formal\*>: \fI3.3.1\fP
+.En
+\*<formal-affix\*>: \fI3.3.1\fP
+.En
+\*<formal-affix-sequence\*>: \fI3.3.1\fP
+.En
+\*<formal-file\*>: \fI3.3.1\fP, 3.5
+.En
+\*<formal-stack\*>: \fI3.3.1\fP, 3.5
+.En
+\*<formal-table\*>: \fI3.3.1\fP, 3.5
+.En
+\*<formal-variable\*>: \fI3.3.1\fP
+.En
+\*{from ascii\*}: \fB5.2.3\fP
+.En
+function: \fB3.2.1\fP
+.En
+.Rb G
+.En
+\*{get char\*}: 4.2.1, \fB5.2.5\fP
+.En
+\*{get data\*}: 4.2.2, \fB5.2.5\fP
+.En
+\*{get int\*}: \fB5.2.5\fP
+.En
+\*{get line\*}: 4.2.1, \fB5.2.5\fP
+.En
+grammar: 1.1, 2.2
+.En
+.Rb I
+.En
+identity: 1.2
+.En
+\*<identity\*>: \fI3.4\fP, \fB3.4.2\fP
+.En
+implementation-dependency: 4.2, 5.1, 6, 6.3
+.En
+\*{incr\*}: \fB5.2.1\fP, 8.4
+.En
+\*+initialized\*-: 3.3.1, 3.3.3, 3.4.1, 3.5
+.En
+\*{int size\*}: \fB5.2.1\fP
+.En
+integer: 4, 4.1.1, 4.1.2, 4.1.4, 4.2.2, 5.2.1
+.En
+integer division: 4.1.1, 5.2.1
+.En
+\*<integral-denotation\*>: \fI3.4\fP, \fB3.4.1\fP
+.En
+introduction: 1
+.En
+\*{is elem\*}: \fB5.2.2\fP
+.En
+\*{is false\*}: \fB5.2.2\fP
+.En
+\*{is true\*}: \fB5.2.2\fP
+.En
+.Rb J
+.En
+\*<jump\*>: 3.3.1, \fB3.6\fP
+.En
+.Rb K
+.En
+key: \fB3.2.2\fP, 3.8
+.En
+.Rb L
+.En
+\*{last col\*}: \fB6.1\fP, 7.1
+.En
+\*<last-member\*>: \fI3.2.3\fP
+.En
+\*{left circ\*}: \fB5.2.2\fP
+.En
+\*{left clear\*}: \fB5.2.2\fP
+.En
+\*{less\*}: \fB5.2.1\fP, 8.4, 8.5
+.En
+limit: 3.4.1
+.En
+\*<limit\*>: \fI4.1.7\fP
+.En
+line: \fB4.2.1\fP, 5.2.5
+.En
+list: 3.4.1, 3.8, \fB4.1.4\fP, 4.1.5.2, 4.1.7, 4.2.2, 5.2.3, 5.2.4, 6.1
+.En
+\*{list length\*}: \fB5.2.4\fP
+.En
+\*<list-tag\*>: \fI4.1.7\fP
+.En
+\*<local-affix\*>: 3.2.2, \fI3.3.3\fP
+.En
+\*<local-affix-sequence\*>: \fI3.3.3\fP
+.En
+location: 3.2.2, 3.4.1, 3.4.3, 4, 4.1.3, 4.1.4, 4.1.6, 5.2.4
+.En
+long comment: 7.1
+.En
+\*{lseq\*}: \fB5.2.1\fP
+.En
+.Rb M
+.En
+\*{macro\*}: 0, \fB6.1\fP
+.En
+\*{max char\*}: \fB5.2.3\fP
+.En
+\*{max int\*}: \fB5.2.1\fP
+.En
+max limit: 4.1.4, 4.1.5.1, 4.1.5.2, 4.1.6
+.En
+\*<max-limit\*>: \fI4.1.7\fP
+.En
+\*{may be string pointer\*}: \fB5.2.3\fP
+.En
+\*<member\*>: 3.2.2, \fI3.2.3\fP, 3.9.1, 3.9.2
+.En
+\*{min int\*}: \fB5.2.1\fP
+.En
+min limit: 4.1.4, 4.1.5.1, 4.1.5.2, 4.1.6
+.En
+\*<min-limit\*>: \fI4.1.7\fP
+.En
+\*{minus\*}: \fB5.2.1\fP, 8.2
+.En
+modifications: 0
+.En
+\*{more\*}: \fB5.2.1\fP, 8.4
+.En
+\*{mreq\*}: \fB5.2.1\fP, 8.5
+.En
+\*{mult\*}: \fB5.2.1\fP
+.En
+.Rb N
+.En
+\*{new line\*}: 4.2.1, \fB5.2.5\fP, 8.2
+.En
+\*{new page\*}: 4.2.1, \fB5.2.5\fP
+.En
+new-line: 4.1.5.2
+.En
+\*{next\*}: \fB5.2.4\fP
+.En
+\*{nil\*}: \fB5.2.4\fP
+.En
+\*{nil table\*}: \fB5.2.4\fP
+.En
+\*<non-quote-item\*>: \fB7.2\fP
+.En
+\*{noteq\*}: \fB5.2.1\fP
+.En
+\*{numerical\*}: 4.2.2, \fB5.2.5\fP
+.En
+.Rb O
+.En
+\*{one\*}: \fB5.2.1\fP
+.En
+\*<operation\*>: \fI3.4\fP
+.En
+.Rb P
+.En
+\*{pack bool\*}: \fB5.2.2\fP
+.En
+\*{pack int\*}: \fB5.2.1\fP
+.En
+\*{pack string\*}: \fB5.2.3\fP
+.En
+parameter: 1.2
+.En
+\*<plain-value\*>: \fI3.4\fP
+.En
+\*{plus\*}: \fB5.2.1\fP, 8.2, 8.5
+.En
+\*{pointer\*}: 4.2.2, \fB5.2.5\fP
+.En
+\*<pointer-initialization\*>: \fI4.1.5\fP, 4.1.5.2, 4.1.6
+.En
+postprocessing: 4.2, 4.2.1
+.En
+\*<pragmat\*>: \fI6\fP
+.En
+\*<pragmat-item\*>: \fI6\fP
+.En
+predicate: \fB3.2.1\fP
+.En
+prefilling: 4.2, 4.2.1
+.En
+\*{previous\*}: \fB5.2.4\fP
+.En
+\*{previous string\*}: \fB5.2.3\fP
+.En
+printer: 4.2.1
+.En
+\*<program\*>: \fI3.1.1\fP
+.En
+\*{put char\*}: \fB5.2.5\fP, 8.1, 8.2, 8.3
+.En
+\*{put data\*}: 4.2.2, \fB5.2.5\fP
+.En
+\*{put int\*}: \fB5.2.5\fP
+.En
+\*{put line\*}: \fB5.2.5\fP, 8.5
+.En
+\*{put string\*}: \fB5.2.5\fP, 8.3
+.En
+.Rb Q
+.En
+question: \fB3.2.1\fP
+.En
+question, committing: 1.4
+.En
+question, non-committal: 1.4
+.En
+queue: 4.1.4
+.En
+\*<quote-image\*>: \fI4.1.5\fP, 4.1.5.2
+.En
+.Rb R
+.En
+\*{random\*}: \fB5.2.1\fP, 8.4
+.En
+re-allotment: 4.1.4
+.En
+\*<relative-size\*>: 4.1.4, \fI4.1.6\fP
+.En
+\*{rest line\*}: 4.2.1, \fB5.2.5\fP
+.En
+\*{right circ\*}: \fB5.2.2\fP
+.En
+\*{right clear\*}: \fB5.2.2\fP
+.En
+right-recursion: 1.7
+.En
+\*<root\*>: 3.1.1, 6.1
+.En
+rule: 1.2, 1.3, 3.2, 3.2.1, 3.2.3, 3.3, 3.3.2, 3.5, 3.6, 3.7, 3.9.1, 5.1, 6.1
+.En
+\*<rule-body\*>: \fI3.2.2\fP, 3.9.1, 3.9.2
+.En
+\*<rule-declaration\*>: \fI3.2.1\fP
+.En
+\*<rule-tag\*>: \fI3.2.1\fP
+.En
+run-time stack: 3.2.2, 3.3.3
+.En
+.Rb S
+.En
+\*{same line\*}: 4.2.1, \fB5.2.5\fP
+.En
+\*{scratch\*}: 4.1.4, \fB5.2.4\fP
+.En
+selector: 3.3.1, 3.4.1, 3.5, 4.1.5.2
+.En
+\*<selector\*>: \fI4.1.5\fP
+.En
+\*{set elem\*}: \fB5.2.2\fP
+.En
+\*{set random\*}: \fB5.2.1\fP
+.En
+\*{set real random\*}: \fB5.2.1\fP
+.En
+sharp-sign: 7.1
+.En
+short comment: 7.1
+.En
+side-effects: 3.2.2, \fB3.9.1\fP
+.En
+\*<single-block\*>: \fI4.1.5\fP, 4.1.5.2
+.En
+\*<size-estimate\*>: 4.1.4, \fI4.1.6\fP
+.En
+\*<source\*>: \fI3.4\fP
+.En
+spoil and fail: 3.7
+.En
+\*{sqrt\*}: \fB5.2.1\fP
+.En
+square brackets: 2.2
+.En
+stack: 1.2, 1.5, 3.3.1, 3.4.3, 3.5, 4, 4.1.1, 4.1.4, 4.1.5.2, \fB4.1.6\fP, 4.1.7, 4.2.1, 5.2.2, 5.2.3, 5.2.4, 5.2.5, 6.1, 8.4
+.En
+\*<stack-declaration\*>: \fI4.1.6\fP
+.En
+\*<stack-element\*>: \fI3.4\fP, 3.4.1
+.En
+\*<stack-head\*>: \fI4.1.6\fP
+.En
+\*<stack-tag\*>: \fI4.1.6\fP
+.En
+string: 1.5, 5.2.3
+.En
+\*{string elem\*}: \fB5.2.3\fP
+.En
+\*{string length\*}: \fB5.2.3\fP
+.En
+\*<string-denotation\*>: \fI4.1.5\fP, 4.1.5.2
+.En
+\*<string-item\*>: \fI4.1.5\fP
+.En
+\*{subtr\*}: \fB5.2.1\fP
+.En
+success: 3.2.2, \fB3.9.2\fP
+.En
+\*<success-symbol\*>: \fB3.6\fP
+.En
+.Rb T
+.En
+table: 1.5, 3.3.1, 3.5, 4, 4.1.4, 4.1.5, \fB4.1.5.1\fP, 4.1.5.2, 4.1.7, 5.1, 5.2.4
+.En
+\*<table-declaration\*>: \fI4.1.5\fP
+.En
+\*<table-element\*>: \fI3.4\fP, 3.4.1
+.En
+\*<table-head\*>: \fI4.1.5\fP
+.En
+\*<table-tag\*>: \fI4.1.5\fP
+.En
+tag: 2.2, 3.1.2, 3.3.1, 3.3.3, 3.7, 4.1.5.2
+.En
+\*<tag\*>: \fB7.2\fP
+.En
+\*<term\*>: \fI4.1.1\fP
+.En
+termination state: 2.1, 3.1.1, 3.6
+.En
+\*<terminator\*>: 3.2.2, \fI3.6\fP, 3.9.2
+.En
+\*{time\*}: \fB5.2.1\fP
+.En
+\*{times\*}: \fB5.2.1\fP
+.En
+\*{title\*}: \fB6.1\fP
+.En
+\*{to ascii\*}: \fB5.2.3\fP
+.En
+transport: 1.2
+.En
+\*<transport\*>: \fI3.4\fP, \fB3.4.1\fP, 3.5, 3.9.1
+.En
+\*{true\*}: \fB5.2.2\fP
+.En
+\*<typer\*>: \fI3.2.1\fP
+.En
+.Rb U
+.En
+\*{unpack bool\*}: \fB5.2.2\fP
+.En
+\*{unpack int\*}: \fB5.2.1\fP
+.En
+\*{unpack string\*}: \fB5.2.3\fP
+.En
+\*{unqueue\*}: \fB5.2.4\fP
+.En
+\*{unqueue to\*}: \fB5.2.4\fP
+.En
+\*{unstack\*}: 4.1.4, \fB5.2.4\fP, 8.2
+.En
+\*{unstack n\*}: 4.1.4
+.En
+\*{unstack string\*}: \fB5.2.3\fP
+.En
+\*{unstack to\*}: \fB5.2.4\fP
+.En
+user-pragmat: \fB6.3\fP
+.En
+.Rb V
+.En
+variable: 1.2, 1.4, 3.2.2, 3.3, 3.3.1, 3.3.3, 3.4.1, 3.7, 4, \fB4.1.3\fP, 6.1
+.En
+\*<variable\*>: \fI3.4\fP
+.En
+\*<variable-declaration\*>: \fI4.1.3\fP
+.En
+\*<variable-description\*>: \fI4.1.3\fP
+.En
+\*<variable-directive\*>: \fI3.4\fP
+.En
+\*<variable-tag\*>: 3.4.1, \fI4.1.3\fP
+.En
+virtual address space: 3.8, \fB4.1.4\fP
+.En
+virtual max limit: \fB4.1.4\fP
+.En
+virtual min limit: \fB4.1.4\fP
+.En
+VW-grammar: 2.2
+.En
+.Rb W
+.En
+\*{was\*}: \fB5.2.4\fP, 8.2, 8.3
+.En
+word: 5.2.2
+.En
+\*{word size\*}: \fB5.2.2\fP
+.En
+.Rb Z
+.En
+\*{zero\*}: \fB5.2.1\fP
+.En
+\*<zone\*>: \fI3.8\fP
+.Ie
