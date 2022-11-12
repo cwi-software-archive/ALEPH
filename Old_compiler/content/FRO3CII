@@ -1,0 +1,20 @@
+
+          IDENT  FRO3CII
+          SST
+          ENTRY  FRO3CII
+ FRO3CII  JP     *+1S17      FROM ASCII TO DISPAY CODE
+          SX1    X1-40B      RELOCATE
+          SX2    37B         QUESTION MARK
+          SX3    TABLE
+          RJ     =XCONV;
+          EQ     FRO3CII
+
+ TABLE    DATA   3020107443335155B
+          DATA   3121110144345266B
+          DATA   3222120263354764B
+          DATA   6123130377364560B
+          DATA   7524140472375653B
+          DATA   6225150554404671B
+          DATA   7626160673415767B
+          DATA   6527170771425070B
+          END

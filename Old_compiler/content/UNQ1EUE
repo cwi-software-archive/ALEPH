@@ -1,0 +1,17 @@
+
+          IDENT  UNQ1EUE
+          SST
+          ENTRY  UNQ1EUE
+ UNQ1EUE  JP     *+1S17      UNQUEUE + []ST[]
+          SA4    X1+<<       <<
+          SA5    A4+B1       >>
+          IX3    X5-X4
+          PL     X3,UNQ1     STACK NOT EMPTY
+          ERREXT (UNQUEUE, STACK EMPTY),L1
+
+ UNQ1     SA5    A4-B1       <>
+          IX6    X4+X5       RESTORE <<
+          BX7    X4          <<PRE
+          SINGLE (\  SA6 A4\  SA7 A4+B2)
+          EQ     UNQ1EUE
+          END

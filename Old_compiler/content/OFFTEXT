@@ -1,0 +1,19 @@
+
+          IDENT  OFFTEXT
+* SWITCHES OFF LINE NUMBER ACCOUNTING AND SUBSCRIPT CHECKING.
+          STEXT
+
+ SA0      MACRO  Q           DELETE ALL UPDATING OF A0
+ SA0      ENDM
+
+ RHQ      CPSYN  RJQ         RENAME NORMAL RJ
+
+ RJ       MACRO  Q           CATCH RJ =XRANGE
+          IFC    EQ, Q =XRANGE
+          IX5    X7+X5
+          ELSE
+          RH     Q
+          ENDIF
+ RJ       ENDM
+
+          END

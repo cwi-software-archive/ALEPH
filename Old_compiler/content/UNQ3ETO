@@ -1,0 +1,25 @@
+
+          IDENT  UNQ3ETO
+          SST
+          ENTRY  UNQ3ETO
+ UNQ3ETO  JP     *+1S17      UNQUEUE TO + []ST[] + >PNT
+          SA3    X1+>>       >>
+          SA4    A3-B1       <<
+          SA5    A4-B1       <>
+          IX3    X3+X5       MAXIMUM PERMISSIBLE
+          IX3    X3-X2       MUST BE POSITIVE
+          IX6    X2-X4       MUST BE POSITIVE
+          BX6    X3+X6       MUST BE POSITIVE
+          NG,X6  BADPNT
+ REP      IX6    X4-X2       COMPARE PROPOSED POINTER TO PNT
+          IX4    X4+X5       PROPOSE NEW POINTER
+          NG,X6  REP
+          NZ,X6  BADPNT      MUST HAVE HIT PNT EXACTLY
+          IX6    X4-X5       CORRECT OVERSHOOT, <<
+          IX7    X6-X5       <<PRE
+          SINGLE (\  SA6 A4\  SA7 A4+B2)
+          EQ     UNQ3ETO
+
+ BADPNT   ERREXT (UNQUEUE TO, BAD POINTER),(L1,D2)
+
+          END

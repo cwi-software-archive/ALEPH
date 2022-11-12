@@ -1,0 +1,282 @@
+
+          IDENT  REC.VER
+          SST
+
+* SUPPLIES THE EXTERNALS 'CPUTRAP' AND 'CPUERR' FOR THE RECOVERY ROUTINE
+
+ CPUTRAP  JP     *+1S17
+          SA5    =XCPUSEMA   BITS 17-12: 0, BITS 11-0: ERROR CODE
+          SX5    X5-1B
+          ZR,X5  CPLIM
+          SX5    X5+1B-17B
+          ZR,X5  MSLIM
+          SX5    X5+17B-21B
+          ZR,X5  IOLIM
+          ERROR  (ABORTED)
+ IOLIM    ERROR  (IO TIME LIMIT)
+ MSLIM    ERROR  (MASS STORAGE LIMIT)
+ CPLIM    ERROR  (CP TIME LIMIT)
+
+ CPUERR   =      BADSEMA
+
+          QUAL   RECOVER
+          RMT
+ CPUSEMA  =      /RECOVER/CPUSEMA
+ CPUTR.P  =      /RECOVER/CPUTR.P
+          ENTRY  CPUSEMA,CPUTR.P
+          RMT
+
+
+ EXPSIZE  =      17D         SIZE OF EXCHANGE PACKAGE
+
+ EXPACK   BSS    EXPSIZE     FOR COPY OF EXCHANGE PACKAGE
+
+ CPUTR.P  JP     *+1S17      ENTERED BY SIMULATED RJ-CALL FROM RECOVER
+                             OR BY RJ-CALL FROM 'UPCPU'.
+          SA5    CPUSEMA     STARTS WITH EITHER 6000B OR 1777B
+          PL,X5  =XCPUERR    MAY NOT BE 1777B.
+          CLOSECPU
+          SA5    CPUTR.P     TRANSFER
+          BX6    X5          RETURN
+          SA6    =XCPUTRAP   ADDRESS.
+          EQ     =XCPUTRAP+1 ENTER AS RJ.
+
+*
+* THE SEMAPHORE 'CPUSEMA' CONTAINS 6 FIELDS:
+* BIT 59 :       INTERRUPT-PENDING BIT
+* BIT 58 - 48 :  DEPTH OF PROTECTION + 2000B
+* BIT 47 :       INTERRUPT-PERMIT BIT
+* BIT 46 :       RUN BIT
+* BIT 35 - 18 :  ADDRESS OF EXCHANGE PACKAGE AFTER INTERRUPT
+* BIT 11 - 0 :   ERROR CODE
+*
+ CPUSEMA  CON    2000BS48+1S47   LEVEL 0 + INTERRUPT-PERMIT
+ RECOVER  JP     *+1S17      X1 = ADDRESS OF EXCHANGE PACKAGE
+* THE ABOVE INSTRUCTION MUST BE AT CPUSEMA+1 !
+          SB1    1           FIRST THINGS FIRST
+* GET EXCHANGE PACKAGE OUT OF DANGER ZONE:
+          SA5    EXPACK-1    SET
+          BX6    X5               A6
+          SA6    A5                  TO EXPACK-1
+          SA5    X1-1        AND A5 TO OLDEXPACK-1.
+          SB5    EXPSIZE     NUMBER OF WORDS TO BE MOVED
+ MOVE     SA5    A5+B1       GET WORD
+          SB5    B5-B1       COUNT IT
+          BX6    X5
+          SA6    A6+B1       AND STORE IT.
+          NZ,B5  MOVE
+
+* ANALYZE STATUS:
+          SA5    CPUSEMA
+          LX5    59D-47D     INTERRUPT-PERMIT BIT
+  SKIP
+          PL,X5  RESTART     IF OFF, THEN RESTART
+  ELSE
+  PL,X5 MSG.RST
+  RMT
+ MSG.RST MESSAGE (=C/***PROTECTED/),LOCAL,R
+          SA5    CPUSEMA
+          LX5    59D-47D     INTERRUPT
+  EQ /RECOVER/RESTART
+  RMT
+  ENDIF
+          LX5    47D-46D     RUN-BIT
+          PL,X5  RECOVER     NO MEANINGFUL RECOVER
+          LX5    46D-59D     RESTORE CPUSEMA IN X5
+* CONSTRUCT NEW SEMA, OLD SEMA IN X5, ADDRESS IN A5:
+          MX6    1
+          BX5    X5+X6       SET INTERRUPT-PENDING BIT
+          LX6    47D-59D
+          BX6    -X6*X5      CLEAR INTERRUPT-PERMIT BIT
+          SA4    EXPACK      WORD 0 OF EXPACK: P, A0, ERRCODE
+          SX5    X4          ERRCODE ONLY
+          BX6    X6+X5       PUT ERRCODE IN BITS 17-0
+          SX5 A4 EXPACK      ADDRESS EXCHANGE PACKAGE
+          LX5    18D
+          BX6    X6+X5       TO BITS 35 - 18.
+          SA6 A5 CPUSEMA     NEW SEMA READY
+*
+          DF,X6  RESTART     SEMA WAS PROTECTED (SINCE NOT 6000B)
+* SIMULATE AN RJ-CALL TO 'CPUTR.P', TO RESTORE ALL REGISTERS SPOILED.
+* WORD 0 OF EXPACK IN X4, ITS ADDRESS IN A4.
+          LX4    -36D        OLD P IN BITS 17-0
+          SX6    X4          OLD P
+          BX4    X4-X6       REMOVED FROM X4
+          LX6    30D
+          MX7    1
+          LX7    -3          040...0B
+          BX6    X6+X7       'EQ OLDP' IN BITS 59-30
+          SA6    CPUTR.P     TO WHERE AN RJ WOULD WRITE IT
+
+          SX6    A6+B1       CPUTR.P+1, ENTRY
+          BX6    X4+X6       TO BE
+          LX6    36D         THE NEW P-COUNTER,
+          SA6 A4 EXPACK      TO BE RESTORED BY RESTART.
+
+ RESTART  BSS    0
+          RECOVR CPUSEMA+1,200B ATTRACT ATTENTION      *****************
+          RECOVR CPUSEMA+1,4B RESTART PROTECTION; RUINS ALL REGISTERS
+
+          SX1    EXPACK      INPUT PARAMETER TO 'CONTINUE'
+          QUAL   CONTINUE
+          BASE   D
+*
+* THE FOLLOWING PIECE OF CODE ASSUMES AN EXCHANGE JUMP PACKAGE (AS
+* PROVIDED BY 'RECOVR') TO BE POINTED AT BY X1 AND WILL RESTART
+* THE PROGRAM ACCORDING TO THAT PACKAGE.
+* THIS CODE MAY CAUSE A MODE 1 INTERRUPT IF THE PACKAGE IS NOT OKAY.
+*
+
+ AREGS    =      0
+ XREGS    =      8
+ RAPLUS1  =      16
+
+*
+* ALL REGISTERS EXCEPT X1, B1, A0 AND P ARE RESTORED BY SIMPLY LOADING
+* THEM. THE REMAINDER IS RESTORED BY EXECUTING CODE CONSTRUCTED FOR THAT
+* PURPOSE.
+*
+* DURING THIS JUGGLING A1 CONTAINS THE ADDRESS OF THE LAST ACCESSED
+* WORD IN THE EXCHANGE PACKAGE WHILE OLDA1 IS KEPT UPDATED SO THAT
+* (A1)-OLDA1 IS ALWAYS THE ADDRESS OF THE EXCHANGE PACKAGE.
+*
+          NOREF  OLDA1,.A1
+ SETA1    MACRO  VALUE       SETS A1 TO RELATIVE VALUE AND UPDATES OLDA1
+ .A1      SET    VALUE-OLDA1
+          IFLT   .A1,0
+ SIGN     MICRO  1,, -
+ .A1      SET    -.A1
+          ELSE
+ SIGN     MICRO  1,, +
+          ENDIF
+          IFLE   .A1,1
+ REG      MICRO  1,, B.
+          ELSE
+ REG      MICRO
+          ENDIF
+          SA1    A1"SIGN""REG".A1
+ OLDA1    SET    VALUE
+ SETA1    ENDM
+
+* RESTORE CONTENTS OF RA+1 (NEED NOT BE ZERO)
+          SA1    X1+RAPLUS1  GET WORD, SET A1
+ OLDA1    SET    RAPLUS1     INITIALIZE
+          BX6    X1
+          SA6    B1          RA+1
+*
+ <>CODE   SET    0           SIZE OF HARD CODE GENERATED
+*
+* X1 IS RESTORED BY FIRST ENTERING 16 BITS THROUGH AN SX1 OPERATION
+* AND THEN ENTERING 44 BITS THROUGH 4 PX1 B1 OPERATIONS. THE VALUES
+* ENTERED BY B1 ARE THOSE THAT BELONG TO THE ABSOLUTE VALUE OF X1.
+* THE CORRECT SIGN OF X1 IS SET BY THE SX1 OPERATION; SINCE THE PACK
+* OPERATION TAKES THE SIGN INTO ACCOUNT, X1 IS RECONSTRUCTED CORRECTLY.
+*
+          SETA1  XREGS+1     VALUE X1
+          MX2    -15
+          BX2    -X2*X1      BITS 14 - 0
+          MX3    1
+          BX3    X3*X1       SIGN BIT
+          LX3    17-59       TO POSITION 17.
+          BX3    X2+X3       FIRST 16 BITS
+          LX3    30          TO ADDRESS POSITION.
+          SA4    SX1CODE     INSTRUCTION TEMPLATE
+ TEMPLATE RMT
+ SX1CODE  SX1    0
+          LX1    3*11        WILL BE MOVED RIGHT 3 TIMES FOR FOUR PACK'S
+          LX1    11          TO OFFSET DUMMY SHIFT
+ TEMPLATE RMT
+          BX6    X3+X4       COMBINE INSTRUCTION WORD
+ <>CODE   SET    <>CODE+1    MAKE ROOM
+          SA6    CODEAREA    AND WRITE IT.
+
+          BX2    X1          X1
+          AX2    60          :=
+          BX1    X1-X2       ABS X1
+*
+          MX2    11
+          LX2    11+15       BITS 25 -15
+          SA4    PX1CODE     INSTRUCTION TEMPLATE
+ TEMPLATE RMT
+ PX1CODE  LX1    -11         MAKE ROOM FOR NEXT PACK
+          SB1    2000B       BIAS BIT FOR PACK
+          PX1    B1
+ TEMPLATE RMT
+          SB5    4           FOUR WORDS GENERATED
+ <>CODE   SET    <>CODE+4    FOUR WORDS GENERATED
+ X1L      BSS    0           CONSTRUCTION OF PACK INSTRUCTIONS
+          BX3    X1*X2
+          BX6    X4-X3       BECAUSE OF BIAS BIT
+          SA6    A6+B1       AND WRITE IT.
+          SB5    B5-B1
+          LX1    -11         NEXT 11 BITS
+          NZ,B5  X1L
+
+* GENERATE CODE FOR B1 AND A0
+          MX2    -18         ADDRESS MASK
+          SETA1  AREGS+1     B1
+          BX3    -X2*X1      B1 SEC
+          LX3    30
+          SETA1  AREGS       A0, P
+          AX1    18          A0
+          BX4    -X2*X1      A0 SEC
+          BX3    X3+X4       B1 AND A0
+          SA4    B1A0CODE
+ TEMPLATE RMT
+ B1A0CODE SB1    A0+0        TO PRESERVE -0
+          SA0    A0+0        TO PRESERVE -0
+ TEMPLATE RMT
+          BX6    X3+X4       COMBINE INSTRUCTION WORD
+ <>CODE   SET    <>CODE+1    MAKE ROOM
+          SA6    A6+B1       AND WRITE IT.
+
+* GENERATE CODE FOR P; X1 STILL CONTAINS P
+          AX1    18          P
+          BX3    -X2*X1      P SEC
+          LX3    30
+          SA4    PCODE
+ TEMPLATE RMT
+ PCODE    JP     0
+ TEMPLATE RMT
+          BX6    X3+X4       COMBINE INSTRUCTION WORD
+ <>CODE   SET    <>CODE+1    MAKE ROOM
+          SA6    A6+B1       AND WRITE IT.
+
+* RESET A7,B7 ... A2,B2
+          MX1    60          B2:=
+          SB2    X1-0             -0
+          ECHO   ,R=(7,6,5,4,3,2)
+          SETA1  AREGS+R
+          SB.R   X1+B2       TO PRESERVE -0
+          AX1    18
+          IFGE   R,6
+          SA5    X1          READ WORD POINTED AT
+          BX.R   X5
+          SA.R   A5          OVERWRITE IT, TO SET A_R
+          ELSE
+          SA.R   X1          SPOILS X_R, WHICH WAS NO GOOD ANYWAY
+          ENDIF
+          ENDD
+
+* RESET X7 ... X2, X0
+          ECHO   ,R=(7,6,5,4,3,2,0)
+          SETA1  XREGS+R
+          BX.R   X1
+          ENDD
+
+* RESET A1 (AND INVALIDATE OLDA1)
+          SETA1  AREGS+1
+          AX1    18
+          SA1    X1
+
+* RESET X1, B1, A0 AND P
+          MX1    60          A0:=
+          SA0    X1-0             -0
+ CODEAREA BSS    <>CODE      WILL BY NOW CONTAIN ASSEMBLED CODE
+
+ TEMPLATE HERE
+
+          BASE   *
+          QUAL * CONTINUE
+          QUAL * RECOVER
+          END

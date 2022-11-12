@@ -1,0 +1,77 @@
+
+          IDENT  PUT3ING     ALEPH EXTERNAL RULE
+          SST
+          ENTRY  PUT3ING
+ PUT3ING  JP     *+1S17      PUT STRING + ''FILE + TEXT[] + >P:
+* WRITES THE STRING (TEXT,P) ONTO THE FILE 'FILE' BY USING 'PUT CHAR'.
+          MX0    0
+          MUSTBE X2,X3,(PUT STRING, BAD STRING POINTER)
+          SA4    X2          OFFSET
+          BX6    X4          COPY IT
+          IX4    X4+X3       ADDRESS LAST WORD
+          SA4    X4          LAST WORD
+          MX7    -11
+          BX7    -X7*X4      LENGTH IN CHARACTERS, SAVE IT
+          AX4    X7,B3              IN WORDS - 1
+          IX3    X3-X4       PNT TO FIRST WORD
+          MUSTBE X2,X3,(PUT STRING, BAD STRING)
+* SAVE PERTINENT REGISTERS IN 'ALF.SC1'
+          SA5    =XALF.SC1+3 A5 IS BASE ADDRESS FOR ALF.SC1 ACCESS
+          BX6    X1          ADDRESS FILE
+          SA6    A5-B3
+          BX6    X2          ADDRESS OF 'TEXT'
+          SA6    A5+B2
+          BX6    X3          POINTER TO NEXT WORD
+          SA6    A5-B2
+          IX5    X0-X7       LENGTH, NEGATIVE
+          MX6    0           INDICATES THAT THE LAST WORD IN X4, WHICH
+                             WAS NEVER READ, IS EXHAUSTED.
+*
+* ALL LOOP ADMINISTRATION IS KEPT IN X-REGISTERS, AS FOLLOWS:
+*
+* X0             0
+* X1/ALF.SC1     ADDRESS FILE (READ ONLY)
+* X2             CHAR, FOR 'PUT CHAR'
+* X3/ALF.SC1+1   POINTER TO NEXT WORD, (READ/WRITE WHEN NECESSARY)
+* X4/ALF.SC1+2   WORD
+* X5/ALF.SC1+3   CHARACTER COUNT  [-N : 0 ] COUNTING UP
+* X6/ALF.SC1+4   SHIFT COUNT      [-8 : 0 ] COUNTING UP
+* X7             MASK, CONSTRUCTED WHEN NEEDED
+*    ALF.SC1+5   ADDRESS OF 'TEXT'
+*
+*
+* A5             CONTAINS THE ADDRESS OF ALF.SC1 + 3
+*
+          ZR     X5,PUT3ING  PERHAPS EMPTY STRING
+ PTLOOP   NZ     X6,CTOK     IF WORD IS EXHAUSTED, THEN
+          SA2    A5+B2       ADDRESS OF 'TEXT'
+          SA2    X2          OFFSET
+          SA3    A5-B2       POINTER TO NEXT WORD
+          IX2    X2+X3       ADDRESS OF NEXT WORD
+          SA4    X2          NEXT WORD
+          MX7    -1          -1
+          IX7    X3-X7       NEW POINTER TO NEXT WORD
+          SA7    A3          STORE IT
+          SX6    -8
+                             NOW X4 CONTAINS (PART OF) A WORD
+ CTOK     LX4    7           POSITION NEXT CHARACTER
+          MX7    -7          MAKE A MASK FOR IT
+          SX6    X6+B1       COUNT IT
+          BX2    -X7*X4      THE CHARACTER
+* SAVE ALL INFORMATION
+          SA6    A5+B1
+          SX7    X5+B1       AND COUNT
+          SA7    A5          ALF.SC1+3
+          BX6    X4
+          SA6    A5-B1       ALF.SC1+2
+* CALL 'PUT CHAR'
+          RJ     =XPUT1HAR
+* RESTORE THE INFORMATION
+          SA5    =XALF.SC1+3 FETCH X5 AND SET A5
+          SA1    A5-B3       ALF.SC1
+          SA4    A5-B1       ALF.SC1+2
+          SA2    A5+B1       ALF.SC1+4
+          SX6    X2
+          NZ     X5,PTLOOP   MORE CHARACTERS ?
+          EQ     PUT3ING     RETURN
+          END

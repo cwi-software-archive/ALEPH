@@ -1,0 +1,60 @@
+
+          IDENT  GETINT
+          SST
+          ENTRY  GETINT
+ SIGN
+ RESULT
+ FETADDR
+
+ ENDINT   BSS    0
+          SA1    FETADDR
+          RJ     =XBAC.HAR
+ ENDREC   MX0    0           CLEAR TOGGLE
+          SA1    RESULT      PICK UP ABS(RESULT)
+          SA2    SIGN
+          BX1    X1-X2       GIVE SIGN
+          IX1    X1+X0       AVOID -0
+*         EQ     GETINT
+
+ GETINT   JP     *+1S17      + ""FILE + INT>
+          BX6    X1          * SAVE
+          SA6    FETADDR     * FET ADDR
+          MX6    0
+          SA6    A6-B2       INIT SIGN TO PLUS
+ SKIP     BSS    0
+          SA1    FETADDR
+          GETCHAR GETINT
+          IFCINT X1,SKIP     SKIP CONTROL INT
+          SX3    X1-1R
+          ZR     X3,SKIP     SKIP SPACE
+          SX3    X1-1R-
+          NZ     X3,NOMIN
+          MX6    60          MINUS ->
+          SA6    SIGN        SIGN
+          EQ     RECHAR
+
+ NOMIN    SX3    X1-1R+      PLUS
+          NZ     X3,NOSIGN
+ RECHAR   BSS    0
+          SA1    FETADDR
+          GETCHAR NODIG
+ NOSIGN   NONDIG X1,NODIG,X6
+          SA6    RESULT      RESULT BEING BUILT
+ REP      BSS    0
+          SA1    FETADDR
+          GETCHAR ENDREC
+          NONDIG X1,ENDINT,X6
+          SA2    RESULT      *
+          IX3    X2+X2       * (10*RESULT+
+          LX2    3           *  NEW DIGIT) ->
+          IX3    X2+X3       * RESULT
+          IX6    X3+X6       *
+          SA6    A2          *
+          OVFL   X6,X6
+          EQ     REP
+
+ NODIG    BSS    0
+          SA5    FETADDR
+          ERREXT (GETINT, NO INTEGER ON INPUTFILE),(F5,C1)
+
+          END

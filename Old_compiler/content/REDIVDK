@@ -1,0 +1,237 @@
+$
+$ PROGRAM: ALEPH REALLOTMENT SCHEME, SIMPLE EDITION.
+$ AUTHOR:  DICK GRUNE.
+$ VERSION: 820410
+$
+'CONSTANT' MIN SPACE = 1250, REQ SPACE = 2500, MAX SPACE = 8000.
+'ACTION' REDIVIDE:
+    ENSURE ENOUGH MEMORY, VIRTUAL MOVE, ACTUAL MOVE, MEM POST PROC.
+'ACTION' ENSURE ENOUGH MEMORY - SPACE - REQ SIZE:
+    OBTAIN PROBLEM + PRE ADM + AREA PRE + AREA SIZE,
+        COLLECT DATA + TOT LNG + TOT WGT,
+        MINUS + AREA SIZE + TOT LNG + SPACE,
+        PLUS + TOT LNG + REQ SPACE + REQ SIZE,
+        (   MORE + SPACE + MAX SPACE,
+                (MEM REDUCE + REQ SIZE, :ENSURE ENOUGH MEMORY; +);
+            MREQ + SPACE + MIN SPACE;
+            MEM EXTEND + REQ SIZE, : ENSURE ENOUGH MEMORY;
+            MREQ + SPACE + 0;
+            MEM GIVE UP + TOT LNG, :ENSURE ENOUGH MEMORY
+        ).
+'FUNCTION' COLLECT DATA + TL> + TW> - ADM:
+    0 -> TL -> TW, PRE ADM -> ADM,
+        (NXT - P:
+           IS NEXT FLOAT ADM + ADM,
+               GET LENGTH + ADM + P, PLUS + TL + P + TL,
+               GET WGT + ADM + P, PLUS + TW + P + TW,
+               : NXT;
+           +
+        ).
+'FUNCTION' GET WGT + >ADM + WGT>:
+    DELETED STACK + ADM, 0 -> WGT; 1 -> WGT.
+'VARIABLE' PRE ADM = 0, AREA PRE = 0, AREA SIZE = 0.
+'VARIABLE' TOT LNG = 0, TOT WGT = 0.
+'PRAGMAT' NEW PAGE.
+'ACTION' VIRTUAL MOVE - ADM - AIM - WGT - SPACE:
+    MINUS + AREA SIZE + TOT LNG + SPACE,
+        (MREQ + SPACE + 0; SYS ERR + 0),
+        AREA PRE -> AIM, PRE ADM -> ADM, TOT WGT -> WGT,
+        (NXT - L:
+            $ EITHER THERE ARE MORE LISTS, $
+            IS NEXT FLOAT ADM + ADM,
+                GET POS + ADM + L, SET OLD POS + ADM + L,
+                GET LENGTH + ADM + L,
+                ($ MIN(LENGTH, ALLOWED LENGTH) -> OLD LENGTH $ - M:
+                    GET ALLOWED LENGTH + ADM + M,
+                        (LSEQ + M + L; L -> M),
+                        SET OLD LENGTH + ADM + M
+                ),
+                VIRTUAL MOVE LIST + ADM + AIM,
+                ($ NEW ALLOWED LENGTH -> L $ - M:
+                    GET WGT + ADM + M,
+                        FRACTION + M + WGT + SPACE + M,
+                        PLUS + L + M + L
+                ),
+                PLUS + L + AIM + AIM,
+                SET ALLOWED LENGTH + ADM + L, : NXT;
+            $ OR ALL HAS FINISHED CORRECTLY, $
+            ( - R:
+                TOT WGT = 0;
+                PLUS + AREA PRE + AREA SIZE + R,
+                    WGT = 0, SPACE = 0, AIM = R
+            );
+            $ OR SOMETHING IS WRONG $
+            SYS ERR + 10
+        ).
+'FUNCTION' FRACTION + >N + >TOT> + >DISTR> + RES> - V:
+    TIMES + N + DISTR + V,
+        (V = 0, 0 -> RES; DIVREM + V + TOT + RES + ?),
+        MINUS + TOT + N + TOT, MINUS + DISTR + RES + DISTR.
+'PRAGMAT' NEW PAGE.
+'ACTION' ACTUAL MOVE - ADM:
+    PRE ADM -> ADM,
+        (LEFT MOVES:
+            IS NEXT FLOAT ADM + ADM, MOVE LEFT + ADM, :LEFT MOVES;
+            +
+        ),
+        (RIGHT MOVES:
+            MOVE RIGHT + ADM,
+                (IS PREVIOUS FLOAT ADM + ADM, :RIGHT MOVES; +)
+        ),
+        CHECK POS.
+'ACTION' MOVE LEFT + >ADM - OLD POS - NEW POS:
+    GET OLD POS + ADM + OLD POS, GET POS + ADM + NEW POS,
+        (   LESS + NEW POS + OLD POS,
+                MOVE LIST + ADM + OLD POS + NEW POS;
+            +
+        ).
+'ACTION' MOVE RIGHT + >ADM - OLD POS - NEW POS:
+    GET OLD POS + ADM + OLD POS, GET POS + ADM + NEW POS,
+        (   MORE + NEW POS + OLD POS,
+                MOVE LIST + ADM + OLD POS + NEW POS;
+            +
+        ).
+'ACTION' MOVE LIST + >ADM + >OLD POS + >NEW POS - LENGTH - P:
+    GET OLD LENGTH + ADM + LENGTH,
+        MOVE + LENGTH + OLD POS + NEW POS,
+        GET POS + ADM + P, SET OLD POS + ADM + P.
+'FUNCTION' CHECK POS - ADM - POS:
+    PRE ADM -> ADM, AREA PRE -> POS,
+        (TEST - P - Q:
+            IS NEXT FLOAT ADM + ADM,
+                GET POS + ADM + P, (POS = P; SYS ERR + 40),
+                GET OLD POS + ADM + P, (POS = P; SYS ERR + 50),
+                GET SOFT PRE + ADM + P, GET CALIBRE + ADM + Q,
+                PLUS + P + Q + P, GET SOFT LEFT + ADM + Q,
+                    (P = Q; SYS ERR + 60), 
+                GET LENGTH + ADM + P, (MREQ + P + 0; SYS ERR + 70),
+                GET ALLOWED LENGTH + ADM + Q,
+                (MREQ + Q + 0; SYS ERR + 80),
+                (MREQ + Q + P; SYS ERR + 90),
+                PLUS + POS + Q + POS, :TEST;
+            +
+        ),
+        (- R:
+            (PLUS + AREA PRE + AREA SIZE + R,  POS = R);
+            SYS ERR + 100
+        ).
+'PRAGMAT' NEW PAGE.
+$ MEMORY MANAGEMENT ROUTINES, MACHINE DEPENDENT.
+'ACTION' OBTAIN PROBLEM + PA> + P> + S>:
+    GET PRE ADM + PA, HARD PRE -> P,
+        (MORE + HARD RIGHT + 0; HARD PRE -> HARD RIGHT),
+        MINUS + HARD RIGHT + HARD PRE + S.
+'PREDICATE' MEM REDUCE + >SIZE - RIGHT:
+    PLUS + HARD PRE + SIZE + RIGHT, ROUND UPW + RIGHT,
+        LESS + RIGHT + HARD RIGHT, RIGHT -> HARD RIGHT.
+'PREDICATE' MEM EXTEND + >SIZE - RIGHT:
+    NOT EQ + HARD RIGHT + MAX RIGHT,
+        PLUS + HARD PRE + SIZE + RIGHT, ROUND UPW + RIGHT,
+        (   TRY GET MEM + RIGHT, RIGHT -> HARD RIGHT;
+            GET ALL MEMORY + RIGHT, MAX RIGHT -> HARD RIGHT
+        ).
+'ACTION' GET ALL MEMORY + >TOO MUCH - RIGHT:
+    MORE + MAX RIGHT + 0,
+        (TRY GET MEM + MAX RIGHT; SYS ERR + 110);
+    PLUS + HARD RIGHT + TOO MUCH + RIGHT,
+        DIVREM + RIGHT + 2 + RIGHT + ?, ROUND UPW + RIGHT,
+        (   RIGHT = TOO MUCH, HARD RIGHT -> MAX RIGHT;
+            TRY GET MEM + RIGHT, RIGHT -> HARD RIGHT, :GET ALL MEMORY;
+            RIGHT -> TOO MUCH, :GET ALL MEMORY
+        ).
+'ACTION' MEM POST PROC - RIGHT:
+    GET ACTUAL RIGHT + RIGHT,
+        (   RIGHT = HARD RIGHT;
+            TRY GET MEM + HARD RIGHT;
+            SYS ERR + 120
+        ).
+'VARIABLE' HARD RIGHT = 0, MAX RIGHT = 0.
+'EXTERNAL' 'ACTION' MEM GIVE UP + >R =
+    "\  EQ =XGIVEUP".
+'EXTERNAL' 'CONSTANT' HARD PRE =
+    "\  SA@1 =XSTACK<<".
+'EXTERNAL' 'FUNCTION' GET PRE ADM + P> =
+    "\  SA1 CA.ADDR\  SX1 X1+CA.LIST-[]LINK".
+'EXTERNAL' 'PREDICATE' TRY GET MEM + >RIGHT =
+    "\  RJ =XTRYEFL\  ZR,X1 S@1".
+'EXTERNAL' 'FUNCTION' ROUND UPW + >RIGHT> =
+    "\  MX2 -6\  BX1 -X2+X1".
+'EXTERNAL' 'FUNCTION' GET ACTUAL RIGHT + T> =
+    "\  SA1 RA.LWP\  SX1 X1-1".
+
+
+
+$ PRIVATE RUN-TIME STACK, BETTER HERE THAN SOMEWHERE ELSE
+'EXTERNAL' 'CONSTANT' RUNTIME STACK= $ KLUDGE TO INSERT ASSEMBLER CODE
+    "\  SX@1 50\  EQ RDV;ST.\RDV;ST BSS 50\RDV;ST. BSS 0\  ENTRY RDV;ST,
+RDV;ST.\STOVL = BADSTACK".
+'PRAGMAT' NEW PAGE.
+$ DATA ACCESS ROUTINES, NON-PRIMITIVE.
+'FUNCTION' GET ALLOWED LENGTH + >ADM + LENGTH> - PRE - MAX:
+    GET SOFT PRE + ADM + PRE, GET SOFT MAX + ADM + MAX,
+        MINUS + MAX + PRE + LENGTH.
+'FUNCTION' GET POS + >ADM + POS> - PRE - OFF:
+    GET SOFT PRE + ADM + PRE, GET OFFSET + ADM + OFF,
+        PLUS + PRE + OFF + POS.
+'FUNCTION' GET LENGTH + >ADM + LNG> - RGT - PRE:
+    GET SOFT RIGHT + ADM + RGT, GET SOFT PRE + ADM + PRE,
+        MINUS + RGT + PRE + LNG.
+'ACTION' SET ALLOWED LENGTH + >ADM + >LNG - PRE:
+    GET SOFT PRE + ADM + PRE, PLUS + PRE + LNG + PRE,
+        SET SOFT MAX + ADM + PRE.
+'ACTION' VIRTUAL MOVE LIST + >ADM + >NEW POS
+        - OLD POS - SHIFT - CALIBRE - OFF:
+    GET OLD POS + ADM + OLD POS, MINUS + NEW POS + OLD POS + SHIFT,
+        GET CALIBRE + ADM + CALIBRE, ADM -> OFF,
+        (UPDATE OFFSETS:
+            CALIBRE = 0;
+            UPDATE OFFSET + OFF + SHIFT,
+                NEXT OFFSET + OFF, DECR + CALIBRE, : UPDATE OFFSETS
+        ).
+'QUESTION' IS NEXT FLOAT ADM + >ADM>:
+    IS NEXT LIST + ADM,
+        (FLOATING STACK + ADM; :IS NEXT FLOAT ADM).
+'QUESTION' IS PREVIOUS FLOAT ADM + >ADM>:
+    IS PREVIOUS LIST + ADM,
+        (FLOATING STACK + ADM; :IS PREVIOUS FLOAT ADM).
+'PRAGMAT' NEW PAGE.
+$ DATA ACCESS ROUTINES, PRIMITIVE.
+'EXTERNAL' 'ACTION' MOVE + >N + >PRE + >AIM =
+    "\  SX2 X2+B1\  SX3 X3+B1\  RJ =XMOVE".
+'EXTERNAL' 'FUNCTION' SYS ERR + >T =
+    "\  EQ BADEXTND".
+'EXTERNAL' 'FUNCTION' GET OFFSET + >ADM + OFF> =
+    "\  SA1 X1".
+'EXTERNAL' 'ACTION' UPDATE OFFSET + >ADM + >SHIFT =
+    "\  SA5 X1\  IX6 X5+X2\  SA6 A5".
+'EXTERNAL' 'FUNCTION' NEXT OFFSET + >OFF> =
+    "\  SX1 X1+B1".
+'EXTERNAL' 'FUNCTION' GET SOFT PRE + >ADM + PRE> =
+    "\  SA1 X1+<<PRE".
+'EXTERNAL' 'FUNCTION' GET SOFT LEFT + >ADM + LEFT> =
+    "\  SA1 X1+<<".
+'EXTERNAL' 'FUNCTION' GET SOFT RIGHT + >ADM + RGT> =
+    "\  SA1 X1+>>".
+'EXTERNAL' 'FUNCTION' GET SOFT MAX + >ADM + MAX> =
+    "\  SA1 X1+>>MAX".
+'EXTERNAL' 'ACTION' SET SOFT MAX + >ADM + >MAX =
+    "\  BX6 X2\  SA6 X1+>>MAX".
+'EXTERNAL' 'FUNCTION' GET CALIBRE + >ADM + CAL> =
+    "\  SA1 X1+<>".
+'EXTERNAL' 'ACTION' SET OLD POS + >ADM + >POS =
+    "\  BX6 X2\  SA6 X1+[]AIM".
+'EXTERNAL' 'FUNCTION' GET OLD POS + >ADM + POS> =
+    "\  SA1 X1+[]AIM".
+'EXTERNAL' 'ACTION' SET OLD LENGTH + >ADM + >LNG =
+    "\  BX6 X2\  SA6 X1+[]LSR".
+'EXTERNAL' 'FUNCTION' GET OLD LENGTH + >ADM + LNG> =
+    "\  SA1 X1+[]LSR".
+'EXTERNAL' 'QUESTION' IS NEXT LIST + >ADM> =
+    "\  SA1 X1+[]LINK\  SX1 X1\  ZR X1,S@1".
+'EXTERNAL' 'QUESTION' IS PREVIOUS LIST + >ADM> =
+    "\  SA1 X1+[]LINK\  AX1 30\  ZR X1,S@1".
+'EXTERNAL' 'QUESTION' FLOATING STACK + >ADM =
+    "\  SA5 X1+[]HIST\  SX5 X5+B1\  ZR X5,S@1".
+'EXTERNAL' 'QUESTION' DELETED STACK + >ADM =
+    "\  SA5 X1+[]HIST\  SX5 X5+B2\  NZ X5,S@1".
+'END'

@@ -1,0 +1,29 @@
+
+          IDENT  CONV;
+          SST
+          ENTRY  CONV;
+* ROUTINE TO BE USED BY THE CONVERTION ROUTINES TO ASCII AND FROM ASCII
+ CONV;    JP     *+1S17      X1 CONTAINS CHARACTER, NORMALLY 0 : 63
+                             X2 CONTAINS REPLACEMENT CHARACTER IF X1 BAD
+                             X3 CONTAINS ADDRESS OF TABLE
+*         SX1    X1          MUST BE POSITIVE
+          SX4    X1-64       MUST BE NEGATIVE
+          BX4    -X1*X4      MUST BE NEGATIVE
+          AX4    60          MUST BE -0
+          BX1    X4*X1       IF CONVERTIBLE
+          BX2    -X4*X2      IF NON-CONVERTIBLE
+          BX1    X1+X2
+* NOW X1 IS BETWEEN 0 AND 63
+          MX2    -3
+          BX2    -X2*X1      WORD NUMBER
+          IX3    X3+X2       @ OF WORD WITH CHAR
+          SA3    X3          GET WORD
+          BX1    X1-X2       CHAR NUMBER * 8
+          AX2    X1,B2        * 2
+          IX1    X1-X2        * 6
+          SB4    X1
+          AX1    X3,B4
+          MX2    -6          0 : 63
+          BX1    -X2*X1
+          EQ CONV;
+          END

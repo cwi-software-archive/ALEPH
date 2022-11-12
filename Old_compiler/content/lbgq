@@ -1,0 +1,1684 @@
+ 
+          IDENT  GET1HAR
+          SST
+*GET1HAR  JP     *+1S17      + ""FILE + CHAR> - CNT - WORD:
+*
+* THIS ROUTINE WILL SUPPLY THE NEXT CHARACTER OR CONTROL INTEGER FROM
+* 'FILE'. IT WILL TRANSLATE OR SUPPLY CONTROL INTEGERS, DEPENDING ON 
+* BITS IN 'FILETYPE' AND 'FILECH#'. THE ITEM CAN THEN BE PUSHED BACK 
+* BY ADDING 6 TO 'FILECH#'.
+*
+* 'PRED' GET CHAR + ""FILE + CHAR>:
+* IS DUMMY + FILE; 
+* IS INPUT CHARFILE + FILE,
+*  (= CNT =
+*   [ 54 : 0 ], CHAR FROM WORD;
+*   [ BL STAT ], 54 -> CNT, CHAR FROM WORD;
+*   [ EOR STAT], - ;
+*   [ CI STAT], 48 -> CNT, CHAR FROM WORD;
+*   [ NCI STAT], 54 -> CNT, CHAR FROM WORD;
+*   [ BL STAT + 6], 0 -> CHAR, BL STAT -> CNT;
+*   [ EOR STAT + 6], EOR STAT -> CNT, -;
+*   [ CI STAT + 6], YIELD CI;
+*   [ NCI STAT + 6], CONSTRUCT CI;
+*   [ NEW STAT], START NEW LINE;
+*   [ -6], (GET WORD + WORD, 54 -> CNT, CHAR FROM WORD; YIELD EOR);
+*   [ : ], BAD FET 
+*  );
+*  ERROR.
+*
+* 'PRED' CHAR FROM WORD:
+*   PICK CHAR + CHAR, MINUS + CNT + 6 + CNT,
+*   ((CHAR = 0, LAST BITS ZERO), ZERO WORD TAIL; +).
+*
+* 'PRED' ZERO WORD TAIL:
+*   $ CERTAIN EOL:$ MREQ + CNT + 0, START NEW LINE;
+*   GET WORD + WORD,
+*      (WORD = 0, START NEW LINE;
+*       $ WRONG GUESS $ BL STAT -> CNT);
+*   YIELD EOR.
+*
+* 'PRED' START NEW LINE:
+*   GET WORD + WORD, (CI FILE, YIELD CI; CONSTRUCT CI);
+*   YIELD EOR.
+*
+* 'PRED' YIELD EOR: EOR STAT -> CNT, -.
+*
+* 'ACTION' YIELD CI: CONVERT FIRST CHAR + CHAR, CI STAT -> CNT.
+*
+* 'ACTION' CONSTRUCT CI: NEWLINE -> CHAR, NCI STAT -> CNT. 
+*
+* REGISTER ASSIGNMENT:
+ FILE     =      1           X.FILE
+ CHAR     =      2           X.CHAR
+ CNT      =      3           X.CNT
+ WORD     =      4           X.WORD
+*
+ YIELDEOR BSS    0           RECORD LEVEL IN B4
+          SX5    EORSTAT
+          PX.CNT X5,B4
+          MX0    1 
+*         EQ     OUT
+ 
+ OUT      BSS    0           X.CNT CONTAINS NEW FILECH#,
+                             X.CHAR CONTAINS CHAR.
+          BX6    X.CNT
+          SA6    X.FILE+FILECH#
+          BX1    X.CHAR
+          SPACE  10,10
+************************ PATCH FOR SYSTEM BUG:
+ +        NZ,X1  *+1         TURN CHAR 00B
+          SX1    1R          INTO SPACE
+*************************** END OF PATCH
+          SPACE  10,10
+*         EQ     GET1HAR
+ 
+ GET1HAR  JP     *+1S17      + ""FILE + CHAR> - CNT - WORD:
+          ENTRY  GET1HAR
+          SA5    X.FILE      FILE NAME 
+          MX0    1 
+          ZR,X5  GET1HAR     DUMMY, FAIL
+          MX0    0 
+* IS INPUT CHARFILE:
+          SA5    X.FILE+FILETYPE
+          BX4    X5
+          LX5    SIGNBIT-READBIT MUST BE NEGATIVE
+          LX4    SIGNBIT-CHDATBIT MUST BE POSITIVE
+          BX5    -X4*X5      MUST BE NEGATIVE
+          PL,X5  BADFILE
+* = CNT =
+          SA.CNT X.FILE+FILECH#
+          SX5    X.CNT-9*6-1 
+          PL,X5  BADFET
+          PL,X.CNT FROMWORD  [ 54 : 0] 
+          SB5    X.CNT-LASTSTAT NOW B5 MUST BE >= 0,
+          NG,B5  BADFET
+          JP     B5+HERE     AND IS ENTRY IN A JUMP TABLE. 
+* BEGINNING OF JUMP TABLE
+ HERE     BSS    0 
+          DUP    -LASTSTAT,1 PREFILL THE TABLE
+ +        EQ     BADFET      WITH ERROR JUMPS.
+ BASE     BSS    0           @ CORRESPONDING TO X.CNT = 0. 
+ 
+          ORG    BLSTAT+BASE 
+ +        SX.CNT 9*6
+          EQ     FROMWORD
+          ORG    HERE
+ 
+          ORG    EORSTAT+BASE
+ +        MX0    1 
+          EQ     OUT
+          ORG    HERE
+ 
+          ORG    CISTAT+BASE 
+ +        SX.CNT 8*6
+          EQ     FROMWORD
+          ORG    HERE
+ 
+          ORG    NCISTAT+BASE
+ +        SX.CNT 9*6
+          EQ     FROMWORD
+          ORG    HERE
+ 
+          ORG    NEWSTAT+BASE
+ +        EQ     STARTNL
+          ORG    HERE
+ 
+          ORG    BLSTAT+6+BASE PUSHED-BACK 00B IN POS. 5-0 
+ +        MX.CHAR 0          THE 00B READ
+          EQ     BLREAD
+          ORG    HERE
+ 
+          ORG    EORSTAT+6+BASE PUSHED-BACK END-OF-RECORD
+ +        UX5,B4 X.CNT       GET OLD RECORD LEVEL
+          EQ     YIELDEOR
+          ORG    HERE
+ 
+          ORG    CISTAT+6+BASE PUSHED-BACK CONTROL INT.
+ +        SA.WORD X.FILE+FILEWORD
+          EQ     YIELDCI
+          ORG    HERE
+ 
+          ORG    NCISTAT+6+BASE PUSHED-BACK INSERTED CONTROL INT.
+ +        EQ     CONSTRCI
+          ORG    HERE
+ 
+          ORG    -6+BASE     LAST CHAR IN WORD USED UP.
+ +        EQ     NEWWORD
+          ORG    HERE
+ 
+          ORG    BASE
+* END OF JUMP TABLE
+ 
+ FROMWORD BSS    0           X.CNT CONTAINS PROPER VALUE
+          SA.WORD X.FILE+FILEWORD
+*PICKCHAR BSS    0 
+          SB5    X.CNT       FOR SHIFT 
+          MX5    -6
+          AX.CHAR X.WORD,B5  SHIFT
+          BX.CHAR -X5*X.CHAR MASK
+*ENDPICKCHAR
+          SX.CNT X.CNT-6     MINUS + CNT + 6 + CNT,
+          NZ,X.CHAR OUT      (CHAR = 0,
+          SB5    X.CNT-59+6
+          MX5    1 
+          AX5    -B5
+          BX5    -X5*X.WORD  LAST BITS 
+          NZ,X5  OUT                   ZERO),
+* ZERO WORD TAIL:
+          PL,X.CNT STARTNL   MREQ + CNT + 0, START NEW LINE;
+          RJ     GETW        (GET WORD + WORD; YIELD EOR), 
+          NZ,X.WORD BLREAD
+*         EQ     STARTNL     WORD = 0, START NEW LINE
+ 
+ STARTNL  BSS    0           ONLY X.FILE REQUIRED
+          RJ     GETW        (GET WORD + WORD; YIELD EOR), 
+          SA5    X.FILE+FILETYPE
+          LX5    SIGNBIT-CIBIT SHIFT BIT TO SIGN-BIT
+          PL,X5  CONSTRCI
+ 
+ YIELDCI  BSS    0           X.WORD CONTAINS WORD
+          MX5    6 
+          BX.CHAR X5*X.WORD  FIRST CHAR
+          LX.CHAR 6
+          BX.CHAR -X.CHAR    CONVERT, CANNOT BE ZERO
+          SX.CNT CISTAT
+          EQ     OUT
+ 
+ BLREAD   SX.CNT BLSTAT
+          EQ     OUT
+ 
+ CONSTRCI SX.CHAR NEWLINE
+          SX.CNT NCISTAT
+          EQ     OUT
+ 
+ NEWWORD  BSS    0           ONLY X.FILE REQUIRED
+          RJ     GETW        (GET WORD + WORD; YIELD EOR), 
+          SX.CNT 9*6
+          EQ     FROMWORD
+ 
+*
+ GETW     JP     *+1S17      GETS NEXT WORD
+          DOWNCPU
+          BX=    1,FILE
+          RJ     =XGETWORD   + ""FILE + WORD> + TYPE> (LEVEL + 1)
+          BX=    FILE,1
+          BX6    X2
+          SA6    X.FILE+FILEWORD
+          BX.WORD X6
+          UPCPU
+          SB4    X3-1        LEVEL NUMBER
+          PL,B4  YIELDEOR
+          EQ     GETW
+ 
+ BADFILE  ERREXT (GET CHAR, BAD FILE),F.FILE
+          END
+ 
+          IDENT  GET1ATA
+          SST
+          ENTRY  GET1ATA
+ 
+ GET1ATA  JP     *+1S17      GET DATA + ''FILE + ITEM> + TYPE>
+*
+*'PRED' GET DATA + ""FILE + ITEM> + TYPE> - WORD - PNT
+*   - LISTS PNT:
+ FILE     =      1           X.FILE
+ WORD     =      2           X.WORD, FROM GET WORD
+ LISTSPNT =      3           X.LISTSPNT
+ PNT      =      4           X.PNT
+* IS DUMMY + FILE, -;
+* (IS NOT DATA FILE + FILE; IS NOT READ FILE + FILE),
+*         ERROR + BAD FILE;
+* OBTAIN WORD + WORD,
+*   (IS SIMPLE FILE + FILE, WORD -> ITEM, NUMERICAL -> TYPE;
+*    IS POINTER + WORD,
+*     (IS ELEM + WORD + 47 $ 40007 ... 7B $,
+*        GET WORD + FILE + ITEM, NUMERICAL -> TYPE;
+*      DECOMPOSE + WORD + PNT + WORD,
+*        GET LISTS PNT + LISTS PNT,
+*        PLUS + LISTS PNT + PNT + PNT, 
+*        TIMES + WORD + '<>' * LIST ADM[ADDR * FILE ADM[PNT]] + WORD,
+*        PLUS + WORD + '<<PRE' * FILE ADM[PNT] + ITEM,
+*        POINTER -> TYPE
+*     ); 
+*    WORD -> ITEM, NUMERICAL -> TYPE
+*   ).
+*
+*'PRED' OBTAIN WORD + WORD>: 
+*  = STATUS =
+*  [1:], FILE WORD * FILE ADM[FILE] -> WORD, 0-> STATUS;
+*  [0], (GET WORD+FILE + WORD; SET EOR STAT + FILE, -);
+*  [:-1],-$ END OF RECORD $. 
+*
+          SA2    X.FILE      FILE NAME 
+          MX0    1           MAY FAIL
+          ZR,X2  RETURN      IS DUMMY + FILE, -; 
+          MX0    0 
+          SA4    X.FILE+FILETYPE
+          BX5    X4
+          LX4    SIGNBIT-CHDATBIT POS IF NOT DATA FILE
+          LX5    SIGNBIT-READBIT POS IF NOT READ FILE
+          BX5    X4*X5       POS IF EITHER,
+          PL,X5  BADFILE     ERROR + BAD FILE;
+*OBTWORD  BSS    0           OBTAIN WORD:
+          SA5    X.FILE+FILECH# STATUS -> X5,
+          MX0    1 
+          NG,X5  RETURN      [:-1],-$ END OF RECORD $;
+          MX0    0 
+          ZR,X5  OBTNEW      [1:],
+          SA.WORD X.FILE+FILEWORD FILE WORD * FILE ADM[FILE] -> WORD,
+          MX6    0           0
+          SA6    X.FILE+FILECH# -> STATUS;
+          EQ     EOOBTW
+ 
+ OBTNEW   BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE
+          BX=    WORD,2      + WORD
+          ZR,X3  EOOBTW      ;
+          SB5    X3-1        SET
+          SX6    EORSTAT     EOR
+          PX6    B5          STAT
+          SA6    X.FILE+FILECH# + FILE,
+          MX0    1           -
+          EQ     RETURN      .
+ 
+ EOOBTW   BSS    0           WORD OBTAINED IN X.WORD
+          SA5    X.FILE+FILETYPE IS SIMPLE FILE
+          LX5    SIGNBIT-SIMPBIT                + FILE,
+          NG,X5  SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE;
+          ISNOTPNT X.WORD,SIMPLE IS POINTER + WORD,
+          BX5    X.WORD
+          LX5    SIGNBIT-47  IS ELEM + 
+          PL,X5  NOMARKER              WORD + 47,
+          BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE + WORD,
+          BX=    WORD,2
+          EQ     SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE.
+ 
+ NOMARKER MX.PNT -24         DECOMPOSE:
+          BX.PNT X.PNT*X.WORD ALL EXCEPT OFFSET
+          BX.WORD X.WORD-X.PNT OFFSET
+          AX.PNT 24          BITS
+          SX.PNT X.PNT       41-24,
+ 
+          LISTSPNT LISTSPNT  GET LISTS PNT + LISTSPNT,
+          IX.PNT X.LISTSPNT+X.PNT PLUS + LISTS PNT + PNT + PNT,
+          SA5    X.PNT       ADDR * FILE ADM[PNT] -> X5
+          SA5    X5+<>       '<>' * LIST ADM[X5] -> X5
+          IX.WORD X.WORD*X5  TIMES + WORD + X5 + WORD,
+          SA5    X.PNT+B1    '<<PRE' * FILE ADM[PNT] -> X5,
+          IX1    X.WORD+X5   PLUS + WORD + X5 + ITEM,
+          SX2    B.POINTER   POINTER -> TYPE
+          EQ     RETURN      ;
+ 
+ SIMPLE   BSS    0 
+          BX1    X.WORD      WORD -> ITEM,
+          SX2    B.NUMERIC   NUMERICAL -> TYPE
+          EQ     RETURN      .
+ 
+ RETURN   EQU    GET1ATA
+ PROTGW   JP     *+1S17      PROTECTED GETWORD
+          DOWNCPU
+          RJ     =XGETWORD
+          UPCPU
+          EQ     PROTGW
+ 
+ BADFILE  ERREXT (GET DATA, BAD FILE),F.FILE
+ 
+          END
+ 
+          IDENT  GET.ATA     OLD AND INCORRECT VERSION OF GET1ATA
+          SST
+          ENTRY  GET.ATA
+ 
+ GET.ATA  JP     *+1S17      GET DATA + ''FILE + ITEM> + TYPE>
+ FILE     =      1           X.FILE
+ WORD     =      2           X.WORD, FROM GET WORD
+ LISTSPNT =      3           X.LISTSPNT
+ PNT      =      4           X.PNT
+          SA2    X.FILE      FILE NAME 
+          MX0    1           MAY FAIL
+          ZR,X2  RETURN      IS DUMMY + FILE, -; 
+          MX0    0 
+          SA4    X.FILE+FILETYPE
+          BX5    X4
+          LX4    SIGNBIT-CHDATBIT POS IF NOT DATA FILE
+          LX5    SIGNBIT-READBIT POS IF NOT READ FILE
+          BX5    X4*X5       POS IF EITHER,
+          PL,X5  BADFILE     ERROR + BAD FILE;
+*OBTWORD  BSS    0           OBTAIN WORD:
+          SA5    X.FILE+FILECH# STATUS -> X5,
+          MX0    1 
+          NG,X5  RETURN      [:-1],-$ END OF RECORD $;
+          MX0    0 
+          ZR,X5  OBTNEW      [1:],
+          SA.WORD X.FILE+FILEWORD FILE WORD * FILE ADM[FILE] -> WORD,
+          MX6    0           0
+          SA6    X.FILE+FILECH# -> STATUS;
+          EQ     EOOBTW
+ 
+ OBTNEW   BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE
+          BX=    WORD,2      + WORD
+          ZR,X3  EOOBTW      ;
+          SB5    X3-1        SET
+          SX6    EORSTAT     EOR
+          PX6    B5          STAT
+          SA6    X.FILE+FILECH# + FILE,
+          MX0    1           -
+          EQ     RETURN      .
+ 
+ EOOBTW   BSS    0           WORD OBTAINED IN X.WORD
+          SA5    X.FILE+FILETYPE IS SIMPLE FILE
+          LX5    SIGNBIT-SIMPBIT                + FILE,
+          NG,X5  SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE;
+          ISNOTPNT X.WORD,SIMPLE IS POINTER + WORD,
+          BX5    X.WORD
+          LX5    SIGNBIT-47  IS ELEM + 
+          PL,X5  NOMARKER              WORD + 47,
+          BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE + WORD,
+          BX=    WORD,2
+          EQ     SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE.
+ 
+ NOMARKER MX.PNT -24         DECOMPOSE:
+          BX.PNT X.PNT*X.WORD ALL EXCEPT OFFSET
+          BX.WORD X.WORD-X.PNT OFFSET
+          AX.PNT 24          BITS
+          SX.PNT X.PNT       41-24,
+          LISTSPNT LISTSPNT  GET LISTS PNT + LISTSPNT,
+          IX.PNT X.LISTSPNT+X.PNT PLUS + LISTS PNT + PNT + PNT,
+          SA5    X.PNT+B1    '<<PRE' * FILE ADM[PNT] -> X5,
+          IX1    X.WORD+X5   PLUS + WORD + X5 + ITEM,
+          SX2    B.POINTER   POINTER -> TYPE
+          EQ     RETURN      ;
+ 
+ SIMPLE   BSS    0 
+          BX1    X.WORD      WORD -> ITEM,
+          SX2    B.NUMERIC   NUMERICAL -> TYPE
+          EQ     RETURN      .
+ 
+ RETURN   EQU    GET.ATA
+ PROTGW   JP     *+1S17      PROTECTED GETWORD
+          DOWNCPU
+          RJ     =XGETWORD
+          UPCPU
+          EQ     PROTGW
+ 
+ BADFILE  ERREXT (GET DATA, BAD FILE),F.FILE
+ 
+          END
+ 
+          IDENT  GET8ORD
+          SST
+ 
+ FILE     =      1           X.FILE
+ 
+ GET8ORD  JP     *+1S17      + ""FILE + LEVEL>
+          ENTRY  GET8ORD
+          MX0    0 
+          SA5    X.FILE      FILENAME
+          NZ,X5  NODUMMY   = DUMMY,
+          SX1    EOILEVEL    YIELD
+          EQ     GET8ORD           EOI;
+ 
+ NODUMMY  BSS    0 
+          SA5    X.FILE+FILETYPE
+          BX6    X.FILE
+          LX5    SIGNBIT-CHDATBIT
+          SA6    =SSAVE
+          NG,X5  DATAFILE
+          RJ     =XGET1HAR   PROVOKE END-OF RECORD
+          SA.FILE SAVE
+          RJ     =XBAC.HAR
+          SA.FILE SAVE
+          SA5    X.FILE+FILECH#
+          UX5    B5          B5:= IF EOR THEN LEVEL ELSE -2000B FI
+          MX0    1 
+          NG,B5  GET8ORD
+* END OF RECORD
+          MX0    0 
+          SX1    B5          LEVEL
+          SX6    NEWSTAT
+          SA6    A5          FILECH#
+          EQ     GET8ORD
+ 
+ DATAFILE BSS    0 
+*GET END OF RECORD FOR DATAFILES
+          SA5    X.FILE+FILECH#  STATUS
+          ZR,X5  TRY
+          MX0    1 
+          PL,X5  GET8ORD     STATUS >0, FILEWORD FILLED.
+          MX0    0 
+          UX5    B5          UNPACK EOR STATUS
+          SX1    B5          LEVEL
+          MX6    0           0 ->
+          SA6    A5          STATUS
+          EQ     GET8ORD
+ 
+ TRY      RJ     =XGETWORD
+          NZ,X3  EOR
+          BX6    X2          SAVE WORD 
+          SA6    X1+FILEWORD IN FILEWORD,
+          SX7    B1          REREAD -> 
+          SA7    X1+FILECH#            STATUS,
+          MX0    1           -
+          EQ     GET8ORD     ;
+ 
+ EOR      SX1    X3-1        LEVEL
+          EQ     GET8ORD
+*
+          END
+ 
+          IDENT  GETINT
+          SST
+          ENTRY  GETINT
+ SIGN
+ RESULT
+ FETADDR 
+ 
+ ENDINT   BSS    0 
+          SA1    FETADDR
+          RJ     =XBAC.HAR
+ ENDREC   MX0    0           CLEAR TOGGLE
+          SA1    RESULT      PICK UP ABS(RESULT) 
+          SA2    SIGN
+          BX1    X1-X2       GIVE SIGN 
+          IX1    X1+X0       AVOID -0
+*         EQ     GETINT
+ 
+ GETINT   JP     *+1S17      + ""FILE + INT>
+          BX6    X1          * SAVE
+          SA6    FETADDR     * FET ADDR
+          MX6    0 
+          SA6    A6-B2       INIT SIGN TO PLUS
+ SKIP     BSS    0 
+          SA1    FETADDR
+          GETCHAR GETINT
+          IFCINT X1,SKIP     SKIP CONTROL INT
+          SX3    X1-1R
+          ZR     X3,SKIP     SKIP SPACE
+          SX3    X1-1R-
+          NZ     X3,NOMIN
+          MX6    60          MINUS ->
+          SA6    SIGN        SIGN
+          EQ     RECHAR
+ 
+ NOMIN    SX3    X1-1R+      PLUS
+          NZ     X3,NOSIGN
+ RECHAR   BSS    0 
+          SA1    FETADDR
+          GETCHAR NODIG
+ NOSIGN   NONDIG X1,NODIG,X6 
+          SA6    RESULT      RESULT BEING BUILT
+ REP      BSS    0 
+          SA1    FETADDR
+          GETCHAR ENDREC
+          NONDIG X1,ENDINT,X6
+          SA2    RESULT      *
+          IX3    X2+X2       * (10*RESULT+
+          LX2    3           *  NEW DIGIT) ->
+          IX3    X2+X3       * RESULT
+          IX6    X3+X6       *
+          SA6    A2          *
+          OVFL   X6,X6
+          EQ     REP
+ 
+ NODIG    BSS    0 
+          SA5    FETADDR
+          ERREXT (GETINT, NO INTEGER ON INPUTFILE),(F5,C1) 
+ 
+          END
+ 
+          IDENT  GET1INE
+          SST
+          ENTRY  GET1INE
+* VARIABLES
+ FILE
+ ST
+ CINT
+ SYMB
+ 
+ NOSYM    SA1    FILE
+          RJ     =XBAC.HAR   RESTORE LAST CHAR
+ END      MX0    0           SUCCESS
+          SA1    CINT
+*         EQ     GET1INE
+ 
+ GET1INE  JP     *+1S17      'PRED' GETLINE + ''FILE + []ST[] +CINT> 
+                             - SYMB:
+*
+*'PRED' GET LINE + ""FILE + []ST[] + CINT> - SYMB:
+*  GET CHAR + FILE + CINT,
+*    (IF NOT CINT + CINT, OUTSYM + CINT + ST, REST LINE -> CINT;
+*     +),
+*    (COPY: GET CHAR + FILE + SYMB,
+*      (IF NOT CINT + SYMB, OUTSYM + SYMB + ST, : COPY;
+*       BACK LAST CHAR + FILE);
+*     +).
+*
+*'ACTION' OUTSYM + >SYMB + []ST[]:
+*  * SYMB -> ST * ST.
+*
+* SINCE THE EXTENSIONS MAY CAUSE LIST RELOCATION, ALL ADDRESSES HAVE 
+* TO BE KEPT IN RELATIVE FORM.
+*
+          BX6    X1          FILE
+          BX7    X2          ST
+          SA6    FILE
+          SA7    A6+B1       ST
+          GETCHAR GET1INE    GET CHAR + FILE + CINT,
+          IFCINT X1,ISCINT   IF NOT CINT + CINT, 
+          RJ     OUTSYM      OUTSYM + SYMB + ST + SPCNT,
+          SX1    RESTLINE
+ ISCINT   BX6    X1
+          SA6    CINT
+ 
+ COPY     SA1    FILE
+          GETCHAR END        GET CHAR + FILE + SYMB,
+          IFCINT X1,NOSYM    IF NOT CINT + SYMB, 
+          RJ     OUTSYM      OUTSYM + SYMB + ST + SPCNT,
+          EQ     COPY
+ 
+ OUTSYM   JP     *+1S17      OUTSYM + >SYMB + []ST[]:
+          SX2    B1          LENGTH OF ONE ENTRY 
+          BX6    X1          SAVE
+          SA6    SYMB             SYMBOL
+          SA1    ST          STACK ADDRESS
+          EXTEND12           EXTEND + ST + 1,
+          SA5    SYMB        SYMB
+          BX6    X5               ->
+          SA4    X1+>>       >>ST, SOFT
+          SA5    X1          OFFSET
+          IX5    X4+X5       @ OF TOP OF STACK
+          SA6    X5                  ST[>>ST], $ A6 = ADDR $
+          EQ     OUTSYM      .
+ 
+          END
+ 
+          IDENT  GETWORD
+          ENTRY  GETWORD
+ 
+          QUAL   GETWORD
+          NOREF  /GETWORD/
+ 
+ SIGNBIT  =      59
+ BUSYBIT  =      0 
+ ENDINDIC =      4 
+ EIWIDTH  =      2 
+ ERRPOS   =      9 
+ ERRWIDTH =      5 
+ EORLEVEL =      14
+ EOILEVEL =      16
+ EORWIDTH =      4 
+ PRUPOS   =      18
+ PRUWIDTH =      14
+*
+ OKAY     BSS    0 
+* END OF RECORD OR FILE
+          LX1     ERRPOS-EORLEVEL GET EORLEVEL IN LAST BITS
+          MX3    -EORWIDTH
+          BX3    -X3*X1      EORLEVEL
+          SX3    X3+B1
+          LX1    EORLEVEL-ENDINDIC GET ENDINDIC IN LAST BITS
+          MX4    -EIWIDTH
+          BX6    X4*X1       CLEAR THEM
+          LX6    ENDINDIC    BACK TO ORIGINAL POSITION
+          SA6    A2-B1       WRITE STATUS BACK
+          SX1    A6          RESTORE
+          EQ     RETURN
+ EMPTY    BSS    0 
+* THE FET IS IN X1...X5, FET ADDRES + 1 IS IN A2 
+          LX1    SIGNBIT-BUSYBIT PICK UP BUSY-BIT
+          PL,X1  WAIT        IF ON, WAIT
+*         PICK UP END INDICATOR
+          LX1    BUSYBIT-ENDINDIC
+          PL,X1  STOPPED     IF NOT SET, PROCESS SIMPLY STOPPED
+* TEST END OF INFORMATION:
+          LX1    ENDINDIC-SIGNBIT-ERRPOS+60 GET ERROR BITS IN LAST BITS
+          MX4    -ERRWIDTH
+          BX4    -X4*X1      ERROR BITS
+          ZR,X4  OKAY
+          SX1    A2-B1       RESTORE
+          SX3    EOILEVEL+1  END OF INFORMATION
+*         EQ     RETURN
+ RETURN   JP     1S17+*      RJ ENTRY
+ RETRY    SA1    X1          LFN & STATUS
+          SA2    A1+B1       FIRST, JUNK
+          SA3    A2+B1       IN
+          SA4    A3+B1       OUT
+          SA5    A4+B1       LAST + 1, JUNK
+          IX6    X3-X4       IN - OUT
+          ZR,X6  EMPTY
+          SX2    X2          FIRST
+          IX3    X5-X2       BUFFSIZE, JUNK
+          SX3    X3          BUFFSIZE ONLY
+          BX7    X6          IF NEGATIVE,
+          AX7    60          THEN
+          BX2    X3*X7       X2:= BUFFSIZE ELSE 0
+          IX2    X2+X6       X2:= ACTUAL BUFFER LENGTH
+          BX6    X5
+          LX6    -PRUWIDTH-PRUPOS
+          AX6    -PRUWIDTH   PRUSIZE
+          SX5    X5          CLEAR JUNK
+*
+* X1 AND A1 CONTAIN LFN AND FILE @
+* X2 CONTAINS ACTUAL BUFFER SIZE
+* X3 CONTAINS BUFFSIZE
+* X4 CONTAINS OUT-POINTER
+* X5 CONTAINS LAST-POINTER
+* X6 CONTAINS PRUSIZE
+*
+          IX2    X2-X3       ACT BUFL - BUFFSIZE 
+          IX2    X2+X6       + PRUSIZE 
+          SX2    X2+B1       ACT BUFL - BUFFSIZE + PRUSIZE + 1
+                             IF PRUSIZE+BUFL 'GE' BUFFSIZE-1 THEN
+          PL,X2  HIGH        NO ROOM FOR NEXT PRU
+*  NORMAL CASE: 'IF' STOPPED & ^ END INDICATED 'THEN' START
+          BX2    X1          COPY FOR  ENDINDIC
+          LX2    BUSYBIT-ENDINDIC INDICATOR TO POSITION OF BUSY-BIT
+          BX2    -X2*X1      ^ ENDINDIC & STOPPED  IN BUSY-BIT
+          LX2    SIGNBIT-BUSYBIT TO SIGN-BIT
+          PL,X2  GET         IF FALSE
+          RJ     =XCPC       READ, X1 AND A1 ALREADY SET
+          CON    2S42+10B    READ, NO RECALL
+ GET      BSS    0 
+ HIGH     BSS    0 
+          SX1    A2-B1       RESTORE X1
+          SA2    X4          GET WORD FROM UNDER OUT-POINTER
+          SX6    X4+B1       INCREASE  OUT-POINTER
+          IX4    X6-X5       COMPARE TO END OF BUFFER
+          AX4    60          SIGN, +0 IF OVERFLOW
+*         SX3    BUFFSIZE    RESET VALUE
+          BX3    -X4*X3      RESET VALUE IF OVERFLOW, + 0 OTHERWISE
+          IX6    X6-X3
+          SA6    A4          RESTORE
+*
+          MX3    0 
+          EQ     RETURN
+*
+ STOPPED  BSS    0 
+          SA1    A2-B1       RESTORE X1 AND A1
+          RJ     =XCPC
+          CON    2S42+10B    READ, NO RECALL
+ WAIT     RJ     =XRCL=      RECALL
+          SX1    A2-B1       RESTORE X1
+          EQ     RETRY       AND TRY AGAIN
+          QUAL   * 
+ GETWORD  =      /GETWORD/RETURN
+          END
+ 
+          IDENT  LSTTEXT     NULLIFIES  LIST-PSEUDO'S IN ALEPH/COMPASS
+          STEXT
+*
+* TO BE USED IN ASSEMBLING 'REDIV'
+*
+ LIST     MACRO  X,Y,Z,A,B,C  GIVES WARNING 3, OK
+ LIST     ENDM
+          END
+ 
+          IDENT  LEF3EAR
+          SST
+          ENTRY  LEF3EAR
+ LEF3EAR  JP     *+1S17      LEFT CLEAR + >X> + >N:
+          SB5    X2          N
+          EQ     B5,B0,LEF3EAR
+          MX4    1           MASK
+          SB4    B5-B1             OF LENGTH
+          AX4    B4                           N
+          BX1    -X4*X1      CLEAR BITS
+          LX1    B5          AND SHIFT 
+          EQ     LEF3EAR
+          END
+ 
+          IDENT  MAYCTER     ALEPH EXTERNAL RULE 
+          SST
+          ENTRY  MAYCTER
+ MAYCTER  JP     *+1S17      MAY BE STRING POINTER + TEXT[] + >P:
+* CHECKS:
+*  A. WHETHER THE WHOLE DESCRIBED STRING LIES IN TEXT,
+*  B. WHETHER ALL WORDS BUT THE LAST END IN 0000,
+*  C. WHETHER UNUSED PLACES IN THE LAST WORD ARE FILLED WITH ZEROES. 
+          MX0    1 
+          IFNOT  X1,X2,MAYCTER TEST ORIGINAL POSITION
+          SA3    X1
+          IX3    X3+X2       ADDRESS OF LAST WORD
+          SA3    X3          LAST WORD 
+          MX4    -11
+          BX4    -X4*X3      LENGTH OF STRING
+          AX4    3                            IN WORDS - 1 
+          SB5    X4          KEEP COUNT
+          IX2    X2-X4       POINTER TO FIRST WORD
+          IFNOT  X1,X2,MAYCTER TEST IT 
+          MX0    0 
+          BX5    X3          SAVE LAST WORD
+* LOOP FOR TESTING LAST 4 BITS, LENGTH IN B5
+          ZR     B5,.LOOP4
+ LOOP4    SA3    A3-B1       PREVIOUS WORD
+          BX0    X0+X3       COLLECT BITS
+          SB5    B5-B1       COUNT DOWN
+          NZ     B5,LOOP4
+ .LOOP4   BSS    0 
+          MX4    -4
+          BX0    -X4*X0      CLEAR ALL BITS EXCEPT LOWER 4 
+* TAKE LAST WORD (IN X5) APART
+          MX4    -3          -7
+          BX4    -X4*X5      LENGTH OF LAST WORD IN CHARACTERS
+          MX3    -11
+          BX3    X3*X5       MASK OUT CHARACTER PART
+          LX5    X4,B3       B5:= X4
+          IX5    X5-X4               * 
+          SB5    X5                    7
+          LX3    B5          RUB OFF
+          AX3    B5                  SIGNIFICANT CHARACTERS
+          BX0    X0+X3       SHOULD BE ZERO (CANNOT PRODUCE -0)
+          EQ     MAYCTER     RETURN
+          END
+ 
+          IDENT  MULT
+          SST
+          ENTRY  MULT
+ MULT     JP     *+1S17      MULT + >A + >B + HEAD> + TAIL>, 31-1-1974
+*
+* WE USE THE FXX*X AND DXX*X INSTRUCTIONS OF THE MULTIPLICATION UNIT,
+* WHICH GENERALLY DO WHAT WE WANT, EXCEPT IN ONE CASE:
+* IF A 'GE' 2**47 & B 'GE' 2**47  & A*B 'LT' 2**95 THEN
+* THE RESULT IS YIELDED WITH A LEFT SHIFT OF ONE, DUE TO NORMALIZATION
+* CONVENTIONS. THIS SITUATION IS DETECTED UPON UNPACKING THE LOWER (D)
+* PRODUCT: THE EXPONENT WILL BE  1  RATHER THAN  0. A TWO-REGISTER
+* RIGHT SHIFT IS EXECUTED THEN.
+*
+          MX0    0 
+          PX1                PREPARE
+          PX2                FOR MULTIPLICATION. 
+          FX3    X1*X2       UPPER PRODUCT
+          DX4    X1*X2       LOWER PRODUCT
+          UX1    X3
+          UX2,B5 X4          UNPACK AND DETECT
+          ZR,B5  MULT.       IF EXPONENT ZERO
+* OTHERWISE TRANSFER BIT  0  OF X1 TO BIT  48  OF X2.
+          MX3    59
+          BX4    -X3*X1      BIT  0  OF X1
+          LX3    48          TO POSITION
+          LX4    48          48.
+          BX2    X2*X3       CLEAR BIT  48
+          BX2    X2+X4       SET BIT  48
+          AX1    1           UNDO THE
+          AX2    1           NORMALIZATION
+ MULT.    IX1    X1+X0       AVOID  -0 
+          IX2    X2+X0       AVOID  -0 
+          EQ     MULT
+          END
+ 
+          IDENT  OFFTEXT
+* SWITCHES OFF LINE NUMBER ACCOUNTING AND SUBSCRIPT CHECKING.
+          STEXT
+ 
+ SA0      MACRO  Q           DELETE ALL UPDATING OF A0
+ SA0      ENDM
+ 
+ RHQ      CPSYN  RJQ         RENAME NORMAL RJ
+ 
+ RJ       MACRO  Q           CATCH RJ =XRANGE
+          IFC    EQ, Q =XRANGE
+          IX5    X7+X5
+          ELSE
+          RH     Q 
+          ENDIF
+ RJ       ENDM
+ 
+          END
+ 
+          IDENT  PAC2OOL
+          SST
+          ENTRY  PAC2OOL
+ PAC2OOL  JP     *+1S17      + A[] + >N + RES>:
+          RJ     =XX2<=      TEST N
+          SA4    X1+>>       >>LIST
+          SA5    A4-B1       <<PRE
+          IX6    X4-X5       LIST LENGTH-N
+          IX6    X6-X2
+          PL     X6,PAC1
+          ERREXT (PACKBOOL, STACK TOO SMALL),(L1,D2)
+ 
+ PAC1     SA5    X1          OFFSET
+          IX3    X4+X5       @(>>LIST) 
+          IX3    X3-X2       @(>>LIST)-N
+          MX1    0           RESULT
+          SA3    X3          SET PRE-START ADDRESS
+          SB5    X2          SET COUNTER
+ LOOP     ZR,B5  PAC2OOL
+          SA3    A3+B1       GET WORD
+          SB5    B5-B1       COUNT IT
+          LX1    1           POSITION RESULT
+          CX3    X3          MAX. 60, FOR - 0
+          CX3    X3          MAX.  5, FOR 31
+          CX3    X3          MAX.  2, FOR  3
+          CX3    X3          MAX.  1, FOR  1
+          BX1    X1+X3       ENTER BIT 
+          EQ     LOOP
+          END
+ 
+          IDENT  PAC1INT
+          SST
+          ENTRY  PAC1INT
+ PAC1INT  JP     *+1S17      + A[] + >N + RES>:
+          NG     X2,BADCNT
+          SA4    X1+>>       >>
+          SA5    A4+B1       <<PRE
+          IX5    X4-X5       LIST LENGTH
+          IX6    X5-X2                   - N, >= 0
+          PL     X6,SKIP1
+ BADCNT   ERREXT (PACK INT, CHAR COUNT BAD),(L1,D2)
+ 
+ SKIP1    SA5    X1          OFFSET
+          IX3    X4+X5       @(>>LIST) 
+          IX3    X3-X2       @(>>LIST) - N
+          MX1    0           RESULT
+          SA3    X3          SET PRE-START ADDRESS
+          SB5    X2          SET COUNTER
+ LOOP     ZR,B5  PAC1INT
+          SA3    A3+B1       GET WORD
+          SB5    B5-B1       COUNT IT
+          LX4    X1,B2       4*X1
+          IX1    X1+X4       5*X1
+          LX1    1           10*X1
+          NONDIG X3,CHARER,X5 VALUE IN X5
+          IX1    X1+X5
+          OVFL   X1
+          EQ     LOOP
+ 
+ CHARER   ERREXT (PACK INT, BAD CHARACTER),(L1,C3)
+          END
+ 
+          IDENT  PAC4ING     ALEPH EXTERNAL RULE 
+          SST
+          ENTRY  PAC4ING
+ PAC4ING  JP     *+1S17      PACK STRING + FROM[] + >N + []TO[]:
+* PACKS THE RIGHT-MOST 'N' CHARACTERS IN 'FROM' INTO A STRING AND
+* STACKS IT ON 'TO'
+          BX0    X2          LENGTH
+          AX0    11                 '/' 2048
+          CX0    X0          MUST BE ALL ZERO
+          NZ,X0  BADLN
+          SX6    X1          *
+          SA6    =XALF.SC1   *
+          BX6    X2          * STORE ALL
+          SA6    A6+B1       *           PARAMETERS
+          SX6    X3          *
+          SA6    A6+B1       *
+* TEST IF 'FROM' IS BIG ENOUGH
+          SA4    X1+<<PRE    X4:= MIN - 1
+          SA5    A4-B1       X5:= MAX
+          BX6    X5          STORE MAX IN CASE FROM=TO EXTEND SPOILS MAX
+          SA6    A6+B1
+          IX5    X5-X2       MAX - N
+          IX5    X5-X4               - MIN + 1
+          NG     X5,BADLN    MUST BE >= 0
+* CALL 'EXTEND' TO EXTEND 'TO'
+          SX1    X3          FIRST PARAMETER
+          AX2    3           N '/' 8
+          SX2    X2+B1               + 1 IS LENGTH NEEDED
+          EXTEND12 
+* RESTORE PARAMETERS
+          SA1    =XALF.SC1
+          SA2    A1+B1
+          SA3    A2+B1
+* INITIALIZE READING FROM 'FROM'
+          SA5    A3+B1       RESTORE PNT TO TOP OF 'FROM'
+          SA4    X1          OFFSET
+          SB4    X2          COUNT TOTAL
+          IX1    X5+X4       ADDRESS TOP OF 'FROM'
+          IX1    X1-X2       ADDRESS OF FIRST WORD - 1
+          SA1    X1          STORE IT IN A1
+* INITIALIZE WRITING TO 'TO' 
+          SA4    X3          OFFSET
+          SA5    A4-B3       PNT TO TOP OF 'TO'
+          AX2    3           LENGTH OF 
+          SX2    X2+B1         NEW AREA IN 'TO'
+          IX3    X5+X4       ADDRESS TOP OF 'TO' 
+          IX3    X3-X2       ADDRESS FIRST WORD IN 'TO' - 1
+          SA5    X3          STORE
+          BX6    X5                IT
+          SA6    A5                   IN A6
+*
+* WE HAVE NOW SET UP THE FOLLOWING LOOP ENVIRONMENT:
+*  A1/X1  READING REGISTER
+*  X2     LENGTH (TO BE STORED IN LAST WORD)
+*  A6/X6  LAST WRITTEN ADDRESS / WORD UNDER CONSTRUCTION
+*  B4     COUNT TOTAL  [ N : 0 ]
+*  B5     COUNT SHIFT  [ 8 : 0 ]
+*
+ STLOOP   MX6    0           CLEAR WORD
+          SB5    8           AND NOTE THAT.
+ PKLOOP   ZR     B4,B4ZERO   NO MORE CHARACTERS
+          SA1    A1+B1       GET NEXT CHARACTER
+          LX6    7           MAKE ROOM FOR IT
+          SB4    B4-B1       COUNT
+          SB5    B5-B1             IT
+          BX6    X6+X1       ADD IT
+          MX0    -7
+          BX0    X0*X1       REMOVE 7 BITS
+          NZ     X0,BADCHAR  AND NOW IT MUST BE ZERO
+          NZ     B5,PKLOOP   WORD NOT YET FINISHED
+          LX6    4           POSITION FINISHED WORD
+          SA6    A6+B1       WRITE IT
+          EQ     STLOOP      AND START OVER AGAIN
+ B4ZERO   BSS    0 
+*
+* THE ENVIRONMENT IS NOW:
+*
+*  X2     LENGTH
+*  A6/X6  LAST WRITTEN ADDRESS / WORD UNDER CONSTRUCTION
+*  B4     0
+*  B5     COUNT SHIFT [ 8 : 1 ]
+*
+          SA2    A2          RESTORE LENGTH
+          SX4    B5          SHIFT COUNT
+          LX5    X4,B3       8 * B5
+          IX4    X5-X4       7 * B5
+          SB5    X4
+          LX6    B5          SHIFT OVER
+          LX6    4           7 * B5 + 4
+          BX6    X6+X2       INSERT LENGTH
+          SA6    A6+B1       WRITE IT
+          EQ     PAC4ING
+ 
+ BADLN    ERREXT (PACK STRING, BAD LENGTH),(L1,D2)
+ BADCHAR  SA2    =XALF.SC1   ADDRESS OF 'FROM'
+          SA3    A2+2        ADDRESS OF 'TO'
+          ERREXT (PACK STRING, BAD CHAR),(L2,L3,C1)
+          END
+ 
+          IDENT  PRE8ING
+          SST
+          ENTRY  PRE8ING
+ PRE8ING  JP     *+1S17      PREVIOUS STRING + TEXT[] + >P>:
+          SB4    X1          SAVE TEXT @
+          MUSTBE X1,X2,(PREVIOUS STRING, BAD STRING POINTER)
+* EXTRACTS LOWER 11 BITS FROM LAST WORD OF STRING
+          SA1    X1          GET OFFSET
+          IX1    X1+X2       ADDRESS OF LAST WORD
+          SA3    X1          LAST WORD 
+          MX4    -11
+          BX1    -X4*X3      LENGTH  OF STRING
+          AX1    3                            IN WORDS - 1 
+          SX1    X1+B1
+          IX1    X2-X1       RESET
+          SA2    B4-B2       <<PRE
+          IX2    X1-X2       MAY BE EQUAL
+          ZR,X2  PRE8ING     OTHERWISE:
+          MUSTBE B4,X1,(PREVIOUS STRING, BAD STRING)
+          EQ     PRE8ING
+          END
+ 
+          IDENT  PUT1HAR     PUT CHAR
+          SST
+          ENTRY  PUT1HAR     + ""FILE + >CHAR:
+*
+* 'ACTION' PUT CHAR + ""FILE + >CHAR:
+ FILE     =      1           X.FILE
+ CHAR     =      2           X.CHAR
+*   IS DUMMY + FILE;
+*   IS WRITE CHAR FILE + FILE, CUT TO SIZE + CHAR,
+*     (IS CHARACTER + CHAR, CH + CHAR; INT + CHAR);
+*   ERROR.
+*
+* 'FUNCTION' CUT TO SIZE + >CHAR>:
+*   = CHAR =
+*   [     : -128], /?/ -> CHAR;
+*   [ -127:  -64], PLUS + CHAR + 64 + CHAR;
+*   [  -63:   -1], +;
+*   [ 0 ], /?/ -> CHAR;
+*   [    1:   63], +;
+*   [   64:  127], MINUS + CHAR + 64 + CHAR;
+*   [  128:     ], /?/ -> CHAR.
+*
+* 'ACTION' CH + >CHAR:
+*   = FILE CH# =
+*   [ 54 : 0], ENTER + CHAR; 
+*   [ -6], WRITE WORD, ENTER + CHAR;
+*   [ NEWSTAT ], 54 -> CNT,
+*    (CI FILE, ENTER + NEWPAGE, ENTER + CHAR; ENTER + CHAR);
+*   BADFET.
+*
+* 'ACTION' INT + >CHAR:
+*   CHAR = RESTLINE;
+*   CLOSE LINE + FILE,
+*      (CI FILE, CONVERT + CHAR, ENTER + CHAR;
+*       +).
+*
+* 'ACTION' ENTER + >CHAR:
+*   POSITION + CHAR, BOOL OR + WORD + CHAR + WORD,
+*   MINUS + CNT + 6 + CNT.
+*
+ 
+ ENTERNO  BSS    0           X6 ALREADY CLEARED
+          SX7    9*6
+          EQ     SETADM
+*
+ INT      BSS    0 
+          SX5    X.CHAR-RESTLINE
+          ZR,X5  OUT
+* CLOSE LINE:
+          BX6    X.CHAR
+          SA6    =SSAVE
+          BX=    1,FILE
+          RJ     =XCLOLINE   LEAVES X1 UNCHANGED 
+          BX=    FILE,1
+          SA.CHAR =SSAVE     RESTORE CHAR
+* CI FILE:
+          SA5    X.FILE+FILETYPE
+          LX5    SIGNBIT-CIBIT
+          MX6    0           IN CASE OF NO CONTROL INT
+          PL,X5  ENTERNO     NO CONTROL INT
+* CONVERT:
+          BX.CHAR -X.CHAR    CANNOT BE ZERO
+*         EQ     ENTERCL
+ ENTERCL  SX6    X.CHAR
+          SX7    8*6         NEW SHIFT 
+          LX6    9*6         NEW WORD
+*         EQ     SETADM
+ SETADM   BSS    0           WORD IN X6, SHIFT IN X7
+          SINGLE (\  SA6 X.FILE+FILEWORD\  SA7 X.FILE+FILECH#)
+*         EQ     OUT
+ OUT      BSS    0 
+*         EQ     PUT1HAR     RETURN
+ PUT1HAR  JP     *+1S17
+* IS DUMMY:
+          SA5    X.FILE      FILE NAME 
+          ZR,X5  PUT1HAR     DUMMY
+* IS WRITE CHAR FILE:
+          SA5    X.FILE+FILETYPE
+          BX4    X5
+          LX5    SIGNBIT-READBIT MUST BE POSITIVE
+          LX4    SIGNBIT-CHDATBIT MUST BE POSITIVE
+          BX5    X4+X5       MUST BE POSITIVE
+          NG,X5  BADFILE
+ 
+*CUT TO SIZE
+          BX3    X.CHAR      MAKE
+          BX4    X.CHAR           COPIES
+          SX.CHAR 1R?        FIRST FIND THE ?-CASES
+          ZR,X3  EOCUT       THIS IS ONE CASE
+          AX4    6           BITS 59 - 6, FOR LATER DECISIONS
+          AX5    X4,B1       NON-ZERO FOR <-127 OR >+127
+          LX4    6           WAIT AND SEE
+          NZ,X5  EOCUT       AND THIS IS THE SECOND CASE
+* HERE THE ORIGINAL CHARACTER (STILL IN X3) WAS IN [-127:+127].
+* IF IT IS IN [-127:-64], X4 CONTAINS -64, IF IT IS IN [64:127],
+* X4 CONTAINS +64, OTHERWISE IT CONTAINS 0. SO:
+          IX.CHAR X3-X4      CORRECT CHAR
+ EOCUT    BSS    0 
+* IS CHARACTER:
+          IFCINT X.CHAR,INT
+*CH       BSS    0 
+          SA3    X.FILE+FILECH#
+          SX4    X3-9*6-1    WILL BE NEG FOR 54 : -INF
+*         SX3    X3          WILL BE POS FOR INF: 0
+          BX4    -X3*X4      WILL BE NEG FOR 54 : 0
+          PL,X4  NO54
+          SB5    X3          GET SHIFT 
+ ENTER    BSS    0           X2 = CHAR, B5 IS OLD SHIFT
+          SA5    X.FILE+FILEWORD
+          LX.CHAR B5         SHIFT
+          BX6    X5+X.CHAR
+          SX7    B5-6        NEW SHIFT 
+          EQ     SETADM
+*
+ NO54     BSS    0 
+          SX4    X3+6
+          NZ,X4  NEWORBAD
+* WRITE WORD:
+          DOWNCPU
+          SB4    X.CHAR      SAVE CHAR 
+          BX=    1,FILE
+          SA2    X.FILE+FILEWORD
+          MX3    0 
+          RJ     =XPUTWORD   LEAVES X1 AND B4 UNCHANGED
+          BX=    FILE,1
+* UPDATE ADM:
+          MX6    0 
+          SX7    9*6         EMPTY WORD
+          SA6    X.FILE+FILEWORD
+          SA7    X.FILE+FILECH#
+          SX.CHAR B4
+          UPCPU
+          EQ     ENTERCL
+*
+ NEWORBAD BSS    0 
+          SX3    X3-NEWSTAT  MUST BE ZERO
+          NZ,X3  BADFET
+          SB5    9*6         FOR NEW RECORD
+* CI FILE:
+          SA5    X.FILE+FILETYPE
+          LX5    SIGNBIT-CIBIT
+          PL,X5  ENTERCL     NO CONTROL INT
+* ENTER + NEW PAGE:
+          SX6    -NEWPAGE    NEWPAGE CHAR
+          LX6    9*6
+          SA6    X.FILE+FILEWORD
+          SB5    8*6         POSITION FOR NEXT CHAR
+          EQ     ENTER
+*
+ 
+ BADFILE  ERREXT (PUTCHAR, BAD FILE),F.FILE
+ 
+          END
+ 
+          IDENT  PUT1ATA
+          SST
+          ENTRY  PUT1ATA
+ 
+*'ACTION' PUT DATA + ""FILE + >ITEM + >TYPE:
+ FILE     =      1           X.FILE
+ ITEM     =      2           X.ITEM
+*  IS DUMMY + FILE;
+*  (IS NOT DATA FILE + FILE; IS READ FILE + FILE),
+*        ERROR + BAD FILE;
+*  TYPE = POINTER, PUT DATA POINTER + ITEM;
+*  PUT DATA NUMERICAL + ITEM.
+*
+*'ACTION' PUT DATA POINTER + >ITEM:
+*  CONSTRUCT WORD + ITEM, PUT WORD + FILE + ITEM + 0.
+*
+*'FUNCTION' CONSTRUCT WORD + >ITEM> - PNT:
+ PNT      =      3           X.PNT
+*  FIND LIST BLOCK + ITEM + PNT,
+*  MINUS + ITEM + '<<PRE' * FILE ADM[PNT] + ITEM $ OFFSET $,
+*  (-REM: DIVREM + ITEM + '<>' * LIST ADM [ADDR * FILE ADM[PNT]]
+*                + ITEM + REM, $ IN BLOCKS $
+*      (REM = 0; ERROR + IMPURE POINTER)
+*  ),
+*  COMBINE + PNT + ITEM + ITEM.
+*
+*'FUNCTION' FIND LIST BLOCK + >ITEM + PNT>:
+*  GET LISTS PNT + PNT,
+*  (SEARCH LIST:
+*    PNT = NUM ZONE PNT, ERROR + BAD POINTER;
+*    IS IN LIST + PNT + ITEM;
+*    NEXT + FILE ADM + PNT, : SEARCH LIST).
+*
+*'QUESTION' IS IN LIST + >PNT + >ITEM - ADDR:
+*  BETWEEN + '<<' * LIST ADM[ADDR * FILE ADM[PNT]] +
+*            '>>' * LIST ADM[ADDR * FILE ADM[PNT]].
+*
+*'ACTION' PUT DATA NUMERICAL + >ITEM:
+*  CHECK RANGE + ITEM,
+*  (IS SIMPLE FILE + FILE;
+*   IS POINTER + ITEM, PUT WORD + FILE + MARKER + 0; +),
+*  PUT WORD + FILE + ITEM + 0.
+*
+*'FUNCTION' CHECK RANGE + >ITEM - PNT: 
+*  NUM ZONE PNT -> PNT,
+*  (SEARCH RANGES: 
+*    PNT = END OF ZONES PNT, ERROR + BAD NUMERICAL;
+*    BETWEEN + LOWER * FILE ADM[PNT] + ITEM +
+*        UPPER * FILE ADM[PNT];
+*    NEXT + FILE ADM + PNT, : SEARCH RANGES).
+*
+ 
+ PUT1ATA  JP     *+1S17      PUT DATA + ""FILE + >DATA + >TYPE:
+          SA4    X.FILE      FILE NAME 
+          ZR,X4  PUT1ATA     IS DUMMY + FILE;
+          SA5    X.FILE+FILETYPE
+          BX6    X5
+          LX5    SIGNBIT-CHDATBIT POS IF NOT DATA FILE
+          LX6    SIGNBIT-READBIT NEG IF READ FILE
+          BX5    -X6*X5      POS IF EITHER,
+          PL,X5  BADFILE     ERROR + BAD FILE;
+          SB4    X3          TYPE
+          NE     B4,B.POINTER,PUTNUM      = POINTER,
+*PUTPNT   BSS    0           PUT DATA POINTER:
+*CONSTRW  BSS    0           CONSTRUCT WORD:
+*FINDBLCK BSS    0           FIND LIST BLOCK:
+          LISTSPNT PNT       GET LISTS PNT + PNT,
+ SEARCHL  BSS    0 
+          NUMZNPNT 5         NUM ZONE PNT
+          IX5    X5-X.PNT                 = PNT, 
+          ZR,X5  BADPNT      ERROR + BAD POINTER;
+*ISINLIST BSS    0 
+          SA5    X.PNT       ADDR * FILE ADM[PNT] -> X5,
+          SA4    X5+>>       '>>' * LIST ADM[X5] 
+          SA5    A4-B1       '<<' * LIST ADM[X5] 
+          IX4    X4-X.ITEM   MUST BE POSITIVE
+          IX5    X.ITEM-X5   MUST BE POSITIVE
+          BX4    X4+X5       MUST BE POSITIVE
+          PL,X4  EOFINDBL    IS IN LIST + PNT + ITEM;
+          SX.PNT X.PNT+B2    NEXT + FILE ADM + PNT,
+          EQ     SEARCHL     : SEARCH LIST.
+ 
+ EOFINDBL BSS    0           X.PNT IS POINTER TO PROPER BLOCK.
+          BX4    X.ITEM      FOR POSSIBLE ERROR MESSAGE
+          SA5    X.PNT+B1    '<<PRE' * FILE ADM[PNT] -> X5,
+          IX.ITEM X.ITEM-X5  MINUS + ITEM + X5 + ITEM,
+ 
+          SA5    X.PNT       ADDR * FILE ADM [PNT] -> X5,
+          SA5    X5+<>       '<>' * LIST ADM [X5] -> X5,
+          BX6    X.ITEM      FOR
+          BX7    X5              REMAINDER
+          IX.ITEM X.ITEM/X5,B5 DIVREM + ITEM + X5 + ITEM
+          IX7    X7*X.ITEM
+          IX6    X6-X7       + REM,
+          NZ,X6  ERRIMP      (REM = 0F ERROR + IMPURE POINTER),
+ 
+          LISTSPNT 5         LISTS PNT -> X5,
+          IX.PNT X.PNT-X5    MINUS + PNT + X5 + PNT,
+          MX5    1           40000...0B
+          LX.PNT 24          COMBINE + ITEM
+          BX.ITEM X.ITEM+X.PNT              + PUT
+          BX.ITEM X.ITEM+X5                       + ITEM.
+          EQ     PUTW        PUTWORD + FILE + ITEM + 0.
+ 
+ PUTNUM   BSS    0           PUT DATA NUMERICAL: 
+*CHECKRGE BSS    0           CHECK RANGE:
+          NUMZNPNT PNT       NUM ZONE PNT -> PNT,
+ SEARCHRG BSS    0 
+          EOZNSPNT 5         END OF ZONES PNT
+          IX5    X5-X.PNT                     = PNT,
+          ZR,X5  BADNUM      ERROR + BAD NUMERICAL;
+*
+*'BETWEEN' DOES A 60-BIT INTEGER COMPARE:
+*
+          SA4    X.PNT       LOWER * FILE ADM[PNT]
+          SA5    X.PNT+B1    UPPER * FILE ADM[PNT]
+          IX6    X.ITEM-X4   MUST BE POSITIVE AFTER CORRECTION:
+          BX7    X.ITEM-X4   IF SIGNS ARE EQUAL, 
+          BX6    -X7*X6      WE NEED THE DIFFERENCE,
+          BX7    X7*X.ITEM   OTHERWISE THE FIRST TERM
+          BX4    X6+X7       MUST BE POSITIVE.
+          IX6    X5-X.ITEM   MUST BE POSITIVE AFTER CORRECTION:
+          BX7    X5-X.ITEM   IF SIGNS ARE EQUAL, 
+          BX6    -X7*X6      WE NEED THE DIFFERENCE,
+          BX7    X7*X5       OTHERWISE THE FIRST TERM
+          BX5    X6+X7       MUST BE POSITIVE
+          BX4    X4+X5       MUST BE POSITIVE
+          PL,X4  EOCHRNGE    BETWEEN + .... ;
+          SX.PNT X.PNT+B2    NEXT + FILE ADM + PNT,
+          EQ     SEARCHRG    : SEARCH RANGES.
+ 
+ EOCHRNGE BSS    0           ITEM IN SOME RANGE
+          SA5    X.FILE+FILETYPE IS SIMPLE FILE
+          LX5    SIGNBIT-SIMPBIT                +
+          NG,X5  PUTW                             FILE;
+          ISNOTPNT X.ITEM,PUTW IS POINTER + ITEM,
+          BX6    X.ITEM
+          SA6    =SSAVE      SAVE ITEM 
+          BX=    1,FILE
+          MX2    -11         77 ... 74000B
+          LX2    -12         40007...7B
+          MX3    0 
+          RJ     PROTPW      PUT WORD + FILE + MARKER + 0
+          SA.ITEM SAVE
+          BX=    1,FILE
+          BX=    2,ITEM
+ PUTW     MX3    0 
+          RJ     PROTPW      PUT WORD + FILE + ITEM + 0
+          EQ     PUT1ATA     .
+ 
+ PROTPW   JP     *+1S17      PROTECTED PUTWORD
+          DOWNCPU
+          RJ     =XPUTWORD
+          UPCPU
+          EQ     PROTPW
+ 
+ BADFILE  ERREXT (PUT DATA, BAD FILE),F.FILE
+ BADPNT   ERREXT (PUT DATA, BAD POINTER),(F.FILE,D.ITEM)
+ ERRIMP   ERREXT (PUT DATA, IMPURE POINTER),(F.FILE,D4)
+ 
+ BADNUM   ERREXT (PUT DATA, BAD NUMERICAL),(F.FILE,D.ITEM) 
+          END
+ 
+          IDENT  PUT.ATA     OLD AND INCORRECT VERSION OF PUT1ATA
+          SST
+          ENTRY  PUT.ATA
+*'ACTION' PUT DATA + ""FILE + >ITEM + >TYPE:
+ FILE     =      1           X.FILE
+ ITEM     =      2           X.ITEM
+ PNT      =      3           X.PNT
+ PUT.ATA  JP     *+1S17      PUT DATA + ""FILE + >DATA + >TYPE:
+          SA4    X.FILE      FILE NAME 
+          ZR,X4  PUT.ATA     IS DUMMY + FILE;
+          SA5    X.FILE+FILETYPE
+          BX6    X5
+          LX5    SIGNBIT-CHDATBIT POS IF NOT DATA FILE
+          LX6    SIGNBIT-READBIT NEG IF READ FILE
+          BX5    -X6*X5      POS IF EITHER,
+          PL,X5  BADFILE     ERROR + BAD FILE;
+          SB4    X3          TYPE
+          NE     B4,B.POINTER,PUTNUM      = POINTER,
+*PUTPNT   BSS    0           PUT DATA POINTER:
+*CONSTRW  BSS    0           CONSTRUCT WORD:
+*FINDBLCK BSS    0           FIND LIST BLOCK:
+          LISTSPNT PNT       GET LISTS PNT + PNT,
+ SEARCHL  BSS    0 
+          NUMZNPNT 5         NUM ZONE PNT
+          IX5    X5-X.PNT                 = PNT, 
+          ZR,X5  BADPNT      ERROR + BAD POINTER;
+*ISINLIST BSS    0 
+          SA5    X.PNT       ADDR * FILE ADM[PNT] -> X5,
+          SA4    X5+>>       '>>' * LIST ADM[X5] 
+          SA5    A4-B1       '<<' * LIST ADM[X5] 
+          IX4    X4-X.ITEM   MUST BE POSITIVE
+          IX5    X.ITEM-X5   MUST BE POSITIVE
+          BX4    X4+X5       MUST BE POSITIVE
+          PL,X4  EOFINDBL    IS IN LIST + PNT + ITEM;
+          SX.PNT X.PNT+B2    NEXT + FILE ADM + PNT,
+          EQ     SEARCHL     : SEARCH LIST.
+ 
+ EOFINDBL BSS    0           X.PNT IS POINTER TO PROPER BLOCK.
+          BX4    X.ITEM      FOR POSSIBLE ERROR MESSAGE
+          SA5    X.PNT+B1    '<<PRE' * FILE ADM[PNT] -> X5,
+          IX.ITEM X.ITEM-X5  MINUS + ITEM + X5 + ITEM,
+          LISTSPNT 5         LISTS PNT -> X5,
+          IX.PNT X.PNT-X5    MINUS + PNT + X5 + PNT,
+          MX5    1           40000...0B
+          LX.PNT 24          COMBINE + ITEM
+          BX.ITEM X.ITEM+X.PNT              + PUT
+          BX.ITEM X.ITEM+X5                       + ITEM.
+          EQ     PUTW        PUTWORD + FILE + ITEM + 0.
+ 
+ PUTNUM   BSS    0           PUT DATA NUMERICAL: 
+*CHECKRGE BSS    0           CHECK RANGE:
+          NUMZNPNT PNT       NUM ZONE PNT -> PNT,
+ SEARCHRG BSS    0 
+          EOZNSPNT 5         END OF ZONES PNT
+          IX5    X5-X.PNT                     = PNT,
+          ZR,X5  BADNUM      ERROR + BAD NUMERICAL;
+*
+*'BETWEEN' DOES A 60-BIT INTEGER COMPARE:
+*
+          SA4    X.PNT       LOWER * FILE ADM[PNT]
+          SA5    X.PNT+B1    UPPER * FILE ADM[PNT]
+          IX6    X.ITEM-X4   MUST BE POSITIVE AFTER CORRECTION:
+          BX7    X.ITEM-X4   IF SIGNS ARE EQUAL, 
+          BX6    -X7*X6      WE NEED THE DIFFERENCE,
+          BX7    X7*X.ITEM   OTHERWISE THE FIRST TERM
+          BX4    X6+X7       MUST BE POSITIVE.
+          IX6    X5-X.ITEM   MUST BE POSITIVE AFTER CORRECTION:
+          BX7    X5-X.ITEM   IF SIGNS ARE EQUAL, 
+          BX6    -X7*X6      WE NEED THE DIFFERENCE,
+          BX7    X7*X5       OTHERWISE THE FIRST TERM
+          BX5    X6+X7       MUST BE POSITIVE
+          BX4    X4+X5       MUST BE POSITIVE
+          PL,X4  EOCHRNGE    BETWEEN + .... ;
+          SX.PNT X.PNT+B2    NEXT + FILE ADM + PNT,
+          EQ     SEARCHRG    : SEARCH RANGES.
+ 
+ EOCHRNGE BSS    0           ITEM IN SOME RANGE
+          SA5    X.FILE+FILETYPE IS SIMPLE FILE
+          LX5    SIGNBIT-SIMPBIT                +
+          NG,X5  PUTW                             FILE;
+          ISNOTPNT X.ITEM,PUTW IS POINTER + ITEM,
+          BX6    X.ITEM
+          SA6    =SSAVE      SAVE ITEM 
+          BX=    1,FILE
+          MX2    -11         77 ... 74000B
+          LX2    -12         40007...7B
+          MX3    0 
+          RJ     PROTPW      PUT WORD + FILE + MARKER + 0
+          SA.ITEM SAVE
+          BX=    1,FILE
+          BX=    2,ITEM
+ PUTW     MX3    0 
+          RJ     PROTPW      PUT WORD + FILE + ITEM + 0
+          EQ     PUT.ATA     .
+ 
+ PROTPW   JP     *+1S17      PROTECTED PUTWORD
+          DOWNCPU
+          RJ     =XPUTWORD
+          UPCPU
+          EQ     PROTPW
+ 
+ BADFILE  ERREXT (PUT DATA, BAD FILE),F.FILE
+ BADPNT   =      PUTNUM
+ BADNUM   ERREXT (PUT DATA, BAD NUMERICAL),(F.FILE,D.ITEM) 
+          END
+ 
+          IDENT  PUTWORD
+          SST
+*
+ PUTWORD  JP     1S17+*      + ""FILE + >WORD + >EOR LEVEL PLUS ONE
+          ENTRY  PUTWORD
+*
+ SIGNBIT  =      59
+ BUSYBIT  =      0 
+ EORLEVEL =      14
+ PRUPOS   =      18
+ PRUWIDTH =      14
+ 
+          NZ,X3  WREOR       SOME END OF RECORD
+          SA3    X1+2        'IN' IN FET
+          BX6    X2
+          SA6    X3          WRITE THE WORD FIRST OF ALL
+ RETRY    BSS    0 
+          SA1    X1          LFN & STATUS
+          SA2    A1+B1       FIRST, JUNK
+          SA3    A2+B1       IN
+          SA4    A3+B1       OUT
+          SA5    A4+B1       LAST + 1, JUNK
+          IX6    X3-X4       IN - OUT
+          SX2    X2          FIRST
+          IX2    X5-X2       BUFFSIZE, JUNK
+          SX2    X2          BUFFSIZE ONLY
+          BX7    X6          IF NEGATIVE,
+          AX7    60          THEN
+          BX4    X2*X7       X4:= BUFFSIZE ELSE 0
+          IX4    X4+X6       X4:= ACTUAL BUFFER LENGTH
+          BX6    X5
+          LX6    -PRUWIDTH-PRUPOS
+          AX6    -PRUWIDTH   PRUSIZE
+          SX5    X5          CLEAR JUNK
+*
+* X1 AND A1 CONTAIN LFN AND FILE @
+* X2 CONTAINS BUFFSIZE, A2 CONTAINS FILE @ + 1
+* X3 CONTAINS IN-POINTER, A3 CONTAINS IN-POINTER @
+* X4 CONTAINS ACTUAL BUFFER LENGTH
+* X5 CONTAINS LAST-POINTER
+* X6 CONTAINS PRUSIZE
+*
+          IX4    X4-X6       IF BUFL 'GE' PRUSIZE
+          NG,X4  LOW
+          IX4    X4+X6
+          IX4    X4-X2
+          SX4    X4+B1       BUFL - BUFFSIZE + 1 
+          LX1    SIGNBIT-BUSYBIT BUSY-BIT TO SIGN
+          PL,X1  RUNNING     PROCESS RUNNING
+          LX1    BUSYBIT-SIGNBIT LFN & FET ADDRESS
+          RJ     =XCPC
+          CON    2S42+14B    WRITE, NO RECALL
+ RUNNING  BSS    0 
+          NG,X4  ENTER       BUFFER NOT FULL
+*  THE BUFFER IS FULL:
+          RJ     =XRCL=      RECALL
+          SX1    A2-B1       RESTORE X1
+          EQ     RETRY
+*
+ LOW      BSS    0 
+ ENTER    BSS    0 
+          SX6    X3+B1       INCREASE  IN-POINTER
+          IX4    X6-X5       COMPARE TO END OF BUFFER
+          AX4    60          SIGN, +0 IF OVERFLOW
+*         SX2    BUFFSIZE    RESET VALUE
+          BX2    -X4*X2      RESET VALUE IF OVERFLOW, + 0 OTHERWISE
+          IX6    X6-X2
+          SA6    A3          RESTORE IN-POINTER
+ 
+          SX1    A2-B1       RESTORE X1
+          SA2    X3          RESTORE X2
+          MX3    0           RESTORE X3
+          EQ     RETURN
+ 
+ WREOR    BSS    0 
+          SA5    WRITER      WORD FOR CPC
+          SX6    X3-1        EOR LEVEL 
+          LX6    EORLEVEL
+          BX6    X5+X6       COMBINE
+          SA6    WRWORD      FOR CPC
+          SX4    X1          SAVE FET ADDRESS
+          SA1    X1          LFN
+          RJ     =XCPC       WRITER WITH RECALL
+ WRWORD   BSSZ   1 
+          SX1    X4          RESTORE X1
+          EQ     RETURN
+ 
+ WRITER   CON    3S42+1S40+24B WRITER WITH RECALL
+ 
+ RETURN   =      PUTWORD
+          END
+ 
+          IDENT  PUTINT
+          SST
+          ENTRY  PUTINT
+ PUTINT   JP     *+1S17      + ""FILE + >INT:
+          RJ     =XINT.CHR   INFO IN INT.CHR-1 TO INT.CHR-4
+          BX6    X1          FET @
+          SA6    =SSAVE
+* SPACES:
+ SPACES   SA5    INT.CHR-1   - SPACE COUNT
+          PL,X5  SIGN
+          SX6    X5+B1
+          SA6    A5
+          SA1    SAVE
+          SX2    1R          SPACE
+          RJ     =XPUT1HAR
+          EQ     SPACES
+ SIGN     SA2    A5-B1       SIGN
+          SA1    SAVE
+          RJ     =XPUT1HAR
+ DIGITS   SA5    INT.CHR-3   SHIFT
+          SA4    A5-B1       WORD
+          SB5    X5
+          AX3    X4,B5       POSITION
+          MX2    -4
+          BX2    -X2*X3      CHAR
+          NG,X5  PUTINT
+          SX6    X5-4        REDUCE
+          SA6    A5          SHIFT
+          SA1    SAVE
+          SX2    X2+1R0      DISPLAY
+          RJ     =XPUT1HAR
+          EQ     DIGITS
+          END
+ 
+          IDENT  PUT1INE
+          SST
+          ENTRY  PUT1INE
+* VARIABLES
+ FILE
+ A
+ PNT
+ 
+ PUT1INE  JP     *+1S17      PUT LINE + ''FILE + A[] + >CINT - PNT:
+*
+*         PUT CHAR + FILE + CINT, <<A -> PNT,
+*         (COPY: MORE + PNT + >>A;
+*             PUT CHAR + FILE + A[PNT], INCR + PNT, :COPY).
+*
+* SINCE A CALL OF PUT CHAR MAY CAUSE LIST RELOCATION, ALL ADDRESSES HAVE
+* TO BE KEPT IN RELATIVE FORM.
+          BX6    X1
+          BX7    X2
+          SA6    FILE
+          SA7    A6+B1       A
+          BX2    X3          CINT
+          RJ     =XPUT1HAR    WRITE CINT
+          SA1    FILE
+          SA3    A1+B1       A
+          SA4    X3+<<       <<A, INITIAL VALUE OF PNT
+* X1 =FILE, X3 = A, X4 = PNT 
+ COPY     BSS    0 
+          SA5    X3+>>       >>A
+          IX6    X5-X4
+          NG,X6  PUT1INE     MORE + PNT + >>A
+          SA2    X3          OFFSET
+          IX2    X2+X4       ADDRESS
+          SA2    X2          CHAR
+          MX6    -1          -1
+          IX6    X4-X6       INCR + PNT
+          SA6    PNT         SAVE PNT
+          RJ     =XPUT1HAR
+          SA1    FILE
+          SA3    A1+B1       A
+          SA4    A3+B1       PNT
+          EQ     COPY
+          END
+ 
+          IDENT  PUT3ING     ALEPH EXTERNAL RULE 
+          SST
+          ENTRY  PUT3ING
+ PUT3ING  JP     *+1S17      PUT STRING + ''FILE + TEXT[] + >P:
+* WRITES THE STRING (TEXT,P) ONTO THE FILE 'FILE' BY USING 'PUT CHAR'.
+          MX0    0 
+          MUSTBE X2,X3,(PUT STRING, BAD STRING POINTER)
+          SA4    X2          OFFSET
+          BX6    X4          COPY IT
+          IX4    X4+X3       ADDRESS LAST WORD
+          SA4    X4          LAST WORD 
+          MX7    -11
+          BX7    -X7*X4      LENGTH IN CHARACTERS, SAVE IT 
+          AX4    X7,B3              IN WORDS - 1 
+          IX3    X3-X4       PNT TO FIRST WORD
+          MUSTBE X2,X3,(PUT STRING, BAD STRING)
+* SAVE PERTINENT REGISTERS IN 'ALF.SC1'
+          SA5    =XALF.SC1+3 A5 IS BASE ADDRESS FOR ALF.SC1 ACCESS
+          BX6    X1          ADDRESS FILE
+          SA6    A5-B3
+          BX6    X2          ADDRESS OF 'TEXT'
+          SA6    A5+B2
+          BX6    X3          POINTER TO NEXT WORD
+          SA6    A5-B2
+          IX5    X0-X7       LENGTH, NEGATIVE
+          MX6    0           INDICATES THAT THE LAST WORD IN X4, WHICH
+                             WAS NEVER READ, IS EXHAUSTED. 
+*
+* ALL LOOP ADMINISTRATION IS KEPT IN X-REGISTERS, AS FOLLOWS:
+*
+* X0             0 
+* X1/ALF.SC1     ADDRESS FILE (READ ONLY)
+* X2             CHAR, FOR 'PUT CHAR'
+* X3/ALF.SC1+1   POINTER TO NEXT WORD, (READ/WRITE WHEN NECESSARY)
+* X4/ALF.SC1+2   WORD
+* X5/ALF.SC1+3   CHARACTER COUNT  [-N : 0 ] COUNTING UP
+* X6/ALF.SC1+4   SHIFT COUNT      [-8 : 0 ] COUNTING UP
+* X7             MASK, CONSTRUCTED WHEN NEEDED
+*    ALF.SC1+5   ADDRESS OF 'TEXT'
+*
+*
+* A5             CONTAINS THE ADDRESS OF ALF.SC1 + 3
+*
+          ZR     X5,PUT3ING  PERHAPS EMPTY STRING
+ PTLOOP   NZ     X6,CTOK     IF WORD IS EXHAUSTED, THEN
+          SA2    A5+B2       ADDRESS OF 'TEXT'
+          SA2    X2          OFFSET
+          SA3    A5-B2       POINTER TO NEXT WORD
+          IX2    X2+X3       ADDRESS OF NEXT WORD
+          SA4    X2          NEXT WORD 
+          MX7    -1          -1
+          IX7    X3-X7       NEW POINTER TO NEXT WORD
+          SA7    A3          STORE IT
+          SX6    -8
+                             NOW X4 CONTAINS (PART OF) A WORD
+ CTOK     LX4    7           POSITION NEXT CHARACTER
+          MX7    -7          MAKE A MASK FOR IT
+          SX6    X6+B1       COUNT IT
+          BX2    -X7*X4      THE CHARACTER
+* SAVE ALL INFORMATION
+          SA6    A5+B1
+          SX7    X5+B1       AND COUNT 
+          SA7    A5          ALF.SC1+3 
+          BX6    X4
+          SA6    A5-B1       ALF.SC1+2 
+* CALL 'PUT CHAR'
+          RJ     =XPUT1HAR
+* RESTORE THE INFORMATION
+          SA5    =XALF.SC1+3 FETCH X5 AND SET A5 
+          SA1    A5-B3       ALF.SC1
+          SA4    A5-B1       ALF.SC1+2 
+          SA2    A5+B1       ALF.SC1+4 
+          SX6    X2
+          NZ     X5,PTLOOP   MORE CHARACTERS ?
+          EQ     PUT3ING     RETURN
+          END
+
+

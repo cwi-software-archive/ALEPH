@@ -1,0 +1,61 @@
+
+          IDENT  GET8ORD
+          SST
+
+ FILE     =      1           X.FILE
+
+ GET8ORD  JP     *+1S17      + ""FILE + LEVEL>
+          ENTRY  GET8ORD
+          MX0    0
+          SA5    X.FILE      FILENAME
+          NZ,X5  NODUMMY   = DUMMY,
+          SX1    EOILEVEL    YIELD
+          EQ     GET8ORD           EOI;
+
+ NODUMMY  BSS    0
+          SA5    X.FILE+FILETYPE
+          BX6    X.FILE
+          LX5    SIGNBIT-CHDATBIT
+          SA6    =SSAVE
+          NG,X5  DATAFILE
+          RJ     =XGET1HAR   PROVOKE END-OF RECORD
+          SA.FILE SAVE
+          RJ     =XBAC.HAR
+          SA.FILE SAVE
+          SA5    X.FILE+FILECH#
+          UX5    B5          B5:= IF EOR THEN LEVEL ELSE -2000B FI
+          MX0    1
+          NG,B5  GET8ORD
+* END OF RECORD
+          MX0    0
+          SX1    B5          LEVEL
+          SX6    NEWSTAT
+          SA6    A5          FILECH#
+          EQ     GET8ORD
+
+ DATAFILE BSS    0
+*GET END OF RECORD FOR DATAFILES
+          SA5    X.FILE+FILECH#  STATUS
+          ZR,X5  TRY
+          MX0    1
+          PL,X5  GET8ORD     STATUS >0, FILEWORD FILLED.
+          MX0    0
+          UX5    B5          UNPACK EOR STATUS
+          SX1    B5          LEVEL
+          MX6    0           0 ->
+          SA6    A5          STATUS
+          EQ     GET8ORD
+
+ TRY      RJ     =XGETWORD
+          NZ,X3  EOR
+          BX6    X2          SAVE WORD
+          SA6    X1+FILEWORD IN FILEWORD,
+          SX7    B1          REREAD ->
+          SA7    X1+FILECH#            STATUS,
+          MX0    1           -
+          EQ     GET8ORD     ;
+
+ EOR      SX1    X3-1        LEVEL
+          EQ     GET8ORD
+*
+          END

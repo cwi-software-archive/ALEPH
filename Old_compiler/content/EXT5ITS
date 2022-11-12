@@ -1,0 +1,16 @@
+
+          IDENT  EXT5ITS
+          SST
+          ENTRY  EXT5ITS
+ EXT5ITS  JP     *+1S17      EXTRACT BITS + >X + >N + Y>:
+          SB5    X2
+          EQ     B5,B0,EXT1
+          SB4    B5-B1
+          MX5    1
+          AX5    B4          LEFT-ALIGNED MASK OF N BITS
+          LX5    B5          RIGHT-ALIGNED MASK OF N BITS
+          BX1    X1*X5
+          EQ     EXT5ITS
+ EXT1     MX1    0
+          EQ     EXT5ITS
+          END

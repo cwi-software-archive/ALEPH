@@ -1,0 +1,48 @@
+
+          IDENT  SQRT
+          SST
+          ENTRY  SQRT
+ SQRT     JP     *+1S17      SQUARE ROOT + >A + ROOT> + REM>:
+*
+* 'QUESTION' SQRT + >X + Y> + Z>:
+*   GREAT EQ + X + 0   $ OTHERWISE FAILURE $,
+*   (ACTUAL SQRT - Q - TEMP:
+*     0 -> Y, X -> Z, 1 -> Q,
+*     (FIRST TRUE + X + TEMP, DECR + TEMP, CLEAR ELEM + TEMP + 1,
+*       LEFT CLEAR + Q + TEMP,
+*       (REDUCE Q:
+*         SUBTR + Z + Y + TEMP, SUBTR + TEMP + Q + TEMP,
+*             RIGHT CLEAR + Y + 1,
+*         (LESS + TEMP + 0; ADD + Y + Q + Y, TEMP -> Z),
+*         RIGHT CLEAR + Q + 2, (Q = 0; :REDUCE Q)
+*       ); +
+*   ) ).
+*
+* X0: Q; X1: X; X2: Y; X3: Z; X4: TEMP.
+*
+          SX0    B1          SET TOGGLE TO FALSE
+          NG     X1,SQRT     ^ GREAT EQ + X + 0
+          MX2    0           0 -> Y
+          BX3    X1          X -> Z
+*         ZR     X1,SQRT     FIRST TRUE               $$$$$$$$$$$$$$$$$$
+          NX1    B5                     + X
+          SX4    B5-48                      + TEMP
+          BX4    -X4
+          IX4    X4-X0       DECR + TEMP
+          BX4    -X0*X4      CLEAR ELEM + TEMP + 1
+          SB5    X4          LEFT CLEAR
+          LX0    B5                     + Q + TEMP
+*
+ REDUCEQ  IX4    X3-X2       SUBTR + Z + Y + TEMP
+          IX4    X4-X0       SUBTR + TEMP + Q + TEMP
+          AX2    1           RIGHT CLEAR + Y + 1
+          NG     X4,REDQ     LESS + TEMP + 0
+          IX2    X2+X0       ADD + Y + Q + Y
+          BX3    X4          TEMP -> Z
+ REDQ     AX0    2           RIGHT CLEAR + Q + 2
+          NZ     X0,REDUCEQ  (Q = 0; : REDUCE Q)
+*
+          BX1    X2
+          BX2    X3
+          EQ     SQRT
+          END

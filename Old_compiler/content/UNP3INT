@@ -1,0 +1,29 @@
+
+          IDENT  UNP3INT
+          SST
+          ENTRY  UNP3INT
+ UNP3INT  JP     *+1S17      UNPACK INT + >INT + []ST[]:
+          SB5    X2
+          BX2    X1
+          SX1    B5          EXCHANGE X1 AND X2
+          RJ     =XINT.CHR   CONVERT INTEGER
+          SX2    INTSIZE
+          EXTEND12
+          SA2    X1+>>       TOP
+          SA3    X1          OFFSET
+          IX3    X2+X3       ACTUAL TOP ADDRESS
+          SA5    X3-INTSIZE  OLD TOP
+          BX6    X5
+          SA6    A5          SET A6
+*DIGITS
+          SB5    -INTSIZE    COUNTER
+          SA3    INT.CHR-4   WORD
+          MX2    -4
+          LX3    4           RIGHT-ALIGH FIRST CHAR
+ DIGITS   BX6    -X2*X3      CHAR
+          SA6    A6+B1       WRITE
+          LX3    4           NEXT
+          SB5    B5+B1       COUNT
+          NG,B5  DIGITS
+          EQ     UNP3INT
+          END

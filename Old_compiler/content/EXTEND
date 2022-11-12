@@ -1,0 +1,296 @@
+
+          IDENT  EXTEND
+          SST
+* COMMUNICATION VARIABLES           ************************************
+          ENTRY  NEW>>,ADDR>>,STACK<<,MAX>>
+ NEW>>    BSS    1
+ ADDR>>   BSS    1
+*
+ <>RTS    =      2           PSEUDO-CALIBRE OF THE RUN-TIME STACK
+*
+          SPACE  10,10
+* INITIALIZATION                    ************************************
+          ENTRY  INITEXT
+ INITEXT  JP     *+1S17      INITIALIZE FLOATING LIST ADMINISTRATION
+* LOOP FOR UPDATING THE STRUCTURE OF THE LIST ADM CHAIN
+          SA1    CA.ADDR
+          SX4    X1+CA.LIST-[]LINK PRE ADDRESS
+          SX6    B0          INITIAL BACK LINK
+ UPD      SA4    X4+[]LINK
+          SX4    X4          REMOVE BACK POINTER
+          ZR     X4,UPD.
+*
+          SA5    X4+[]LINK   INSERT BACK LINK
+          LX6    30
+          BX6    X5+X6       COMBINE WITH EXISTING LINK
+          SA6 A5 X4+[]LINK   WRITE BACK
+          SX6    X4          UPDATE BACK LINK
+*
+          SA5    X4+[]HIST
+          NZ,X5  UPD         ELSE, IF NON-FLOATING STACK,
+          MX7    -1          -1
+          SA7 A5 []HIST
+          EQ     UPD
+ UPD.     BSS    0
+*
+* INITIALIZE RT STACK ADM:
+          SA1    RA.LWP      POINTER TO FIRST FREE WORD
+          SX6    X1-1        POINTER TO END OF CODE
+          SA6    ALFSTACK+[]LSR
+          SA6    ALFSTACK+>>
+          SB6    X6          STACK POINTER
+          SA6    ALFSTACK+<<PRE
+          SA6    ALFSTACK+>>MAX
+          SB7    X6          STACK LIMIT
+*
+          SX6    X6+<>RTS    <<PRE + <> = <<
+          SA6    ALFSTACK+<<
+*
+* LINK RUN-TIME STACK ADM INTO CHAIN
+          SA1    CA.ADDR     @ OF COMM. AREA
+          SA1    X1+CA.LIST
+          SX6    ALFSTACK    @ OF RT STACK
+          SA6    A1          INTO COMM. AREA.
+*
+          SX7    X1          FORWARD POINTER TO FIRST LIST,
+                             BACKWARD POINTER = NIL
+          SA7    ALFSTACK+[]LINK IS CORRECT CHAINING FOR RT STACK
+*
+          ZR,X1  INITEXT     EITHER THERE IS NO FIRST LIST, OR:
+          SA1    X1+[]LINK   LINK WORD OF FIRST LIST
+          LX6    30          CHAINED BACKWARD
+          BX6    X1+X6       TO RT STACK
+          SA6    A1
+*
+          EQ     INITEXT
+          SPACE  10,10
+* LIST ADM FOR RUN-TIME STACK: *RTS ************************************
+*
+          CON    1R**1S53+1RR*1S46+1RT*1S39+1RS*1S32+4 []NAME
+          CON    10          []HIST
+          CON    0           []AIM
+          BSS    1           []LSR
+          BSS    1           []LINK
+          CON    <>RTS       <>
+          BSS    1           <<
+          BSS    1           >>, B6
+          BSS    1           <<PRE, STACK<<
+          BSS    1           >>MAX, B7
+ ALFSTACK CON    0           OFFSET, DUMMY
+*
+ STACK<<  =      ALFSTACK+<<PRE
+*
+          SPACE  10,10
+* STACK OVERFLOW                    ************************************
+          ENTRY  STOVL
+ STOVL    BSS    0
+*
+* THE STACK OVERFLOW HANDLER ASSUMES THE CALL TO BE OF THE FORM
+*
+*     SX7  *+1   \   EQ  LAB
+*
+* AND WILL RETURN TO THE WORD AT 'LAB' + 1.
+*
+          SA7    SAVPARS     SAVE THE REGS TO BE USED BY THE SYSTEM;
+          BX6    X1          THE SYSTEM DOES NOT USE =XTEMPIES, SO
+          SA6    A7+B1       THERE IS NO NEED TO SAVE THEM
+          BX6    X2
+          SA6    A6+B1
+          BX6    X3
+          SA6    A6+B1
+          STARTPR 2          ANNOUNCE STACK OVERFLOW
+          SX1    ALFSTACK    OFFENDING STACK
+          RJ     REDIVIDE
+          STOPPR 2           ANNOUNCE STACK OVERFLOW
+          SA5    SAVPARS     RESTORE REGS
+          BX7    X5
+          SA1    A5+B1
+          SA2    A1+B1
+          SA3    A2+B1
+          SA5    X7-1        * RETURN TO CALL
+          SB5    X5+1        *
+          JP     B5          *
+*
+ SAVPARS  BSS    4
+          SPACE  10,10
+* EXTENSION ROUTINE                 ************************************
+          ENTRY  EXTEND
+ OLD>>    BSS    1
+*
+ EXTEND   JP     *+1S17      + >A1 + >X1 #UBND + >X2 #SIZE
+                             SAVES A1
+          SX6    A1
+          IX7    X1+X2       NEW SOFT RIGHT
+          SA6    ADDR>>
+          SA4    A1+B2       GET SOFT MAX
+          IX5    X4-X7
+          SA7    NEW>>
+          PL     X5,EXTEND
+*
+          SA7    A1          SET NEW >> IN ADM, SINGLE INSTRUCTION
+          BX6    X1          AND SAVE OLD >>
+          SA6    OLD>>
+*
+          STARTPR 3          ANNOUNCE EXTEND OVERFLOW
+          SX1    A1->>       A1 WAS POINTER TO >>
+          SA5    X1+[]HIST   HALT IF EXTEND ON FIXED STACK
+          NG     X5,VIRTOVFL        CANNOT BE SATISFIED
+*
+          RJ     REDIVIDE    LEAVES X1 INTACT
+*
+          SA1    X1+>>       A1
+          SA5    OLD>>
+          BX6    X5          RESTORE OLD >>
+          SA6    A1          SINGLE INSTRUCTION
+          STOPPR 3           ANNOUNCE EXTEND OVERFLOW
+          EQ     EXTEND
+*
+ VIRTOVFL ERROR  (VIRTUAL ADDRESS SPACE EXHAUSTED),L1
+*
+          SPACE  10,10
+* REDIVIDE                          ************************************
+ REDIVIDE JP     *+1S17
+          SX6    X1           ADM OF STACK
+          SA6    ADM
+          DOWNCPU
+* SAVE AND RESET A0,B6,B7 FOR REDIV
+          SX6    A0-0
+          SA6    SAVEA0
+          SA0    -B1
+          SX6    B6
+          SA6    ALFSTACK+>>
+          SB6    =XRDV;ST-1
+          SB7    =XRDV;ST.-1
+*
+ +        SX7    *+1
+          EQ     =XRED;DIV
+* RESTORE A0,B6,B7 FOR ALEPH
+          SA5    SAVEA0
+          SA0    X5-0        PRESERVE -0
+          SA4    ALFSTACK+>>
+          SA5    ALFSTACK+>>MAX
+          SB6    X4
+          SB7    X5
+*
+          UPCPU
+          SA1    ADM         RESTORE X1
+          EQ     REDIVIDE
+*
+ ADM      BSS    1
+ SAVEA0   BSS    1           TO PREVENT MESSY ERROR MESSAGES
+*
+          SPACE  10,10
+* MOVE + >N + >FROM + >TO           ************************************
+          ENTRY  MOVE
+*
+* MOVES THE CONTENTS OF A PIECE OF CORE OF LENGTH 'N' STARTING AT 'FROM'
+* TO THE AREA STARTING AT 'TO'.
+* THE BODY CONSISTS OF A VERY TIGHT LOOP FOR THE ACTUAL TRANSPORT PLUS
+* SOME INITIALIZATION FOR THAT LOOP.
+*
+          QUAL   MOVE
+ ONE      SA4    X2
+          BX6    X4
+          SA6    X3
+*         EQ     MOVE
+ MOVE     JP     *+1S17      + >N + >FROM + >TO:
+          ZR,X1  MOVE        IF N = 0
+          BX6    X1
+          LX6    -1
+          SB4    X6          B4 := N // 2
+          ZR,B4  ONE         SINCE N /= 0
+          IX4    X2-X3       NEGATIVE IF BACKWARDS TRANSPORT
+          AX4    60
+          SX5    B1          TENTATIVE STEP
+          IX7    X1-X5       LENGTH - 1
+          BX7    X7*X4       IF FORWARD THEN 0 ELSE LENGTH - 1
+          BX5    X5-X4       IF FORWARD THEN 1 ELSE -1
+          SB5    X5          ACTUAL STEP
+          IX4    X2+X7       @ FIRST SOURCE
+          IX5    X3+X7       @ FIRST DESTINATION
+          NG,X6  ODD         RIGHT-MOST BIT OF N
+*EVEN, N >= 2
+          SB4    B4-B1       SINCE THE INITIALIZATION WILL MOVE 2 WORDS
+          SA4    X4          FROM
+          BX6    X4
+          SA6    X5          TO
+          SA5    A4+B5
+          ZR,B4  RET
+ LOOP     BSS    0           HERE STARTS THE LOOP. ENTRY CONDITIONS:
+                             (X5, A5) IS THE SECOND OF THE SOURCE PAIR,
+                             A6 IS THE ADDRESS OF THE FIRST OF THE
+                                DESTINATION PAIR,
+                             THE WHOLE SOURCE PAIR IS READ, THE FIRST
+                             WORD OF THE DESTINATION PAIR HAS BEEN
+                             WRITTEN.
+          SA4    A5+B5
+          BX7    X5
+          SA7    A6+B5
+          SA5    A4+B5
+ LOOP.    BSS    0           SOURCE PAIR IN X4, X5 AND A5.
+                             @ OF SECOND WORD OF DESTINATION IN A7
+          BX6    X4
+          SA6    A7+B5
+          SB4    B4-B1       COUNT THE PAIR
+          NZ,B4  LOOP
+ RET      BSS    0           SAME CONDITIONS AS AT 'LOOP'
+          BX7    X5
+          SA7    A6+B5
+          EQ     MOVE
+
+ ODD      BSS    0           N >= 3
+          SA4    X4          FROM
+          BX7    X4
+          SA7    X5          TO
+          SA4    A4+B5
+          SA5    A4+B5
+          EQ     LOOP.
+          QUAL * MOVE
+ MOVE     =      /MOVE/MOVE
+*MOVE     END
+*
+          SPACE  10,10
+* GIVE UP, MEMORY FULL              ************************************
+          ENTRY  GIVEUP
+ GIVEUP   SA3    ADM         @ OF OFFENDING STACK
+          SX4    ALFSTACK
+          BX4    X3-X4       IS IT THE RUN-TIME STACK?
+          ZR,X4  RTSTOVFL
+          ERROR  (MEMORY EXHAUSTED - DURING EXTENSION),L3
+ RTSTOVFL ERROR  (MEMORY EXHAUSTED - RT STACK OVERFLOW)
+          SPACE  10,10
+*  ATTEMPT TO EXTEND FIELD LENGTH   ************************************
+          ENTRY  TRYEFL
+ TRYEFL   JP     *+1S17        NEW RIGHT IN X1, RESULTING INCREASE IN X1
+          SX6    X1+B1         NUMBER OF LOCATIONS
+          LX6    30
+          SA6    =SSTAT
+          MEMORY CM,A6,R,,N
+          MX6    0
+          SA6    =SSTAT
+          MEMORY CM,A6,R
+* UPDATE RA.LWP
+          SA4    RA.LWP      OLD FL + BITS 59-18
+          SA5    =SSTAT
+          AX5    30          NEW FL
+          MX6    -18
+          BX6    X6*X4       BITS 59-18
+          BX4    X4-X6       OLD FL
+          BX6    X6+X5       NEW FL + BITS 59-18
+          SA6 A4 RA.LWP
+          IX1    X5-X4       SET RESULT TO NEW FL - OLD FL
+*
+* UPDATE MAX>>
+          SA4    MAX>>
+          IX6    X5-X4       NEW FL - MAX>>, NEGATIVE IF MAX>> OK
+          AX6    60
+          BX4    X6*X4
+          BX5    -X6*X5      OTHERWISE NEW FL SELECTED
+          BX6    X4+X5
+          SA6 A4 MAX>>       WINNER WRITTEN BACK
+*
+          EQ     TRYEFL
+*
+ MAX>>    CON    0           MAX CM USED
+*
+          END

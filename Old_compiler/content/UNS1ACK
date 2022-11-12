@@ -1,0 +1,16 @@
+
+          IDENT  UNS1ACK
+          SST
+          ENTRY  UNS1ACK
+ UNS1ACK  JP     *+1S17      UNSTACK + []ST[]:
+          SA4    X1+<<       <<
+          SA5    A4+B1       >>
+          IX3    X5-X4
+          PL     X3,UNS1     STACK NOT EMPTY
+          ERREXT (UNSTACK, STACK EMPTY),L1
+
+ UNS1     SA4    A5-B2       <>
+          IX6    X5-X4
+          SA6    A5          >>
+          EQ     UNS1ACK
+          END

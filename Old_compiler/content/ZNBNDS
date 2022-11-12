@@ -1,0 +1,13 @@
+
+          IDENT  ZNBNDS      ZONE BOUNDS
+          SST
+          ENTRY  ZNBNDS
+ ZNBNDS   JP     *+1S17      RJ ENTRY
+* + >X1 # LWB + >X2 # UPB + >B4 # OFFSET ON STACK + >B5 #FALSE @
+          SA3    B6-B4
+          IX4    X3-X1       MUST BE POSITIVE
+          IX5    X2-X3       MUST BE POSITIVE
+          BX5    X4+X5       MUST BE POSITIVE
+          PL,X5  ZNBNDS
+          JP     B5
+          END

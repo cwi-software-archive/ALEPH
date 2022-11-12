@@ -1,0 +1,67 @@
+
+          IDENT  UNP6ING     ALEPH EXTERNAL RULE
+          SST
+          ENTRY  UNP6ING
+ UNP6ING  JP     *+1S17      UNPACK STRING + FROM[] + >P + []TO[]:
+* UNPACKS THE STRING 'FROM,N' INTO 'TO'
+          MUSTBE X1,X2,(UNPACK STRING, BAD STRING POINTER)
+          SA4    X1          OFFSET
+          IX4    X4+X2       ADDRESS OF LAST WORD
+          SA4    X4          LAST WORD
+          MX5    -11
+          BX4    -X5*X4      LENGTH IN CHARACTERS
+          BX6    X4          WHICH
+          SA6    =XALF.SC1+2       SAVE
+          AX4    3           LENGTH IN WORDS - 1
+          IX2    X2-X4       POINTER TO FIRST WORD
+          MUSTBE X1,X2,(UNPACK STRING, BAD STRING)
+          BX4    X6          LENGTH IN CHARACTERS
+          BX6    X2          POINTER TO FIRST WORD
+          SA6    A6-B1       STORE
+          BX6    X1          ADDRESS OF 'FROM'
+          SA6    A6-B1       STORE
+          SX1    X3          STACK TO BE EXTENDED
+          BX2    X4          LENGTH
+          EXTEND12
+*
+*  X1:     ADDRESS OF 'TO'
+*  X4/A4:  READING REGISTER
+*  X5:     SEVEN-BITS MASK
+*  X6/A6:  WRITING REGISTER
+*  B4:     COUNTER OVER PACKED WORDS
+*  B5:     SHIFT COUNTER
+*
+          SA2    X1          OFFSET OF 'TO'
+          SA3    X1+>>       >>TO
+          IX2    X2+X3       ADDRESS OF RIGHT-MOST WORD
+          SA3    =XALF.SC1+2 LENGTH
+          IX2    X2-X3       ADDRESS OF LAST WORD FILLED
+          SA5    X2
+          BX6    X5
+          SA6    A5          A6:= ADDRESS OF LAST WORD FILLED
+          SA2    A3-B1       POINTER TO FIRST PACKED WORD
+          SA1    A2-B1       ADDRESS OF 'FROM'
+          SA1    X1          OFFSET
+          IX2    X2+X1       ADDRESS OF FIRST WORD
+          SA4    X2          LOAD FIRST WORD
+          MX5    -7          MASK
+          AX3    3           NUMBER OF PACKED WORDS - 1
+          SB4    X3          COUNTER
+          ZR     B4,LAST     PERHAPS NO FULL WORD
+ WRDL     SB5    8           SHIFT COUNT
+ CHRL     LX4    7           NEXT CHARACTER
+          BX6    -X5*X4      GET IT
+          SA6    A6+B1       AND WRITE;
+          SB5    B5-B1       COUNT DOWN
+          NZ     B5,CHRL
+          ZR     B4,UNP6ING  WAS THIS THE LAST WORD?
+          SA4    A4+B1       IF NOT, GET THE NEXT ONE
+          SB4    B4-B1       COUNT IT
+          NZ     B4,WRDL     IS IT GOING TO BE THE LAST WORD?
+ LAST     MX2    -3          IF SO, EXTRACT ITS LENGTH
+          BX2    -X2*X4
+          SB5    X2          MAKE IT THE COUNT
+          NZ     B5,CHRL     AND IF THERE IS SOMETHING TO BE DONE,
+                             RESTART THE LOOP WITH B4 = 0
+          EQ     UNP6ING
+          END

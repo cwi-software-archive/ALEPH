@@ -1,0 +1,5 @@
+
+          IDENT  ALF.SC1     SCRATCH AREA FOR STRING HANDLING
+          ENTRY  ALF.SC1
+ ALF.SC1  BSS    6
+          END
