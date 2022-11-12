@@ -1,0 +1,696 @@
+$                  ********** aleph compiler, scan 2, version 0  **********
+
+
+'short'
+
+
+$ ****** general environment ******
+
+
+'external' 'action'
+    new page, exit, prsym, csym, fromdrum.
+'macro''pointer'
+    int reg = 940 101, label marker = 940 102, nlcr marker = 940 103,
+    loc marker = 940 001, value marker = 940 002, sel marker = 940 005,
+    addr marker = 940 004,
+    tag marker = 940 003, left marker = 940 012, row marker = 940 006,
+    right marker = 940 011, size marker = 940 013, tenthmax = 6 710 886,
+    disjunct = 10, marker offset = 940 000, floating space = 20 000,
+    nix = (-1), minuscode = 65, spacecode = 93, nlcrcode = 119,
+    bits minus four = 22, printer = 0, cardpunch = 1, buffer = 2,
+    acceptor = 1, relayer = 2, donor = 3, qtable = 4, qlist = 5, qfile = 6,
+    true = 1, false = 0, maxcardpos = 72, zerochar = 0,
+    zero = 0, one = 1, two = 2.
+
+$ **** stacks ****
+
+'macro' 'pointer'
+min tag =100001,max tag =106000,
+min bold=200001,max bold=200400,
+min spec=300001,max spec=300050,
+min string = 510001, max string = 510600,
+min stringbuff = 520001, max stringbuff = 520300,
+min glob=600001,max glob=605000,
+min globptr = 910001, max globptr = 911500,
+min formals = 920001, max formals = 920300,
+min display = 930001, max display = 930300,
+min member =950001, max member =950500,
+min select=960001, max select=960300,
+min disk = 410 001, max disk = 410 650,
+min expr = 440001, max expr = 442800,
+min labels = 470 001, max labels = 470600,
+min diskptrs = 480 001, max diskptrs = 480 050,
+min preread = 490 001, max preread = 490 100,
+min tolab = 0, max tolab = 100,
+min stack = 450 001, max stack = 450 700.
+'macro' 'pointer'
+    size glob = 10, size globptr = 4, size display = 1,
+    size diskptrs = 2, size labels = 2.
+'list'
+[min tag : max tag] ttag(tag, right, left, adm),
+[min bold : max bold] tbold,
+[min spec : max spec] tspec,
+[min string : max string] tstring,
+[min stringbuff : max stringbuff] stringbuff,
+[min glob : max glob] lglob (type, sort, place = addr loc, max parms = displ,
+                             call = sel, forms = size, bits = fixed,
+                             first = length,  min limit, repr),
+[min globptr : max globptr] lglobptr (type, place, expr, repr),
+[min formals : max formals] lformals,
+[min display : max display] ldisplay,
+[min member : max member] lmemb,
+[min select : max select]lselect(slt, place, link, cnt),
+[min disk : max disk] ldisk,
+[min expr : max expr] lexpr (state, value),
+[min labels : max labels] llabels (lab, repr),
+[min preread : max preread] lpreread,
+[min diskptrs : max diskptrs] ldiskptrs (plist, dlist),
+[min tolab : max tolab] ltolab,
+[min stack : max stack] stack.    $ deel in in blokken
+'macro' 'question'
+was tag =min tag '"le"''1'&'1''"le"'ptag,
+was bold=min bold'"le"''1'&'1''"le"'pbold,
+was spec=min spec'"le"''1'&'1''"le"'pspec,
+was symbol = min tag'"le"''1'&'1''"le"'p spec,
+was glob = min glob'"le"''1'&'1''"le"'p glob,
+was formals = min formals'"le"''1'&'1''"le"'p formals,
+was member = min member'"le"''1'&'1''"le"'p member,
+was expr = min expr'"le"''1'&'1''"le"'p expr,
+was int den = '1' = int reg.
+
+$ ****** simple external operations ******
+
+
+'macro' 'action'
+mark='1':=-'1',
+add='3':='1'+'2',
+subtr='3':='1'-'2',
+mult = '3':='1'*'2',
+divide = '3':='1'_:'2',
+divrem='3':='1''"/"''2';'4':='1'-'2'*'3',
+incr  ='1':='1'+1,
+decr  ='1':='1'-1,
+select 2 bits = '3':=bitstring('2'+1',''2'',''1'),
+select 3 bits = '3':=bitstring('2'+2',''2'',''1'),
+    unpack3 = '2':='1''"/"'65536-2;
+              '4':=-65536*'2'+'1'-131072;
+              '3':='4''"/"'256-2;'4':=-256*'3'+'4'-514.
+'macro' 'question'
+is = '1'=1, not = '1'=0,
+marked='1'<0,
+less='1'<'2',
+lseq='1'_<'2'.
+
+$ ****** pointers ******
+
+
+'pointer'
+    x diskptrs, x preread, p preread, p labels, p glob, p globptr,
+    p string, p stringbuff, p expr, p display, p formals, p member, p select,
+    p tag, p bold, p spec, p stack, x stack, p disk.
+'pointer' drop, output, follow up, undef.
+'pointer' x formals, curlab, cur aleph lab, cur datalab, firsttag.
+'pointer'
+    handle, handle adm, forms bitcnt, int value, drump, drumsize, floatsum,
+    line, n plus, inpt, lastsym, title, labelbase, locals addr.
+'pointer' p temps, ind temp, entry, cardpos.
+'action'
+    alternative, member, righthandside, operation, destination tail,
+    extension, showlists,setstack,scan2, g init machine,    endalt, stackskip,
+    onstack, g stack,   bound affixes, endrule, retrieve formal, error,
+    get memb ind, claim, get rule def, terminator, error text, fatal error,
+    skip to point, error skip, prelude, to stringbuff, g temps,
+                g address, g space, g value, g string, g variable,
+    gen variables, gen administrations, show, rs any, to s3, g transport,
+    gen fixed lists and tables, gen floating lists, g syst routines,
+    gen display item list, gen insertion, fresh datalab, g init toggle,
+    g copyr, g copy params, treat aleph lab, name externals, name external,
+    generate data, r to s any, get selector, g name external,
+    g copy temps, g corest,        unpack, unpack1, init disk,
+    g call rule, g restore params, g follow up card, g lab,
+    g jump, g begin, g end, g false result, g identj,
+    from disk,               puchar, punch, puint, puint1, poscard,
+    puspaces, newcard, rany,         read, rs mod, init labels,
+    termtr jump, true jump, fresh, putlab, putjump, putlabel, fresh repeater,
+    get label repr, print, outint, outint1,            position, spaces, nlcr,
+    prchar, fill, init system, fill lists, pre.
+
+$ ********** the grammar **********
+
+
+'action' alternative + nextlab + falselab + >tofalse> - branch:
+    g init toggle, member + nextlab + branch,
+    nxt:(was member + inpt, member + falselab + branch,
+            (is + branch, error text + backtrack, true -> to false; + ),
+         :nxt; + #nxt).
+'action' member + dest + >branch - last - operat:
+    get membind + last + operat,
+        (is + operat, operation + dest + branch #incl claim;
+         compound member + dest + branch;
+         affix form + dest + branch;
+            (is + last;  error + invalid member), terminator + dest + branch).
+'predicate' rule declaration - dum:
+    is tag + handle, adm*ttag[handle] -> handle adm, bound affixes,
+    min labels -> p labels, claim + size labels + max labels + p labels,
+    treat aleph lab + handle, init labels,
+    righthandside + 0 + dum, endrule, add + labelbase + curlab + labelbase.
+'action' righthandside + dest + >branch - truelab - nextlab - to false:
+    false -> to false, fresh + nextlab, fresh + truelab,
+    nxt:(false -> termtr, alternative + nextlab + dest + to false,
+         endalt + truelab + nextlab + dest + to false + branch,
+            (r + semicolon, :nxt;  false -> termtr) #nxt).
+'action' operation + dest + >branch - savp:
+    p stack -> sav p,
+    #affix(stack affix + acceptor + false,
+        #tail(identity tail + dest + sav p, true -> branch;
+              destination tail + sav p, false -> branch #tail);
+           extension, false -> branch #affix), sav p -> p stack.
+'predicate' identity tail + dest + sav p:
+    r + equals, (stack affix + acceptor + false; + ),
+    onstack + nix, set stack + sav p, 0 -> p temps, g copy params,
+    true -> ltolab[dest], add + dest + labelbase + dest, g identj + dest.
+'action' destination tail + sav p - dum:
+    onstack + nix, setstack + sav p, 0 -> p temps,
+    g copy params, g transport, sav p -> p stack,
+    rep:(r + minus, rany + dum,
+            (stack affix + donor + false; + ), :rep;
+         onstack + nix, setstack + sav p,
+         0 -> p temps, 2 -> ind temp, g restore params + true).
+'action' extension: + .
+'predicate' compound member + dest + >branch - lab - dum:
+    r + label marker, rany + lab, treat aleph lab + lab, rany + dum,
+    righthandside + dest + branch, rany + dum,
+    subtr + p labels + size labels + p labels;
+    r + open, righthandside + dest + branch, rany + dum.
+'action' treat aleph lab + lab:
+    lab -> lab*llabels[p labels], cur aleph lab -> repr*llabels[p labels],
+    g lab + repfix + cur aleph lab, fresh repeater,
+    claim + size labels + max labels + p labels.
+'action' scan2:
+    init system, showlists, prelude,
+   (is + drop, error + dropped;  g begin,
+    nxt:(rule declaration, :nxt; root; true -> drop),
+    g syst routines, generate data, name externals + first tag, g end,
+        (is + undef, error + undefsym; + ),
+    nlcr, nlcr, print + program,
+        (is + drop, print + incorrect;  print + correct)).
+'action' terminator + dest + branch - tg - repr:
+    r + repeatsym, rany + tg, get label repr + tg + repr,
+    termtr jump + repr + true, false -> branch;
+        (r + succsym, false -> branch;
+         r + failsym, true -> branch, termtr jump + dest + false),
+        (r + rootsym, errorskip + not yet implemented; + ); + .
+'predicate' affix form + dest + >branch - tg - adm - sort - type - rec - sav p:
+    is tag + tg, adm*ttag[tg] -> adm, p stack -> sav p,
+    get rule def + adm + sort + type + x formals + rec, 0 -> forms bitcnt,
+      l:(affix, :l; onstack + nix),
+        ((type = action;  type = function), false -> branch, nix -> dest;
+         true -> ltolab[dest], add + dest + labelbase + dest, true -> branch),
+    setstack + sav p, 0 -> p temps, g copy params,
+    g call rule + repr*lglob[adm] + dest, add + p temps + 1 + ind temp,
+    0 -> p temps, setstack + sav p, g restore params + false, sav p -> p stack.
+'predicate' affix - type:
+    retrieve formal + type, incr + n plus,
+  #staff(stack affix + type + false,
+            (type = zero, error + wrong number of affixes; + );
+            (type = zero;  error + wrong number of affixes),
+         decr + n plus, -
+  #staff).
+'predicate' stack affix + type + index - x type - x - sel - p - dum:
+#staff(r + locmarker, to s3 + type + index + locmarker, r to s any;
+       r + tag marker, to s3 + type + index + tagmarker, r to s any;
+       r + value marker, to s3 + type + index + value marker, r to s any;
+       inpt -> p,
+     #list((r + size marker;  r + left marker;  r + right marker),
+           (r + tag marker;  rany + dum, add + p + disjunct + p),
+           to s3 + type + index + p, r to s any;
+           r + sel marker, rany + sel, rany + x type, rany + x,
+              (stack affix + type + true; + ), get selector + sel + x + p,
+           to s3 + type + index + sel marker, to s3 + p + x type + x;
+           r + row marker, rany + x type, rany + x,
+              (stack affix + type + true; + ), to s3 + type + index + rowmarker,
+           onstack + x type, onstack + x #list) #staff),
+      (is + index;  onstack + nix).
+'predicate' root - dum:
+    r + rootsym, g lab + tagfix + 0, g init machine,  0 -> dum,
+        (affix form + dum + dum; + ).
+
+$ ******** miscellaneous ********
+
+
+'macro' 'pointer'  pluscol = 8, lastsymcol = 16, textcol = 40.
+'action' endalt + tlab + >nlab> + flab + to false + >jpd> - ndone - fdone - h:
+    ahead + close, ltolab[nlab] -> jpd,
+        (is + jpd, truejump + tlab, putlabel + nlab,
+         fresh + nlab, putjump + flab, putlabel + tlab;
+         putlab + tlab + h, to false -> jpd);
+    ahead + semicolon, truejump + tlab, putlab + nlab + ndone,
+        (is + ndone, fresh + nlab; error + alternative never reached);
+        (true handle;  putjump + tlab),
+    putlab + nlab + ndone, putlab + flab + fdone,
+        ((is + fdone;  is + ndone),
+            (true handle, error + rule may be false;  g false result);
+            (true handle;  error + nonfalse rule)), putlab + tlab + h.
+'question' true handle - type:
+    type*lglob[handle adm] -> type, (type = action;  type = function).
+'predicate' y copy + >type x + >x + >cpy + >pt + >it + >sel - type - index:
+    rs + nix, - ;
+    rs + donor, stackskip, :y copy;
+    rs any + type, rs any + index, true -> cpy,
+  #ahead((rs + sel marker, rs any + sel;  rs + row marker, 0 -> sel),
+         rs mod + type x + x, (rs + nix; + ), p temps -> it;
+         incr + p temps, rs mod + type x + x, 0 -> sel,
+            (rs + nix; + ), 0 -> it #ahead), p temps -> pt.
+'predicate' y restore + operat + >type x + >x + >cpy + >pt + >it + >sel
+            - type - index:
+    rs any + type,
+  #nix(type = nix, - ;
+        (type = relayer;  type = donor),
+    rs any + index, index -> cpy,
+  #ahead((rs + sel marker, rs any + sel;  rs + row marker, 0 -> sel),
+         rs mod + type x + x, (rs + nix; + ), ind temp -> it;
+         incr + p temps, rs mod + type x + x, 0 -> sel,
+            (rs + nix; + ), 0 -> it #ahead),
+        (is + index, ind temp -> pt;  is + operat, 1 -> pt;  p temps -> pt);
+       stackskip, :y restore #nix).
+'action' stackskip:
+    rs + nix;  incr + x stack, :stackskip.
+'action' onstack + x:
+    claim + 1 + max stack + p stack, x -> stack[p stack].
+'action' to s3 + p1 + p2 + p3:
+    onstack + p1, onstack + p2, onstack + p3.
+'action' claim + size + max + >p list>:
+    add + p list + size + p list,
+        (lseq + p list + max;  fatal error + overflow).
+'action' get selector + sel + head + >cnt - p:
+    sel*lglob[adm*ttag[head]] -> p,
+    rep:(slt*lselect[p] = sel, cnt*lselect[p] -> cnt;
+         link*lselect[p] -> p, :rep).
+'action' bound affixes:
+    0 -> p temps -> forms bitcnt -> entry,
+    forms*lglob[handle adm] -> x formals,
+    g copy temps + repr*lglob[handle adm] + max parms*lglob[handle adm].
+'predicate' y copyr + to stack - type:
+    retrieve formal + type, incr + entry,
+#to stack(less + 0 + to stack,
+             (type = zero, - ;  type = donor, :y copyr;  incr + p temps);
+             (type = zero, - ;
+                 (type = relayer;  type = donor), incr + p temps;  :y copy r)
+#to stack).
+'action' endrule - dum:
+    0 -> p temps -> forms bitcnt -> entry,
+    forms*lglob[handle adm] -> x formals, rany + dum #point,
+    g copy temps + 0 + maxparms*lglob[handle adm].
+'action' retrieve formal + >type:
+        (less + bits minus four + forms bitcnt,
+         0 -> formsbitcnt, incr + x formals; + ),
+        (was formals + x formals,
+          select 3 bits + lformals[x formals] + formsbitcnt + type,
+          add + forms bitcnt + 3 + forms bitcnt;  zero -> type).
+'action' error text + text:
+    nlcr, outint + line, position + pluscol, outint + n plus,
+    position + lastsymcol, print + lastsym,
+    position + textcol, print + text, nlcr.
+'action' error + text:
+    error text + text, true -> drop.
+'action' error skip + text:
+    error + text, error + skipped, skip to point.
+'action' skip to point:   $ er staat geen punt in input
+    r + point;  read + inpt, :skip to point.
+'action' fatal error + text:
+    error + text, show lists, exit.
+'action' get membind + >last + >operat - p - q - bits:
+    rany + p, rany + q, select 2 bits + lmemb[p] + q + bits,
+        (bits = zero, false -> last -> operat;
+         bits = one, false -> last, true -> operat;
+         bits = two, true -> last, false -> operat;
+         true -> last -> operat).
+'action' get rule def + adm + >sort + >type + >forms + >rec:
+    type*lglob[adm] -> type, sort*lglob[adm] -> sort,
+    forms*lglob[adm] -> forms,
+        (bits*lglob[adm] = one, true -> rec;  false -> rec).
+'action' initialize for reading:
+    min disk -> p disk, min stringbuff -> p stringbuff,
+    min preread -> x preread, incr + x preread,
+    min stack -> p stack, min disk -> p disk,
+    1 -> cur alephlab -> cur datalab, fill lists, init disk, fromdisk.
+'action' init system:
+    read + title, 0 -> line -> pos -> labelbase,
+    tenth max -> cardpos, false -> follow up,
+    print + title, read + inpt.
+'action' name externals + x:
+    x = 0;
+    name externals + left*ttag[x], name external + x,
+    name externals + right*ttag[x].
+'action' name external + x - adm:
+    adm*ttag[x] -> adm,
+    ((was glob + adm, sort*lglob[adm] = external),
+     g name external + repr*lglob[adm] + x; + ).
+'action' show lists:
+    show + ttag + min tag + p tag + max tag,
+    show + tbold + min bold + p bold + max bold,
+    show + tspec + min spec + p spec + max spec,
+    show + tstring + min string + p string + max string,
+    show + stringbuff + min stringbuff + p stringbuff + max stringbuff,
+    show + lglob + min glob + p glob + max glob,
+    show + lglobptr + min globptr + p globptr + max globptr,
+    show + lformals + min formals + p formals + max formals,
+    show + ldisplay + min display + p display + max display,
+    show + lmemb + min member + p member + max member,
+    show + l select + min select + p select + max select,
+    show + lexpr + min expr + p expr + max expr.
+'action' show + []lst + minlist + p list + max list - p:
+    nlcr, outint + min list, outint + p list, outint + max list,
+    nlcr, minlist -> p,
+    rep:(lseq + p + p list, print + lst[p], incr + p, :rep; + ), nlcr.
+
+$ ******** machine dependent part ********
+
+
+'action' fill lists:
+    from drum + ldiskptrs + 0, min diskptrs -> x diskptrs,
+    fill + p tag + ttag, fill + p bold + tbold, fill + p spec + tspec,
+    fill + p string + tstring, fill + p glob + lglob,
+    fill + p globptr + lglobptr, fill + p formals + lformals,
+    fill + p display + ldisplay,
+    fill + p member + lmemb, fill + p select + lselect,
+    fill + p expr + lexpr, fill + p preread + lpreread.
+'action' fill + >p list + []lst:
+    add + x diskptrs + size diskptrs + x diskptrs,
+    plist*ldiskptrs[x diskptrs] -> p list,
+    from drum + lst + dlist*ldiskptrs[x diskptrs].
+'action' init disk:
+    subtr + max diskptrs + min diskptrs + drump, incr + drump,
+    subtr + max disk + min disk + drumsize, incr + drumsize.
+'action' g copy temps + lab + space:
+        (lab = 0, poscard + 11, punch + restrr;
+         g lab + tagfix + lab, poscard + 11, punch + copyrr),
+    poscard + 18,
+ #ycopyr(ycopyr + lab, punch + open, g copyr,
+        rep:(ycopyr + lab, punch + comma, g copyr, :rep;  punch + close); +
+ #ycopyr),
+    punch + comma, puint + space.
+'action' g copyr:
+    punch  + open, puint + p temps, punch  + comma,
+    puint + entry, punch  + close.
+'action' g copy params - type x - x - cpy - pt - it - sel:
+    poscard + 11, punch + call, poscard + 18,
+        (y copy + type x + x + cpy + pt + it + sel, punch + open,
+         g corest + type x + x + cpy + pt + it + sel,
+    rep:(y copy + type x + x + cpy + pt + it + sel, punch + comma,
+         g corest + type x + x + cpy + pt + it + sel, :rep;
+         punch  + close); + ).
+'action' g callrule + x + dest:
+    punch  + comma, punch + tagfix, puint + x,
+    punch + comma, (dest = nix, puint + 0;  punch + skipfix, puint + dest).
+'action' g restore params + operat - type x - x - cpy - pt - it - sel:
+    y restore + operat + type x + x + cpy + pt + it + sel, punch + comma,
+    punch + open, g corest + type x + x + cpy + pt + it + sel,
+    rep:(y restore + operat + type x + x + cpy + pt + it + sel, punch + comma,
+         g corest + type x + x + cpy + pt + it + sel, :rep;
+         punch  + close); + .
+'action' g followup card:
+    newcard, true -> follow up, punch + comma.
+'action' g lab + fix + x:
+        (less + 10 + cardpos;  is + follow up;
+         poscard + 11, punch + bss, poscard + 18, puint + 0),
+    new card, punch + fix, puint + x.
+'action' g jump + sort + x:
+    poscard + 11, punch + eq, poscard + 18, punch + sort,
+    puint + x.
+'action' prelude:
+    pre + drop, pre + output, pre + locals addr, pre + undef,
+    pre + floatsum, pre + firsttag.
+'action' pre + >x:
+    lpreread[x preread] -> x, incr + x preread.
+'action' g begin: + .
+'action' g end:
+    poscard + 11, punch + end, poscard + 18,
+    punch + tagfix, puint + 0.
+'action' g syst routines:  poscard + 11, punch + syst.
+'action' g init machine:  poscard + 11, punch + inmach.
+'action' g temps:  poscard + 11, punch + tempsm.
+'action' g stack:  poscard + 11, punch + stackm.
+'action' g name external + repr + x:
+    g lab + tagfix + repr, poscard + 11, punch + equ,
+    poscard + 18, punch + x,
+        (lseq + cardpos + 25; error + external name too long).
+
+                                                               letrahhp,1.f7802a
+'action' g false result:
+    poscard + 11, punch + mx0, poscard + 18, puint + 1.
+'action' unpack + []list1 + x list1 + dest - p - val:  $ and put on printbuff
+    x list1 -> p,                                      $ or punchbuff
+    rep:(list1[p] -> val,                              $ or stringbuff
+            (marked + val, mark + val, unpack1 + val + dest;
+             unpack1 + val + dest, incr + p, :rep)).
+'action' unpack1 + val + dest - p1 - p2 - p3:
+    unpack3 + val + p1 + p2 + p3,
+        (dest = printer, prchar + p1, prchar + p2, prchar + p3;
+         dest = cardpunch, puchar + p1, puchar + p2, puchar + p3;
+         to stringbuff + p1, to stringbuff + p2, to stringbuff + p3).
+'action' to stringbuff + x:
+    x = nix;
+    x -> stringbuff[p stringbuff], claim + 1 + max stringbuff + p stringbuff.
+'action' g corest + type x + x + cpy + pt + it + sel:
+    punch + open, puint + type x, punch + comma, puint + x,
+    punch + comma, puint + cpy, punch + comma, puint + pt,
+        (it = 0;  punch + comma, puint + it,
+         punch + comma, puint + sel), punch + close.
+'action' g identj + dest:
+    punch + comma, puint + 1, punch + comma, punch + skipfix, puint + dest.
+'action' g transport:  punch + comma, puint + 0, punch + comma, puint + 0.
+'action' g variable + repr + value:
+    g lab + tagfix + repr, poscard + 11,
+    punch + con, poscard + 18, puint + value.
+'action' g address + fix + repr + x:
+    poscard + 11, punch + con, poscard + 18,
+    punch + fix, puint + repr,
+        (marked + x, puint + x;  punch  + plus, puint + x).
+'action' g space + space:
+    poscard + 11, punch + bss,
+    poscard + 18, puint + space.
+'action' g value + value:
+    poscard + 11, punch + con, poscard + 18, puint + value.
+'action' g string - chars - ch - bits - p - q:
+    poscard + 11, punch + vfd, poscard + 18,
+    subtr + p stringbuff + min stringbuff + ch,
+    ch -> chars, min stringbuff -> p,
+    rep:(lseq + 10 + ch, puint + 60, punch + slash, puint + 10,
+         punch + listfix, subtr + ch + 10 + ch, add + p + 10 + q,
+        wrd:(p = q;  puchar + stringbuff[p], incr + p, :wrd),
+         punch + comma, :rep;
+         mult + ch + 6 + bits, puint + bits, punch + slash,
+         puint + ch, punch + listfix,
+        rest:(p = p stringbuff;  puchar + stringbuff[p], incr + p, :rest),
+         punch + comma, subtr + 60 + bits + bits,
+         puint + bits, punch + slash,
+            (bits = 6, puint + 0, punch + comma,
+             puint + 60, punch + slash; + ), incr + chars,
+         divide + chars + 10 + p, incr + p, puint + p #rep).
+'action' from disk:
+    from drum + ldisk + drump, add + drump + drumsize + drump.
+
+$ ****** punch section ******
+
+
+'action' puchar + x:
+    not + output;  x = nix;  csym + x,
+   #nlcr(incr + cardpos,
+            (less + max cardpos + cardpos, g followup card; + )
+    #nlcr).
+'action'punch + x:
+    was tag + x, unpack + ttag + x + cardpunch;
+    was bold + x, unpack + tbold + x + cardpunch;
+    was spec + x, puchar + tspec[x];
+    was intden + x, puint + int value;
+    puint + x.
+'action' puint + x - quot - rem:
+    x = 0, puchar + zerochar;
+        (less + x + 0, mark + x, puchar + minuscode; + ),
+    divrem + x + 10 + quot + rem, puint1 + quot, puchar + rem.
+'action' puint1 + x - quot - rem:
+    x = 0;
+    divrem + x + 10 + quot + rem, puint1 + quot, puchar + rem.
+'action' poscard + x - y:
+        (is + follow up, newcard; + ),
+    subtr + x + cardpos + y,
+        (lseq + 0 + y, puspaces + y;
+         newcard, decr + x, puspaces + x).
+'action' puspaces + x - p:
+    0 -> p,
+    rep:(less + p + x, puchar + spacecode, incr + p, :rep; + ).
+'action' newcard:
+    0 -> cardpos, puchar + nlcr code, false -> follow up.
+
+$ ****** printsection ******
+
+
+'pointer' pos.
+'action' print + x:   prchar + spacecode,
+    (was tag + x, unpack + ttag + x + printer;
+     was bold + x, unpack + tbold + x + printer;
+     was spec + x, prchar + tspec[x];
+     was int den + x, outint + int value;
+     outint + x).
+'action' outint + x - quot - rem:
+    prchar + spacecode, prchar + spacecode,
+        (x = 0, prchar + 0;
+            (less + x + 0, mark + x, prchar + minus code; + ),
+         divrem + x + 10 + quot + rem, outint1 + quot, prchar + rem).
+'action' outint1 + x - quot - rem:
+    x = 0;
+    divrem + x + 10 + quot + rem, outint1 + quot, prchar + rem.
+'action' position + x - y:
+    subtr + x + pos + y,
+        (lseq + 0 + y, spaces + y;
+         nlcr, spaces + x).
+'action' spaces + x - n:
+    0 -> n,
+spcs:(less + n + x, prchar + spacecode, incr + n, :spcs; + ).
+'action' nlcr:   prchar + nlcr code.
+'action' prchar + x:
+    x = nix;  prsym + x,
+        (x = nlcr code, 0 -> pos;  incr + pos).
+
+$ ****** input section ******
+
+
+'predicate' r + x:   inpt = x, read + inpt.
+'question' ahead + x:   inpt = x.
+'predicate' is tag + >x:
+    was tag + inpt, inpt -> x, read + inpt.
+'action' rany + >x:   inpt -> x, read + inpt.
+'action' r to s any - x:   rany + x, onstack + x.
+'action' read + >x:
+    ldisk[p disk] -> x, (was symbol + x, x -> lastsym; + ),
+        (p disk = max disk, fromdisk, min disk -> p disk;  incr + p disk),
+        (x = nlcr marker, incr + line, 0 -> n plus, :read; + ).
+
+$ ****** pseudo reads ******
+
+
+'action' setstack + x:   add + x + 1 + x stack.
+'predicate' rs + x:
+    stack[x stack] = x, incr + x stack.
+'action' rs any + >x:
+    stack[x stack] -> x, incr + x stack.
+'action' rs mod + >type x + >x - expr - p - q:
+    rs any + type x, rs any + x,
+        (type x = loc marker;  type x = value marker;  type x = sel marker;
+         less + size marker + type x;
+         adm*ttag[x] -> p,
+            (was glob + p, repr*lglob[p] -> x,
+             subtr + x stack + 4 + q, stack[q] -> q,
+                ((q = q table;  q = q list;  q = q file),
+                 addr marker -> type x; + );  p = 0;
+             type*lglobptr[p] = constant, value marker -> type x,
+             expr*lglobptr[p] -> expr,
+                (expr = 0, 0 -> x;  value*lexpr[expr] -> x);
+             repr*lglobptr[p] -> x)),
+    subtr + type x + marker offset + type x.
+
+$ ****** label creation and handling ******
+
+
+'pointer' termtr.
+'action' init labels - p:
+    1 -> curlab, 0 -> p,
+    nxt:(false -> ltolab[p], incr + p, (less + max tolab + p;  :nxt)).
+'action' putlab + lab + >done:
+    not + ltolab[lab], false -> done;
+    putlabel + lab, true -> done.
+'action' fresh + >lab:   curlab -> lab, incr + curlab.
+'action' termtr jump + lab + alephj:
+    true -> termtr,
+        (is + alephj, g jump + repfix  + lab;  putjump + lab).
+'action' true jump + lab:  is + termtr;  putjump + lab.
+'action' putjump + x - p:
+    true -> ltolab[x], add + x + labelbase + p, g jump + skipfix + p.
+'action' putlabel + x - p:
+    add + x + labelbase + p, g lab + skipfix + p.
+
+$ ****** handling existing aleph labels ******
+
+
+'action'  fresh repeater:     incr + cur aleph lab.
+'action' get label repr + lab + >repr - p:
+    min labels -> p,
+    rep:(lab*llabels[p] = lab, repr*llabels[p] -> repr;
+         add + p + size labels + p, :rep).
+
+$ ******** data generation ********
+
+
+'action' fresh datalab:   incr + curdatalab.
+'action' generate data:
+    g temps, gen variables, gen administrations,
+    gen fixed lists and tables, gen floating lists, g stack.
+'action' gen variables - adm:
+    min globptr -> adm, add + adm + size globptr + adm,
+    rep:(#type(type*lglobptr[adm] = pointer, g variable + repr*lglobptr[adm]
+               + value*lexpr[expr*lglobptr[adm]]; + #type),
+         add + adm + size globptr + adm,
+             (less + adm + p globptr, :rep; + )#rep).
+'action' gen administrations
+         - type - adm - repr - displ - size - sel - p - q:
+    min glob -> adm, add + adm + size glob + adm,
+    rep:(type*lglob[adm] -> type,
+       #list((type = table;  type = list),
+             minlimit*lglob[adm] -> p, g value + p, displ*lglob[adm] -> displ,
+                (displ = 0, p -> q;  add + p + ldisplay[displ] + q),
+             g value + q, repr*lglob[adm] -> repr,
+             g address + listfix + repr + 0,
+             g address + maxfix + repr + 0, g lab + tagfix + repr,
+             mark + p, 0 -> sel, size*lglob[adm] -> size,
+             repp:(g address + listfix + repr + p, incr + sel,
+                      (lseq + size + sel;  decr + p, :repp)#repp); + #list),
+          add + adm + size glob + adm,
+             (less + adm + p glob, :rep; + )#rep).
+'action' gen fixed lists and tables - adm - type - repr - displ - p:
+    minglob -> adm, add + adm + size glob + adm,
+    rep:(type*lglob[adm] -> type,
+        #list((type = table;  type = list, is + fixed*lglob[adm]),
+              repr*lglob[adm] -> repr, g lab + listfix + repr, g space + 1,
+              displ*lglob[adm] -> displ,
+              gen display item list + displ,
+                 (type = list, value*lexpr[length*lglob[adm]] -> p,
+                     (displ = 0;
+                      subtr + p + ldisplay[displ] + p),
+                  g space + p; + ),
+              g lab + maxfix + repr, g space + 1; + #list),
+         add + adm + size glob + adm,
+            (less + adm + p glob, :rep; + ) #rep).
+'action' gen floating lists - adm - repr - mem unit - displ - p:
+    min glob -> adm,
+    divide + floating space + floatsum + mem unit,
+    rep:(add + adm + size glob + adm,
+       #less(less + pglob + adm;
+                (type*lglob[adm] = list, not + fixed*lglob[adm]),
+                 repr*lglob[adm] -> repr, g lab + listfix + repr, g space + 1,
+                 displ*lglob[adm] -> displ, gen display item list + displ,
+                 mult + value*lexpr[length*lglob[adm]] + mem unit + p,
+                    (displ = 0;  subtr + p + ldisplay[displ] + p),
+                 g space + p, g lab + maxfix + repr, g space + 1, :rep;
+                 :rep #less) #rep).
+'action' gen display item list + displ:
+    displ = 0;
+    add + displ + size display + displ,
+    rep:(ldisplay[displ] = nix;
+         gen insertion + displ, incr + displ, :rep).
+'action' gen insertion + displ - p:
+    ldisplay[displ] -> p,
+        (was expr + p, g value + value*lexpr[p];
+         unpack + tstring + p + buffer, g string,
+         min stringbuff -> p stringbuff).
+'root' scan2.
+            (less + adm + p glob, :rep; + ) #rep).
+'action' gen floating lists - adm - repr - mem unit - displ - p:
+    min glob -> adm,
+    divide + floating space + floatsum + mem unit,
+    rep:(add + adm + size glob + adm,
+       #less(less + pglob + adm;
+                (type*lglob[adm] = list, not + fixed*lglob[adm]),
+                 repr*lglob[adm] -> repr, g lab + listfix + repr, g space + 1,
+                 displ*lglob[adm] -> displ, gen display item list + displ,
+                 mult + value*lexpr[length*lglob[adm]] + mem unit + p,

@@ -1,1 +1,1392 @@
+    $ ********** aleph compiler, version 1, 19-12-1972  **********
 
+'short'
+
+
+    $ *** 1 general environment ***
+
+$ 1.1   interface with machine $
+
+'external''action'
+    new page, exit, prsym, to drum.
+'macro' 'question'
+was letter='1'>9&'1'<36,
+was letgit='1'<36,
+was digit ='1'<10,
+was specch='1'>63.
+'macro''pointer'
+    int reg = 940 101, label marker = 940 102, nlcr marker = 940 103,
+    loc marker = 940 001, value marker = 940 002, sel marker = 940 005,
+    tag marker = 940 003, left marker = 940 012, row marker = 940 006,
+    right marker = 940 011, size marker = 940 013,
+    nix = (-1), minuscode = 65, spacecode = 93, nlcrcode = 119, accc = 120,
+    slash = 67, quotesym = 121, max line = 4096, tenth max = 6 710 886,
+    maxint = 67 108 863, minint = (-67 108 863), bits minus four = 22,
+comm ch=133, tag comm ch=125,end of file=(-4096), true=1, false=0,
+    const = 1, int den = 2, size lim = 3, empty = 4, repr plus = 1,
+    repr minus = 2, repr times = 3, repr by = 4, open plus = 5,
+    open minus = 6, repr close = 7, min lim = 8, max lim = 9,
+    zero = 0, one = 1, two = 2, three = 3, other machine = 1,
+    acceptor = 1, relayer = 2, donor = 3, qtable = 4, qlist = 5, qfile = 6,
+    half addr space = 33 504 431, min addr space = 100 000.
+
+
+$ 1.2   stacks $
+
+'macro' 'pointer'
+
+min tag =100001,max tag =106000,
+
+min bold=200001,max bold=200400,
+min spec=300001,max spec=300050,
+
+min loc =500001,max loc =500150,
+min string =510001, max string =510600,
+
+min glob=600001,max glob=605000,
+min text=800001,max text=805000,
+
+min rules=900001, max rules=904000,
+min globptr = 910001, max globptr = 911500,
+
+min formals = 920001, max formals = 920150,
+min display =930001, max display =930300,
+min member =950001, max member =950500,
+min select=960001, max select=960300,
+min character = 970 001, max character = 970 134,
+min disk = 410 001, max disk = 410 650,
+min symbuff = 420 001, max symbuff = 420 100,
+
+min expr = 440 001, max expr = 441 500,
+min diskptrs = 480 001, max diskptrs = 480 050,
+
+min preread = 490 001, max preread = 490 100,
+
+min stack = 450 001, max stack = 450 700.
+'macro' 'pointer'
+    size loc = 8, size rules = 3, size glob = 10, size diskptrs = 2,
+    size globptr = 4, size select = 4, size expr = 2, size display = 1.
+'list'
+[min tag : max tag] ttag(tag, right, left, adm),
+[min bold : max bold] tbold,
+[min spec : max spec] tspec,
+[min loc : max loc] lloc (state, type, form funct, form type, tag,
+                          sel, up, repr),
+[min string : max string] tstring,
+[min glob : max glob] lglob (type, sort, place = addr loc, max parms = displ,
+                             call = sel, forms = size, bits = fixed,
+                             first = length,  min limit, repr),
+[min text : max text] ltext,
+[min rules : max rules] lrules (rules, lkrhs, lksame),
+[min globptr : max globptr] l globptr (type, place, expr, repr),
+[min formals : max formals] lformals,
+[min display : max display] ldisplay, $ for each display item list a machine
+    $ word count, pointed to by displ*lglob[], followed by a sequence
+    $ of pointers to lexpr and/or lstring
+[min member : max member] lmemb,
+[min select : max select]lselect(slt, place, link, cnt),
+[min character : max character] lcharacter,
+[min disk : max disk] ldisk,
+[min symbuff : max symbuff] symbuff,
+[min expr : max expr] l expr (optr = state, opnd = value),
+[min diskptrs : max diskptrs] ldiskptrs (plist, dlist),
+[min preread : max preread] lpreread, $ contains saved variables
+[min stack : max stack] stack.
+'macro' 'question'
+was tag =min tag '"le"''1'&'1''"le"'ptag,
+was bold=min bold'"le"''1'&'1''"le"'pbold,
+was spec=min spec'"le"''1'&'1''"le"'pspec,
+was int den = '1' = int reg,
+was rules=min rules'"le"''1'&'1''"le"'prules,
+was glob = min glob'"le"''1'&'1''"le"'p glob,
+was text = min text'"le"''1'&'1''"le"'p text,
+was globptr = min globptr'"le"''1'&'1''"le"'p globptr,
+was expr = min expr'"le"''1'&'1''"le"'pexpr,
+was loc=min loc'"le"''1'&'1''"le"'ploc.
+
+
+$ 1.3   simple external operations $
+
+'macro' 'action'
+mark='1':=-'1',
+add='3':='1'+'2',
+subtr='3':='1'-'2',
+mult = '3':='1'*'2',
+divide = '3':='1'_:'2',
+divrem='3':='1''"/"''2';'4':='1'-'2'*'3',
+incr  ='1':='1'+1,
+decr  ='1':='1'-1,
+    shift in 2 bits = '2':=set('1'',''3'+1',''3'',''2'),
+    shift in 3 bits = '2':=set('1'',''3'+2',''3'',''2'),
+    pack2 = '3':='1'*8192+'2',
+    or2 = '3':=or('1'',''2'),
+    unpack3 = '2':='1''"/"'65536-2;
+              '4':=-65536*'2'+'1'-131072;
+              '3':='4''"/"'256-2;'4':=-256*'3'+'4'-514,
+    get parm1 = '2':= and('1'','67 100 672 $ 011111111111110000000000000 $ )
+                      / 8192,
+    get parm2 = '2':= and('1'','8191 $ 000000000000001111111111111 $ ).
+'macro' 'action' addmult = '3':='2'*256+'1'+2, rechar = '1':=resymbol.
+'macro' 'question'
+is = '1'=1, not = '1'=0,
+marked='1'<0,
+less='1'<'2',
+lseq='1'_<'2'.
+
+
+$ 1.4   pointers $
+
+'pointer'
+    ptag, pbold, pspec, pselect, p formals, pglobptr, pexpr,
+    p diskptrs, drump, drumsize, p preread,
+    p loc, x loc, p glob, p text, p display, p rules, p stack, xp stack,
+    p string, p disk, p symbuff, p member.
+
+'pointer' in init, give trace, legible, output, drop, undef,
+          eval1, produced.
+'pointer' first tag, startsym, linkp, parms, max parms, handle, locals addr,
+    forms bitcnt, mem bitcnt, int value, currepr, floatsum.
+'action'
+default options,      outint , outint1, print, position, spaces, nlcr,
+shift 2 lines, space, prchar, book call,     inform, error, fatal error,
+to symbuff, next char, display character,           next non space char,
+enter tag, reserve admin space, enter bold, enter spec, req tag, req,
+next symbol, skip to point, read, add place, add place1, add sel place,
+    forget locals,       claim, book glob, check double, signal, req point,
+    define local ptr, apply indexed,     error skip, d tag affix,
+    define member, apply label, apply affix,    bookselector, add parm,
+book glob ptr, enter text, compiler description, define indexed local,
+    scan1, req expression, enter opnd, int overflow, enter optr,
+    show, claimloc, define pointer constant,           stringplace, testadd,
+     testmult, error1, showlists, visit indexed, visit varstant,
+    interscan, previsit1, previsit2, save,
+    previsit3, prelude, save information, selector list pack,
+    monadic, init chars, ch, chs,        get bitwrd, d, store selector,
+    const descr, define constant, point descr, define pointer,
+    list description, list head, size estimate, selector, display item listpack,
+    display item list, display item, insertion, define list, expression,
+    table description, table head, define table, bound affix sequence,
+    formal, save formal,                  define rule, external type descr,
+    external descr, actual rule, middle, right hand side, alternative series,
+    member, affix, initialize for reading, init system,
+    treat, treattag, cycle, treat rules, outbits, onstack, stackrules,
+    replace, glue, testbits, replace1, try to evaluate, evaluate, sav.
+'action'  list tags, list tag, entries,
+        print selectors, print selector,
+        print chain of entries, out entry, out entry ln.
+'action' $ machine dependent actions
+    pack, unpack, unpack1, stringcomp, to disk.
+'action' default options:
+        false -> give trace,
+        true -> legible -> output.
+
+
+$ 1.5   machine dependent part $
+
+'pointer' inpt scan2.
+'action' init chars:
+    chs + 0 + 27 + 10, chs + 10 + 1 + 26, chs + 64 + 37 + 4,
+    chs + 87 + 46 + 2, chs + 98 + 41 + 2, chs + 100 + 49 + 2,
+    ch + 70 + 44, ch + 72 + 58, ch + 74 + 59, ch + 90 + 51, ch + 91 + 63,
+    ch + 93 + 45, ch + 120 + 56, ch + 121 + 52, ch + 125 + 48, ch + 133 + 43.
+'action' ch + x + y - p:
+    add + min character + x + p, y -> lcharacter[p].
+'action' chs + x + y + n:
+    less + 0 + n, ch + x + y, incr + x, incr + y, decr + n, :chs; + .
+'action' prelude - p:
+    subtr + max disk + min disk + drumsize, incr + drumsize,
+    subtr + max diskptrs + min diskptrs + drump, incr + drump,
+    read + inpt, int value -> inpt scan2, 0 -> p,
+    rep:(p = inpt scan2;  read + inpt, d + inpt, incr + p, :rep).
+'action' save information:
+    save + min tag + p tag + ttag, save + min bold + p bold + tbold,
+    save + min spec + p spec + tspec, save + min string + p string + tstring,
+    save + min glob + p glob + lglob, save + min globptr + p globptr + lglobptr,
+    claim + 1 + max formals + p formals,
+    save + min formals + p formals + lformals,
+    save + min display + p display + ldisplay,
+    claim + 1 + max member + p member,
+    save + min member + p member + lmemb,
+    save + min select + p select + lselect, save + min expr + p expr + lexpr,
+    sav + drop, sav + output, sav + locals addr,
+    sav + undef, sav + floatsum, sav + first tag,
+    save + min preread + p preread + lpreread, to drum + ldiskptrs + 0.
+'action' save + min list + p list + []lst:
+    to drum + lst + drump, p list -> p list*ldiskptrs[p diskptrs],
+    drump -> dlist*ldiskptrs[p diskptrs],
+    claim + size diskptrs + max diskptrs + p diskptrs,
+    subtr + drump + min list + drump, add + drump + p list + drump.
+'action' sav + x:
+    x -> lpreread[p preread], claim + 1 + max preread + p preread.
+'action' pack + []list2 + max list2 + >p list2> - p - val - cnt:
+    min symbuff -> p, 0 -> cnt, nix -> val,
+  rep:(p = p symbuff, min symbuff -> p symbuff,
+    #cnt(cnt = 0, subtr + p list2 + 1 + p, mark + list2[p];
+         cnt = 1, addmult + nix + val + val,
+         addmult + nix + val + list2[p list2], mark + list2[p list2],
+         claim + 1 + max list2 + p list2;
+         $ cnt = 2, $ addmult + nix + val + list2[p list2],
+         mark + list2[p list2], claim + 1 + max list2 + p list2 #cnt);
+         cnt = 0, add + symbuff[p] + 2 + val, incr + p, 1 -> cnt, :rep;
+         addmult + symbuff[p] + val + val, incr + p, incr + cnt,
+        (cnt = 3, val -> list2[p list2], 0 -> cnt -> val,
+         claim + 1 + max list2 + p list2, :rep; :rep) #rep).
+'action' unpack + []list1 + x list1 - p - val:         $ and put on printbuff
+    x list1 -> p,
+    rep:(list1[p] -> val,
+            (marked + val, mark + val, unpack1 + val;
+             unpack1 + val, incr + p, :rep)).
+'action' unpack1 + val - p1 - p2 - p3:
+    unpack3 + val + p1 + p2 + p3, prchar + p1, prchar + p2, prchar + p3.
+'action' d + x:
+    x -> ldisk[p disk],
+        (p disk = max disk, to disk;  incr + p disk).
+'action' to disk:
+    to drum + ldisk + drump, add + drump + drumsize + drump,
+    min disk -> p disk.
+'action' stringcomp + []list1 + x1 + []list2 + x2 + >res - p1 - w1 - p2 - w2:
+    x1 -> p1, x2 -> p2,
+    comp:(list1[p1] -> w1, list2[p2] -> w2,
+         #w1(marked + w1, mark + w1,
+             #w2(marked + w2, mark + w2,
+                    (less + w1 + w2, 1 -> res, mark + res;
+                     w1 = w2, 0 -> res;  1 -> res);
+                 less + w2 + w1, 1 -> res;  1 -> res, mark + res #w2);
+            #w22(marked + w2, mark + w2,
+                    (less + w1 + w2, 1 -> res, mark + res;  1 -> res);
+                 less + w1 + w2, 1 -> res, mark + res;
+                 less + w2 + w1,  1 -> res;
+                 incr + p1, incr + p2, :comp #w22) #w1) #comp).
+'question' string equals+[]list1 + x1+[]list2 + x2 + >xx2 - p1 - p2 - w1 - w2:
+    x1 -> p1, x2 -> p2,
+    comp:(list1[p1] -> w1, list2[p2] -> w2,
+            (marked + w2, add + p2 + 1 + xx2, w1 = w2;
+             w1 = w2, incr + p1, incr + p2, :comp;
+             incr + p2,
+             rep:(marked + list2[p2], add + p2 + 1 + xx2, - ;
+                  incr + p2, :rep))).
+'function' stringplace + cnt + >place - p:
+    add + cnt + 11 + p, divide + p + 10 + place.
+
+
+$ 2   printing routines $
+
+'pointer'pos.
+'action' print + x:  space,
+   (was tag + x, unpack + ttag + x;
+    was bold + x, unpack + tbold + x;
+    was spec + x, prchar + tspec[x];
+    was int den + x, outint + int value;
+    outint + x).
+'action' outint + x - quot - rem:
+    space, space,
+        (x = 0, prchar + 0;
+            (less + x + 0, mark + x, prchar + minuscode; + ),
+         divrem + x + 10 + quot + rem, outint1 + quot, prchar + rem).
+'action' outint1 + x - quot - rem:
+        x = 0;
+        divrem+x+10+quot+rem,outint1+quot,prchar+rem.
+'action' position + x- y:
+    subtr + x + pos + y,
+       (lseq + 0 + y, spaces + y;
+        nlcr, spaces + x).
+'action' spaces + x - n:
+        0 -> n,
+  spcs:(less+n+x,space,incr+n,:spcs;+).
+'action' nlcr: prchar + nlcr code.
+'action' shift 2 lines:
+    nlcr, nlcr, spaces + pos.
+'action' space:  prchar + space code.
+'action' prchar + x:
+    x = nix;  prsym + x, (x = nlcr code, 0 -> pos;  incr + pos).
+
+
+$ 3   trace administration $
+
+'action' signal + x - old pos:
+        pos -> old pos, position + 16, inform + x, position + old pos.
+'action' inform + x - p - type:
+    adm*ttag[x] -> p,
+    (was glob + p, print + type*lglob[p];
+         was globptr + p, print + type*lglobptr[p];
+         was text + p, print + undefined affix;
+         type*lloc[p] -> type, print + type,
+            (type = formaltype, print + form funct*lloc[p],
+             print + form type*lloc[p]; + )), print + x.
+'action' error text + text + info - old pos:
+        pos -> old pos, nlcr, print + text,
+                (was tag+info,inform+info,position+old pos;
+                 info = 0, position + old pos;
+                 print + info, position + old pos).
+'action' error + x + y:  error text + x + y, true -> drop.
+'action' error skip + x + y:
+    error + x + y, error + skipped + 0, skip to point.
+'action' fatal error + x + y:
+    error + x + y, show lists, interscan, save information, exit.
+
+
+$ 4   input $
+
+'pointer'
+    line, char, inpt, postinpt, post, post 2 inpt, post2.
+
+
+$ 4.1   reading characters $
+
+'predicate' letter + >x:
+        was letter + char, char -> x, next non space char.
+'predicate' letgit + >x:
+        was letgit + char, char -> x, next non space char.
+'predicate' digit + >x:
+        was digit + char, char -> x, next non space char.
+'predicate' accent:  char = accc, nextchar.
+'predicate' non acc + >x:  char = accc, - ; char -> x, next char.
+'predicate' specchar + >x:
+        was specch + char, char -> x, next char.
+'action' nextchar - x - y:
+    1 -> x -> y,
+    rep:(display character, rechar + char,
+        #char(char = commch, mark + x, :rep;
+              char = end of file, fatal error + input exhausted + 0;
+              marked + x, (char = nlcr code; :rep);
+              char = tag comm ch, mark + y, :rep;
+              marked + y,
+                  (was letgit + char, :rep;
+                   char = space code, :rep; + ); + #char) #rep).
+'action' display character:      $ in init is tijdelijk
+    char = nlcr code, incr + line,
+        (not + in init, nlcr, d + nlcr marker, position + 46,
+         outint1 + line, position + 52; + );  is + in init;
+    prchar + char.
+'action' next non space char:    $ in init is tijdelijk
+    nextchar,
+        ((is + ininit, char = nlcr code);
+         layoutsymbol, :next non space char; + ).
+'question' layout symbol:
+    char = space code; char = nlcr code.
+
+
+$ 4.2   tag symbols $
+
+'predicate' readtag + >x - p:
+    letter + p, ptag -> x, to symbuff + p,
+    nxt:(letgit + p, to symbuff + p, :nxt;
+         pack + ttag + max tag + p tag).
+'action' enter tag + >x> - y - val:
+    firsttag -> y,
+    nxy:(stringcomp + ttag + x + ttag + y + val,
+        #val(val = 0,
+                (x = y, reserve adminspace;
+                 x -> ptag, y -> x);
+             less + val + 0,
+                (left*ttag[y] = 0, x -> left*ttag[y], reserve admin space;
+                 left*ttag[y] -> y, :nxy);
+             right*ttag[y] = 0, x -> right*ttag[y], reserve admin space;
+             right*ttag[y] -> y, :nxy #val) #nxy).
+'action' reserve admin space:
+    claim + 3 + max tag + ptag,
+    0 -> adm*ttag[ptag] -> left*ttag[ptag] -> right*ttag[ptag].
+
+
+$ 4.3   bold symbols $
+
+'predicate' read bold + >x - p:
+    accent, pbold -> x,
+        (accent, to symbuff + nix;
+        nxt:(non acc + p, to symbuff + p, :nxt; next char),
+         pack + tbold + max bold + p bold).
+'action' enter bold + >x> - y - p:
+    minbold -> y,
+    nxy:(stringequals + tbold + x + tbold + y + p,
+        (x = y;  x -> p bold, y -> x);  p -> y, :nxy #nxy).
+
+
+$ 4.4   special symbols $
+
+'predicate' read spec + >x - p:
+    specchar + p, pspec -> x, p -> tspec[pspec],
+    claim + 1 + max spec + p spec.
+'action' enter spec + >x> - y - p:
+    minspec -> y, tspec[x] -> p,
+    nxy:(tspec[y] = p,
+            (x = y; x -> pspec, y -> x);
+         incr + y, :nxy).
+
+
+$ 4.5   integers $
+
+'predicate' read integral + >val - t - h - test:
+    digit + h,
+    rep:(digit + t,
+            (less + tenthmax + h, int overflow + val;
+             mult + h + 10 + h, subtr + maxint + h + test,
+                (less + test + t, int overflow + val;
+                 add + h + t + h, :rep)); h -> val
+     #rep).
+
+
+$ 4.6   testing input symbols $
+
+'predicate' is tag + >x:
+    was tag + inpt, inpt -> x, next symbol.
+'action' req tag + >x:
+    is tag + x;  dummy tag -> x, error text + tag missing + 0.
+'predicate' r + x:   ahead + x, next symbol.
+'predicate' rr + x:
+        (is + post; read + post inpt, true -> post),
+    post inpt = x, read + inpt, false -> post.
+'action' req + x:
+    r + x;  error text + missing + x.
+'action' req point:
+    ahead + point, shift 2 lines, req + point;  error skip + missing + point.
+'question' ahead + x:  inpt = x.
+'question' post ahead + x:
+        (is + post; read + post inpt, true -> post), post inpt = x.
+'question' post 2 ahead + x:
+    (is + post2;
+        (is + post; read + postinpt, true -> post),
+     read + post 2 inpt, true -> post2), post 2 inpt = x.
+'question' tag ahead + >x:  was tag + inpt, inpt -> x.
+'action' next symbol:
+    is + post, post inpt -> inpt,
+        (is + post2, post 2 inpt -> postinpt, false -> post2; false -> post);
+    read + inpt.
+'action' skip to point:
+    nxt:(ahead + point, shift 2 lines, req + point;  next symbol, :nxt).
+'action' read + >x:
+    layout symbol, nextchar, :read;
+    read tag + x, enter tag + x;
+    read bold + x, enter bold + x;
+    read spec + x, enter spec + x;
+    read integral + int value, int reg -> x;
+    error + wrong input code + char, nextchar, :read.
+
+
+$ 5   routines creating administration space $
+
+'action' apply label + lab - adm:  $ to enable test on forbidden jump
+    adm*ttag[lab] -> adm,
+        ((was loc + adm, type*lloc[adm] = label type),
+         applied -> state*lloc[adm], jumptype -> type*lloc[ploc],
+         lab -> tag*lloc[ploc], 0 -> state*lloc[ploc] -> form funct*lloc[ploc]
+         -> form type*lloc[ploc] -> sel*lloc[ploc] -> up*lloc[ploc]
+         -> repr*lloc[ploc], claimloc;  lab = handle;
+         add place + lab + line, error + undefined label + lab).
+'action' apply affix + x - adm:
+    adm*ttag[x] -> adm,
+        (was loc + adm, applied -> state*lloc[adm]; add place + x + line).
+'action' apply indexed + x - adm:
+    adm*ttag[x] -> adm,
+    #adm(was loc + adm, applied -> state*lloc[adm],
+           (form type*lloc[adm] = indexed;  error + wrong type + x);
+         book glob + x, adm*ttag[x] -> adm,
+            (was indexed glob + adm;
+             was glob + adm, indexed -> type*lglob[adm]; + ) #adm).
+'action' book call + x - adm:
+    bookglob + x, adm*ttag[x] -> adm,
+        (was glob + adm,
+            (sort*lglob[adm] = external;  stackrules + x),
+            (type*lglob[adm] = undefined, rule -> type*lglob[adm]; + ); + ).
+'action' bookglob + head - p:
+    adm*ttag[head] -> p,
+       ((p = 0;  was text + p), p glob -> adm*ttag[head],
+         undefined -> sort*lglob[p glob] -> type*lglob[p glob],
+         p -> place*lglob[p glob],
+         0 -> forms*lglob[p glob] -> max parms*lglob[p glob]
+         -> call*lglob[pglob] -> first*lglob[pglob] -> bits*lglob[pglob],
+         claim + sizeglob + maxglob + pglob;
+         was glob + p;  error + doubly defined + head),
+    add place + head + line.
+'action' book glob ptr + head - p:
+    adm*ttag[head] -> p,
+        (was loc + p;
+           ((p = 0;  was text + p), p globptr -> adm*ttag[head],
+             undefined -> type*lglobptr[p globptr],
+             p -> place*lglobptr[p globptr], 0 -> expr*lglobptr[p globptr],
+             claim + size globptr + max globptr + p globptr;
+             was glob + p,  error + doubly defined + head; + ),
+         add place + head + line).
+'action' book selector + sel + lst + cnt - x select - adm - p:
+    adm*ttag[lst] -> adm,
+    #type(was indexed glob + adm, sel*lglob[adm] -> p,
+         #p0(p = 0, p select -> sel*lglob[adm],
+             store selector + sel + cnt + x select;
+            rep:(sel = slt*lselect[p], p -> x select,
+                    (cnt = nix;  cnt -> cnt*lselect[p]);
+                 link*lselect[p] = 0, p select -> link*lselect[p],
+                 store selector + sel + cnt + x select;
+                 link*lselect[p] -> p, :rep) #p0),
+             add sel place + x select; + #type).
+'action' store selector + sel + cnt + >x select:
+    sel -> slt*lselect[p select], p select -> x select,
+        (cnt = nix;  cnt -> cnt*lselect[p select]),
+    claim + size select + max select + p select,
+    nix -> cnt*lselect[p select],
+    0 -> place*lselect[p select] -> link*lselect[p select].
+
+
+$ 6    routine deleting administration space $
+
+'action' forget locals + savp + ext - lab - jump - p - q:
+    p loc = sav p;
+    p loc -> p, (type*lloc[savp] = label type, tag*lloc[savp] -> lab;
+                 handle -> lab),
+    rep:(subtr + p + size loc + p,
+        #less(less + p + savp, savp -> p loc;
+              type*lloc[p] = jump type, tag*lloc[p] -> jump,
+                (jump = lab;
+                 ahead + comma, error + forbidden jump + jump; + ), :rep;
+              tag*lloc[p] -> q,
+                (is + ext;  state*lloc[p] = defined,
+                 error text + defined + q; + ),
+              up*lloc[p] -> adm*ttag[q],
+                (type*lloc[p] = labeltype;  decr + parms), :rep #less) #rep).
+
+
+$ 7    evaluation of expressions $
+
+'action' try to evaluate + x expr + call expr - state:
+    state*lexpr[x expr] -> state,
+   #state(state = ready;
+          is + eval1,
+              ((state = ready2pc;  state = virgin2pc),
+               error1 + cycle1 2pc + call expr;
+               state = busy, error1 + cycle1 1 + call expr;
+               evaluate + x expr + state + call expr);
+          state = busy, error1 + cycle2 2 + call expr;
+          state = ready2pc; evaluate + x expr + state + call expr #state).
+'action' evaluate + x expr + state + call expr - xx expr - val:
+               x expr -> xx expr, busy -> state*lexpr[x expr],
+                  (eval pack + xx expr + val + call expr; + ),
+                  (state = virgin2pc, ready2pc -> state*lexpr[x expr];
+                   ready -> state*lexpr[x expr]),
+                  val -> value*lexpr[x expr].
+'predicate' eval pack + >x expr> + >val + call expr - optr - p - q:
+    add + x expr + size expr + x expr,
+    get parm1 + optr*lexpr[x expr] + optr,
+        (optr = open plus;  optr = open minus;
+         subtr + x expr + size expr + x expr, - ),
+        (eval term + x expr + p + call expr; + ),
+        (optr = open minus, mark + p; + ),
+    term:(get parm1 + optr*lexpr[x expr] + optr,
+       #optr(optr = repr plus, eval term + x expr + q + call expr,
+             testadd + p + q + call expr, add + p + q + p, :term;
+             optr = repr minus, eval term + x expr + q + call expr, mark + q,
+             testadd + p + q + call expr, add + p + q + p, :term;
+             add + x expr + size expr + x expr #repr close, p -> val #optr)
+    #term).
+'action' testadd + p + >q> + call expr - test:
+    less + 0 + p,
+    #pos(less + q + 0;  subtr + maxint + p + test,
+            (lseq + q + test;
+             0 -> q, error1 + integer overflow + call expr) #pos);
+    #neg(less + 0 + q;  subtr + min int + p + test,
+            (lseq + test + q;
+             0 -> q, error1 + integer overflow + call expr) #neg).
+'predicate' eval term + >x expr> + >val + call expr - optr - p - q:
+    eval value + x expr + p + call expr,
+    rep:(get parm1 + optr*lexpr[x expr] + optr,
+        #optr(optr = repr times, eval value + x expr + q + call expr,
+              testmult + p + q + call expr, mult + p + q + p, :rep;
+              optr = repr by, eval value + x expr + q + call expr,
+                (q = 0, error1 + zero divide + call expr, 1 -> q; + ),
+              divide + p + q + p, :rep;  p -> val #optr) #rep).
+'action' testmult + p + >q> + call expr - test:
+    less + 0 + p,
+    #ppos(less + 0 + q, divide + maxint + p + test,
+            (lseq + q + test;  0 -> q, error1 + integer overflow + call expr);
+         divide + minint + p + test,
+            (lseq + test + q;  0 -> q, error1 + integer overflow + call expr)
+    #ppos);  p = 0;
+    #pneg(less + 0 + q, divide + minint + p + test,
+            (lseq + q + test;  0 -> q, error1 + integer overflow + call expr);
+         divide + maxint + p + test,
+            (lseq + test + q;  0 -> q, error1 + integer overflow + call expr)
+    #pneg).
+'predicate' eval value + >x expr> + >val + call expr:
+    eval plain value + x expr + val + call expr;
+    eval pack + x expr + val + call expr.
+'predicate' eval plain value + >x expr> + >val + call expr
+            - expr - ind - opnd - adm:
+    getparm2 + optr*lexpr[x expr] + ind, opnd*lexpr[x expr] -> opnd,
+    #int(ind = int den, opnd -> val;  ind = empty, - ;
+         adm*ttag[opnd] -> adm,
+      #const(ind = const,
+            #was((was glob ptr + adm, type*lglobptr[adm] = constant,
+                  expr*lglobptr[adm] -> expr,
+                  was expr + expr, try to evaluate + expr + call expr,
+                  value*lexpr[expr] -> val);
+                 error1 + no constant + call expr, 0 -> val #was);
+             ind = size lim,
+                (was indexed glob + adm, size*lglob[adm] -> val;
+                 error1 + wrong size limiter + call expr, 0 -> val);
+             ind = min lim,
+         #minlim(was indexed glob + adm, min limit*lglob[adm] -> val;
+                 error1 + wrong limiter + call expr, 0 -> val #min lim);
+             ind = max lim,
+
+         #maxlim(was indexed glob + adm, min limiy*lglob[adm] -> val,
+                    (displ*lglob[adm] = 0;
+                     add + val + ldisplay[displ*lglob[adm]] + val);
+                 error1 + wrong limiter + call expr, 0 -> val #max lim)
+      #const) #int), add + x expr + size expr + x expr.
+'action' error1 + text + call expr - place - wrd - ln:
+    (is + inter error;  newpage, print + error heading,
+     nlcr, nlcr, true -> drop -> inter error),
+#er(call expr = 0, nlcr, position + 8, print + text, nlcr;
+        (was glob ptr + call expr, place*lglobptr[call expr] -> place;
+         place*lglob[call expr] -> place),
+    rep:(ltext[place] -> wrd, getparm1 + wrd + place,
+         getparm2 + wrd + ln, add + place + mintext + place, decr + place,
+            (ln = maxline, getparm2 + ltext[place] + ln, nlcr,
+             outint + ln, position + 8, print + text, nlcr; :rep) #rep) #er).
+
+
+$ 8    auxiliary routines $
+
+
+$ 8.1   disk routines $
+
+'predicate' rd + >x:  r + x, d + x.
+'action' reqd + >x:  req + x, d + x.
+'action' reqd tag + >x:  req tag + x, d + x.
+'predicate' isd tag + >x:  is tag + x, d + x.
+'action' d tag affix + x - adm:
+    adm*ttag[x] -> adm,
+        (was loc + adm, d +  loc marker, d + repr*lloc[adm];
+         d + tag marker, d + x).
+
+
+$ 8.2   saving line numbers $
+
+'action' add place + tag + info - p - adm:
+    adm*ttag[tag] -> adm,
+        (was glob + adm, place*lglob[adm] -> p,
+         p text -> place*lglob[adm];
+         was globptr + adm,
+         place*lglobptr[adm] -> p, p text -> place*lglobptr[adm];
+         adm -> p, p text -> adm*ttag[tag]),
+    add place1 + info + p.
+'action' add place1 + info + h - p:    $bits_> 25:
+    h = 0, pack2 + h + info + p, enter text + p;
+    subtr + h + mintext + p, incr + p,
+    pack2 + p + info + p, enter text + p.
+'action' add sel place + sel - h:
+    place*lselect[sel] -> h, p text -> place*lselect[sel],
+    add place1 + line + h.
+
+
+$ 8.3   testing of types $
+
+'question' type equals + x + type - p:
+    was tag + x, adm*ttag[x] -> p,
+        (was glob + p, type*lglob[p] = type;
+         was globptr + p, type*lglobptr[p] = type;
+         was loc + p, type*lloc[p] = type).
+'question' was rule + adm - type:
+    was glob + adm, type*lglob[adm] -> type,
+        (type = action;  type = predicate;  type = function;
+         type = question;  type = rule).
+'question' was indexed glob + adm - type:
+    was glob + adm, type*lglob[adm] -> type,
+        (type = list;  type = table;  type = indexed).
+
+
+$ 8.4   miscellaneous $
+
+'action' claim + size + max + >p list>:
+    add + p list + size + p list,
+
+        (lseq + p list + max;  fatal error + overflow + 0).
+'action' claimloc:
+    claim + size loc + max loc + p loc,
+        (lseq + p loc + x loc;  p loc -> x loc).
+'action' enter text + x:   $ bits per word _> 25:
+    x -> ltext[ptext], claim + 1 + maxtext + ptext.
+'action' to symbuff + x:
+    x -> symbuff[psymbuff], claim + 1 + max symbuff + p symbuff.
+
+
+
+
+
+                        $ 9 *** the grammar *** $
+
+
+
+'action' scan1:
+    prelude, init system, compiler description, inter scan, save information,
+    show lists.
+'action' compiler description:
+    nxt:((declaration; pragmat), :nxt;
+         root;  error skip + unrecognizable + 0, :nxt).
+'predicate' declaration:
+    pointer declaration;     constant declaration;
+    list declaration;        table declaration;
+    file declaration;        rule declaration;
+    external declaration.
+
+
+$ 9.1   expressions $
+
+'action' req expression + >x expr + virgin:
+    virgin -> state*lexpr[p expr], p expr -> x expr,
+    claim + size expr + max expr + p expr, expression.
+'action' expression:
+    monadic,
+    #expr(term,
+        l:(plusminus, (term; error + wrongterm + 0), :l;
+           enter optr + repr close, enter opnd + 0 + empty #l);
+           error + wrong expression + 0 #expr).
+'predicate' term:
+    value,
+      l:(times by, (value; error + wrong factor + 0), :l; + ).
+'predicate' value:
+    plain value; expression pack.
+'predicate' plain value - val - adm:
+        (integral denotation + val; character denotation + val),
+    enter opnd + val + int den;
+    is tag + val, enter opnd + val + const, book glob ptr + val,
+    adm*ttag[val] -> adm,
+        (was globptr + adm,
+            (type*lglobptr[adm] = pointer, error + wrong type + val;
+             constant -> type*lglobptr[adm]); + );
+    minlimit + val, enter opnd + val + min lim;
+    maxlimit + val, enter opnd + val + max lim;
+    size limit + val, enter opnd + val + size lim.
+'action' enter opnd + val + ind:
+    pack2 + optr*lexpr[pexpr] + ind + optr*lexpr[pexpr],
+    val -> opnd*lexpr[pexpr],  claim + size expr + max expr + p expr.
+'action' int overflow + >val - t:
+    error + integer overflow + 0, 0 -> val,
+    rep:(digit + t, :rep; + ).
+'predicate' integral denotation + >val:   r + int reg, int value -> val.
+'predicate' character denotation + >val - p:
+    ahead + abssym,
+        (is + other machine, add + min character + char + p,
+         lcharacter[p] -> val;  char -> val), nextchar,
+        (char = slash;  error + wrong character denotation + 0),
+    nextchar, req + abssym.
+'predicate' min limit + >lst:
+    ahead + leftsym, rr + leftsym, req tag + lst.
+'predicate' max limit + >lst:
+    ahead + rightsym, rr + rightsym, req tag + lst.
+'predicate' size limit + >lst:
+    ahead + leftsym, rr + rightsym, reqtag + lst.
+'predicate' times by:
+    r + times, enter optr + repr times;
+    r + bysym, enter optr + repr by.
+'action' enter optr + reprx:  reprx -> optr*lexpr[pexpr].
+'predicate' plus minus:
+    r + plus, enter optr + repr plus;
+    r + minus, enter optr + repr minus.
+'predicate' expression pack:
+    r + open, enter opnd + 0 + empty, expression, req + close.
+'action' monadic:
+    r + plus, enter optr + open plus;
+    r + minus, enter optr + open minus;
+    enter optr + open plus.
+
+
+$ 9.2    constant declarations $
+
+'predicate' constant declaration - dum:
+    r + constant, const descr + dum,
+      l:(r + comma, const descr + dum, :l;  req point #l).
+'action' const descr + >x expr - tg:
+    is tag + tg, req + equals,
+        (post ahead + equals, const descr + x expr;
+         req expression + x expr + virgin2),
+    define constant + tg + x expr; error + wrong const descr + 0.
+'action' define constant + head + x expr - p:
+    book glob ptr + head, add place + head + maxline #define,
+    adm*ttag[head] -> p,
+        (was globptr + p, constant -> type*lglobptr[p],
+         x expr -> expr*lglobptr[p]; + ).
+
+
+$ 9.3   pointer declarations $
+
+'predicate' pointer declaration - dum:
+    r + pointer, point descr + dum,
+      l:(r + comma, point descr + dum, :l; req point #l).
+'action' point descr + >x expr - tg:
+    is tag + tg, req + equals,
+        (post ahead + equals, point descr + x expr;
+         req expression + x expr + virgin2),
+    define pointer + tg + x expr;  error + wrong point descr + 0.
+'action' define pointer + head + x expr - p:
+    book glob ptr + head, add place + head + maxline #def,
+    adm*ttag[head] -> p,
+        (was globptr + p,
+            (type*lglobptr[p] = constant, error + wrong type + head;
+             pointer -> type*lglobptr[p]),
+         x expr -> expr*lglobptr[p]; + ).
+
+
+$ 9.4   list declarations $
+
+'predicate' list declaration:
+    r + list, list description,
+      l:(r + comma, list description, :l; req point #l).
+'action' list description - length - fixed - head - x display:
+    list head + length + fixed + head,
+        (r + equals, display item list pack + head + x display;
+         0 -> x display),
+    define list + length + fixed + head + x display.
+'action' list head + >length + >fixed + >head:
+    size estimate + length + fixed, reqtag + head,
+    apply indexed + head, selector list pack + head.
+'action' size estimate + >length + >fixed:
+    req + sub, (r + equals, true -> fixed;  false -> fixed),
+    req expression + length + virgin1,
+        (r + equals; + ), req + bus.
+'action' selector list pack + head - cnt - adm:
+    r + open, 0 -> cnt,
+      l:(selector + head + cnt, incr + cnt,
+            (r + comma, :l;  req + close, adm*ttag[head] -> adm,
+                (was indexed glob + adm,  cnt -> size*lglob[adm]; + ))
+      #l); + $ size = one means now one selector $.
+'action' selector + head + cnt - sel:
+    reqtag + sel, book selector + sel + head + cnt, $not if head is formal
+        (r + equals, :selector; + ).
+'action' display item list pack + head + >x display:
+    p display -> x display, req + open, display item list + head, req + close.
+'action' display item list + head - index - x display:
+    1 -> index, p display -> x display,
+    claim + size display + max display + p display,
+    rep:(display item + head + index,
+            (r + comma, :rep;  decr + index, index -> ldisplay[x display],
+             nix -> ldisplay[p display],
+             claim + size display + max display + p display)).
+'action' display item + head + >index> - tg:
+        (is tag + tg, define pointer constant + head + index + tg,
+         req + colon; + ),
+    insertion + index, claim + size display + max display + p display.
+'action' define pointer constant + head + index + tg:
+    define constant + tg + p expr, virgin2pc -> state*lexpr[p expr],
+    claim + size expr + max expr + p expr, enter optr + open plus,
+    enter opnd + head + min lim, enter optr + repr plus,
+    enter opnd + index + int den, enter optr + repr close,
+    enter opnd + 0 + empty.
+'action' insertion + >index> - p:
+        (string denotation + p + index;
+         req expression + p + virgin2, incr + index),
+    p -> ldisplay[p display].
+'predicate' stringdenotation + >x string + >index> - cnt:
+    ahead + quote, 0 -> cnt,
+    stringitem:(char = quotesym, nextchar,
+                   (char = quotesym, nextchar,
+                    to symbuff + quotesym, incr + cnt, :stringitem;
+                    req + quote, p string -> x string,
+                    pack + tstring + max string + p string,
+                    stringplace + cnt + cnt, add + index + cnt + index);
+               to symbuff + char, incr + cnt, next char, :stringitem
+    #stringitem).
+'action' define list + length + fixed + head + x display - p:
+    add place + head + maxline #def, adm*ttag[head] -> p,
+        (was rule + p;  was glob + p, list -> type*lglob[p],
+         length -> length*lglob[p], fixed -> fixed*lglob[p],
+         global -> sort*lglob[p], x display -> displ*lglob[p]; + ).
+
+
+$ 9.5   table declarations $
+
+'predicate' table declaration:
+    r + table, table description,
+      l:(r + comma, table description,
+         :l; req point #l).
+'action' table description - head - x display:
+    table head + head, req + equals,
+    display item list pack + head + x display,
+    define table + head + x display.
+'action' table head + >head:
+    reqtag + head, apply indexed + head, selector list pack + head.
+'action' define table + head + x display - p:
+    add place + head + maxline #def, adm*ttag[head] -> p,
+        (was rule + p;  was glob + p, table -> type*lglob[p],
+         global -> sort*lglob[p],  x display -> displ*lglob[p],
+         true -> fixed*lglob[p]; + ).
+
+
+$ 9.6   file declarations $
+
+'predicate' file declaration:
+    r + file, error skip + not yet implemented + 0.
+
+
+$ 9.7   rule declarations $
+
+'predicate' rule declaration
+            - type - forms - loc - call - accompanied:
+    typer + type, reqtag + handle,
+    d + handle, false -> produced -> accompanied, book glob + handle,
+
+                                                  t          5x    6xb
+    tenthmax -> formsbitcnt, 0 -> parms -> max parms,
+    p rules -> call, p formals -> forms, incr + forms, p loc -> loc,
+    bound affix sequence + p loc + accompanied,
+    actual rule, define rule + global + type
+    + forms + accompanied + call, forget locals + loc + false,
+    signal + handle, req point, d + point #to ajust line count.
+'predicate' typer + >type - p:  inpt -> p,
+        (r + action; r + predicate; r + question; r + function), p -> type.
+'action' bound affix sequence + sav ploc + >accompanied>:
+    r + plus, add parm, formal + sav ploc, true -> accompanied,
+    :bound affix sequence; + .
+'action' formal + sav ploc:
+    constant formal + sav ploc; pointer formal + sav ploc;
+    list formal + sav ploc; table formal + sav ploc;
+    file formal + sav ploc; error + wrong formal + 0.
+'predicate' constant formal + sav ploc - affx:
+    is tag + affx, (r + move sym; + ),
+    define localptr + affx + in + formaltype + sav ploc,
+    save formal + acceptor.
+'predicate' pointer formal + sav ploc - affx:
+    ahead + move sym,
+        (post ahead + sub, - ; next symbol, req tag + affx,
+            (r + move sym, define localptr
+             + affx + inout + formaltype + sav ploc,
+             save formal + relayer;
+             define localptr + affx + out + formaltype + sav ploc,
+             save formal + donor)).
+'predicate' list formal + sav ploc - affx:
+    ahead + move sym,
+    #sub(rr + sub, req + bus, reqtag + affx, selector list pack + affx,
+            (r + rightsym,
+             define indexed local + affx + inout + sav ploc,
+             save formal + qlist;
+             define indexed local + affx + out + sav ploc,
+             save formal + qlist) #sub).
+'predicate' table formal + sav ploc - affx:
+    r + sub, req + bus, reqtag + affx, selector list pack + affx,
+        (r + rightsym; + ),
+    define indexed local + affx + in + sav ploc,
+    save formal + qtable.
+'predicate' file formal + sav ploc - affx:
+    r + quote, req + quote, reqtag + affx, error + not yet implemented + 0,
+    define localptr + affx + inout + formaltype + sav ploc,
+    save formal + qfile.
+'action' save formal + x - p:
+    add + formsbitcnt + 3 + formsbitcnt,
+    get bitwrd + lformals + max formals + p formals + forms bitcnt + p,
+    shiftin 3 bits + x + p + formsbitcnt, p -> lformals[p formals].
+'action' define localptr + head + form funct + type + sav ploc:
+    check double + head + sav ploc, adm*ttag[head] -> up*lloc[ploc],
+    p loc -> adm*ttag[head], defined -> state*lloc[ploc],
+    type -> type*lloc[ploc], pointer -> form type*lloc[ploc],
+    form funct -> form funct*lloc[ploc], head -> tag*lloc[ploc],
+    0 -> sel*lloc[ploc], parms -> repr*lloc[ploc], claimloc.
+'action' define indexed local + head + form funct + sav ploc:
+    check double + head + sav ploc, adm*ttag[head] -> up*lloc[ploc],
+    p loc -> adm*ttag[head], defined -> state*lloc[ploc],
+    formaltype -> type*lloc[ploc], form funct -> form funct*lloc[ploc],
+    indexed -> form type*lloc[p loc], head -> tag*lloc[ploc],
+    parms -> repr*lloc[p loc], claimloc.
+'action' check double + head + sav ploc - p:
+    adm*ttag[head] -> p,
+        (p = 0;  was glob + p;  was globptr + p;
+         was text + p;  less + p + sav ploc;
+         error + doubly defined + 0).
+'action' define rule
++ sort + type + forms + accompanied + call - p - q:
+
+    add place + handle + maxline #def, adm*ttag[handle] -> p,
+#was(was indexed glob + p;  was glob + p, sort -> sort*lglob[p],
+     type -> type*lglob[p],
+        (not + accompanied; add + formsbitcnt + 3 + formsbitcnt,
+         get bitwrd + lformals + max formals + p formals + forms bitcnt + q,
+         shift in 3 bits + zero + q + forms bitcnt,
+         q -> lformals[p formals], forms -> forms*lglob[p]),
+        (not + produced;
+         subtr + p rules + size rules + q, mark + lrules[q],
+         call -> call*lglob[p]); + #was).
+'action' define member:  $ is nog niet in de graph opgenomen
+    local -> sort*lglob[p glob], 0 -> maxparms*lglob[p glob],
+    undefined -> type*lglob[p glob],
+    0 -> place*lglob[p glob] -> forms*lglob[p glob]
+    -> call*lglob[p glob] -> first*lglob[p glob] -> bits*lglob[p glob],
+    claim + size glob + max glob + p glob.
+'action' get bitwrd +>[]lst + max lst + >p lst> + >bitcnt> + >res:
+        (less + bits minus four + bitcnt, claim + 1 + maxlst + p lst,
+         0 -> bitcnt, zero -> lst[p lst] -> res;  lst[p lst] -> res).
+'action' add parm:
+    incr + parms, (less + max parms + parms, parms -> max parms; + ).
+
+
+$ 9.8   external declarations $
+
+'predicate' external declaration:
+    r + external, external type descr,
+      l:(r + comma, external type descr, :l; req point).
+'action' external type descr - type:
+    typer + type, external descr + type,
+      l:(r + comma, external descr + type, :l; + ); error + missing typer + 0.
+'action' external descr + type - forms - loc - accompanied:
+    req tag + handle, false -> accompanied -> produced,
+
+    tenth max -> forms bitcnt, book glob + handle, p loc -> loc,
+    p formals -> forms, incr + forms,
+    bound affix sequence + p loc + accompanied,
+    define rule + external + type + forms + accompanied + 0,
+    forget locals + loc + true.
+
+
+$ 9.9   pragmats $
+
+'predicate' pragmat:
+    r + pragmatsym, error skip + not yet implemented + 0.
+
+
+$ 9.10   root $
+
+'predicate' root:
+    rd + rootsym,
+        ((tag ahead + startsym, affix form);
+         error + missing affix form + 0),
+        (ahead + point, d + point;  error + missing + point).
+
+
+$ 9.11   actual rules $
+
+'action' actual rule - sav ploc - adm - dum:
+    p loc -> sav ploc,
+    middle + sav ploc, adm*ttag[handle] -> adm,
+        (was glob + adm, maxparms -> maxparms*lglob[adm]; + ),
+    righthandside + dum.
+'action' middle + sav ploc - tg:
+    r + minus, add parm, reqtag + tg,
+    define localptr + tg + inout + localtype + sav ploc, :middle;
+    req + colon.
+'action' righthandside + >only transp:
+    classification, false -> only transp;
+    alternative series + only transp.
+'action' alternative series + >only transp - transp:
+    true -> only transp, member + transp,
+        (is + transp;  false -> only transp),
+        (r + comma, :alternative series;
+         rd + semicolon, :alternative series; + ).
+'action' member + >transp - wrd - bitcnt - x mem - operat - lst:
+    add + membitcnt + 2 + membitcnt,
+    get bit wrd + lmemb + max member + p member + mem bitcnt + wrd,
+    p member -> x mem, membitcnt -> bitcnt, d + x mem, d + membitcnt,
+    false -> transp,
+        (operation + transp, true -> operat;
+         compound member + operat,
+            (is + operat, reqd + ofsym, reqd tag + lst, apply indexed + lst; +);
+         affix form, false -> operat;
+         terminator, false -> operat;
+         error + wrong member + 0, false -> operat),
+   #ahead(ahead + comma, $ non last member
+            (is + operat, shift in 2 bits + one + wrd + bitcnt;
+             shift in 2 bits + zero + wrd + bitcnt);
+            (is + operat, shift in 2 bits + three + wrd + bitcnt;
+             shift in 2 bits + two + wrd + bitcnt)
+   #ahead), or2 + lmemb[x mem] + wrd + lmemb[x mem].
+'predicate' compound member + >operat - dum - sav ploc - only transp:
+    false -> dum, ploc -> sav ploc,
+        (label, reqd + open, righthandside + dum,
+         reqd + close, forget locals + sav ploc + false, false -> operat;
+         rd + open, righthandside + only transp, reqd + close,
+            (ahead + ofsym, true -> operat,
+                (is + only transp;
+                 error + wrong selector source list + 0); false -> operat)).
+'predicate' label - head - locals:
+        (postahead + minus, d + p glob, true -> locals;
+         postahead + colon, d + labelmarker, false -> locals),
+    reqdtag + head, define localptr + head + 0 + labeltype + p loc,
+    middle + p loc,  (is + locals, define member; + ).
+'predicate' operation + >transp>:
+        (post ahead + minus, post 2 ahead + rightsym;  postahead + equals;
+         postahead + times; postahead + sub;
+         ahead + leftsym;  ahead + rightsym),
+    affix,
+        (identity tail; destination tail + transp;
+         error + wrong operation + 0).
+'predicate' identity tail:  rd + equals, affix.
+'predicate' destination tail + >transp> - tg:
+    rd + minus, reqd + rightsym,
+        (tag ahead + tg,
+            (post ahead + ofsym;  post ahead + sub;  true -> transp); + ),
+    affix,
+      l:(rd + minus, reqd + rightsym, affix, :l; + ).
+'predicate' terminator - tg:
+    rd + repeatsym, reqd tag + tg, apply label + tg;
+        (rd + succsym; rd + failsym), (rd + rootsym; + ).
+'predicate' classification:
+    r + boxsym, error skip + not yet implemented + 0.
+
+
+$ 9.12   affix forms $
+
+'predicate' affix form - head:
+    $ operation and compound member are already excluded
+    isd tag + head, book call + head,
+      l:(r + plus, affix, :l; + ).
+'action' affix - tg - lst:
+    plain affix value;
+    #list((post ahead + ofsym, reqtag + tg, req + ofsym,
+           reqtag + lst, apply indexed + lst,
+           book selector + tg + lst + nix,  d + sel marker, d + tg;
+           post ahead + sub, reqtag + lst, apply indexed + lst, d + rowmarker),
+          d tag affix + lst,
+          req + sub, affix, req + bus #list);
+    is tag + tg, d tag affix + tg, apply affix + tg;
+    r + leftsym, req + leftsym, d + left marker,
+    req tag + tg, d tag affix + tg, apply indexed + tg;
+    r + rightsym, req + rightsym, d + right marker,
+    req tag + tg, d tag affix + tg, apply indexed + tg;
+    error + wrong affix + 0.
+'predicate' plain affix value - p:
+        (integral denotation + p;  character denotation + p),
+    d + value marker, d + p;
+    ahead + leftsym, rr + rightsym, d + size marker,
+    req tag + p, d tag affix + p.
+
+
+$ 10  initialisation $
+
+'pointer' title.
+'action' initialize for reading:
+    true -> in init, min tag -> p tag, min bold -> p bold,
+    min spec -> p spec, min loc -> p loc -> x loc, min string -> p string,
+    min glob -> p glob, min member -> p member,
+    min text -> p text, min rules -> p rules, min globptr -> p globptr,
+    min formals -> p formals, min select -> p select, min display -> p display,
+    min disk -> p disk, min symbuff -> p symbuff,
+    min expr -> p expr, min preread -> p preread,
+    min stack -> p stack -> xp stack, min diskptrs -> p diskptrs,
+    nix -> char, nextchar, reserve admin space, p tag -> firsttag.
+'action' init system:
+    read + title, false -> ininit -> post -> post2 -> drop -> undef,
+    default options, claim + size rules + max rules + p rules,
+    claim + size select + max select + p select, nix -> cnt*lselect[p select],
+    0 -> link*lselect[p select],
+    0 -> startsym -> lkrhs*lrules[p rules] -> cur repr ->
+    place*lselect[p select] -> line -> pos, tenthmax -> membitcnt,
+    claim + size glob + max glob + p glob, claimloc,
+    claim + size globptr + max globptr + p globptr,
+    claim + size display + max display + p display,
+    claim + size expr + max expr + p expr,
+    claim + size diskptrs + max diskptrs + p diskptrs,
+    claim + 1 + max preread + p preread, init chars,
+    print + title, next symbol.
+
+
+$ 11   inter scan routines $
+
+'macro' 'pointer' descr col= 32, entries col = 59, right hand margin= 134,
+                  max sel = 100, names col = 5.
+'action' interscan - p virtual - p:
+    add + minloc + size loc + p, forget locals + p + true,
+    false -> inter error,
+    min addr space -> p virtual, add + p virtual + max sel + p virtual,
+    previsit1 + p virtual, previsit2 + p virtual, previsit3,
+        (type equals + startsym + action,
+         minstack -> p stack, 0 -> stack[p stack],
+         treat + startsym; + ),
+    new page, list tags + first tag.
+'action' show lists:
+    newpage,
+    show + ttag + min tag + p tag + max tag,
+    show + tbold + min bold + p bold + max bold,
+    show + tspec + minspec + p spec + max spec,
+    show + lloc + minloc + x loc + max loc,
+    show + tstring + min string + p string + max string,
+    show + lglob + min glob + p glob + max glob,
+    show + ltext + min text + p text + max text,
+    show + lrules + min rules + p rules + max rules,
+    show + lglobptr + min globptr + p globptr + max globptr,
+    show + lformals + min formals + p formals + max formals,
+    show + ldisplay + min display + p display + max display,
+    show + lmemb + min member + p member + max member,
+    show + lselect + min select + p select + max select,
+    show + ldisk + min disk + p disk + max disk,
+    show + symbuff + min symbuff + p symbuff + max symbuff,
+    show + lexpr + min expr + p expr + max expr,
+    show + ldiskptrs + min diskptrs + p diskptrs + max diskptrs,
+    show + lpreread + min preread + p preread + max preread,
+    show + stack + min stack + xp stack + max stack.
+'action' previsit1 + >p virtual> - type - adm - displ - val - p:
+$                       evaluate length expressions of all lists,
+$                       give a virtual minimum to all non floating lists
+
+$                       and tables,and assign their total space to fixed space.
+    true -> eval1, minglob -> adm, add + adm + size glob + adm, 0 -> p,
+    rep:(type*lglob[adm] -> type,
+       #eval(type = list, try to evaluate + length*lglob[adm] + adm,
+             value*lexpr[length*lglob[adm]] -> val,
+                (less + 0 + val;  error1 + non pos space + adm),
+             displ*lglob[adm] -> displ,
+            #test(displ = 0;
+                  lseq + ldisplay[displ] + val;
+                  not + fixed*lglob[adm];
+                  error1 + insuff virt space + adm #test),
+             #add(is + fixed*lglob[adm], p virtual -> minlimit*lglob[adm],
+                  testadd + p virtual + val + adm,
+                  add + p virtual + val + p virtual;
+                  testadd + p + val + adm, add + p + val + p #add);
+             type = table, p virtual -> minlimit*lglob[adm],
+             displ*lglob[adm] -> displ,
+                 (displ = 0 #error;  ldisplay[displ] -> val,
+                  testadd + p virtual + val + adm,
+                  add + p virtual + val + p virtual); + #eval),
+         add + adm + size glob + adm,
+            (less + adm + p glob, :rep;
+             p -> floatsum) #rep).
+'action' previsit2 + >p virtual> - adm - val - addr unit - p:
+                      $ share out virtual minima to all floating lists.
+
+                                      ,p + les xam + ecaps rdda flah + rtbus
+    divide + p + floatsum + addr unit,
+    min glob -> adm, add + adm + size glob + adm,
+  rep:(
+   #type((type*lglob[adm] = list, not + fixed*lglob[adm]),
+         value*lexpr[length*lglob[adm]] -> val,
+         p virtual -> min limit*lglob[adm],
+         #add(lseq + floatsum + 0 #error;
+              testmult + addr unit + val + 0, mult + val + addr unit + p,
+              add + p virtual + p + p virtual,
+              add + p virtual + p + p virtual #add); + #type),
+       add + adm + size glob + adm,
+          (less + adm + p glob, :rep; + ) #rep).
+'action' previsit3 - adm:
+$                       evaluate remaining expressions, i.e. those in displays
+$                       and those of variable declarations and of constant decl.
+    min glob -> adm, add + adm + size glob + adm, false -> eval1,
+    rep:(visit indexed + adm, add + adm + size glob + adm,
+            (less + adm + p glob, :rep; + ) #rep),
+    min globptr -> adm, add + adm + size glob ptr + adm,
+    repp:(visit varstant + adm, add + adm + size globptr + adm,
+            (less + adm + p globptr, :repp; + ) #repp).
+'action' visit indexed + adm - type - displ - p:
+    type*lglob[adm] -> type,
+    #type((type = list;  type = table), displ*lglob[adm] -> displ,
+        #displ(displ = 0;
+            rep:(incr + displ, ldisplay[displ] -> p,
+                    (p = nix;
+                        (was expr + p, try to evaluate + p + adm; + ), :rep)
+            #rep) #displ); + #type).
+'action' visit varstant + adm - expr:
+    expr*lglobptr[adm] -> expr,
+        (was expr + expr, try to evaluate + expr + adm; + ).
+'action' show + []lst + minlist + p list + max list - p:
+    nlcr, outint + min list, outint + p list, outint + max list,
+    nlcr, minlist -> p,
+    rep:(lseq + p + p list, print + lst[p], incr + p, :rep; + ), nlcr.
+'action' treat + node - adm - p - q:
+    adm*ttag[node] -> adm, call*lglob[adm] -> p,
+    bits*lglob[adm] -> q,
+        (p = 0, 2 -> bits*lglob[adm];
+         q = 2;  q = 3;  lseq + 8 + q;
+         stack[p stack] = node, 7 -> bits*lglob[adm];
+         testbits + node, onstack + node, treat rules + p,
+         decr + p stack, subtr + bits*lglob[adm] + 4 + bits*lglob[adm]).
+'action' testbits + node:
+    bits*lglob[adm*ttag[node]] = 0, 6 -> bits*lglob[adm*ttag[node]];
+    7 -> bits*lglob[adm*ttag[node]].
+'action' treat tag + x:
+    lseq + 4 + bits*lglob[adm*ttag[x]], cycle + x; treat + x.
+'action' cycle + x - p - q:
+    pstack -> p,
+  rep:(stack[p] -> q,(q = x,
+    (bits*lglob[adm*ttag[x]] = 7; incr + bits*lglob[adm*ttag[x]]);
+    decr + p, (lseq + 8 + bits*lglob[adm*ttag[q]], :rep;
+    replace + q + x, glue + q + x, 15 -> bits*lglob[adm*ttag[q]], :rep))).
+'action' onstack + x:
+    claim + 1 + max stack + pstack, x -> stack[pstack],
+        (lseq + p stack + xp stack;  p stack -> xp stack).
+'action' stackrules + x:
+    x -> lrules[p rules], first*lglob[adm*ttag[x]] -> lksame*lrules[p rules],
+    p rules -> first*lglob[adm*ttag[x]],
+        (not + produced, true -> produced;
+         p rules -> lkrhs*lrules[linkp]),
+    prules -> linkp, claim + size rules + max rules + p rules,
+    0 -> lkrhs*lrules[p rules].
+'action' replace + fm + to - p - q:  first*lglob[adm*ttag[fm]] -> p,
+rep:(replace1 + p + to, lksame*lrules[p] -> p,
+     #less(less + 0 + p, :rep;
+           first*lglob[adm*ttag[to]] -> p,
+          repp:(lksame*lrules[p] -> q, (less + 0 + q, q -> p, :repp;
+                first*lglob[adm*ttag[fm]] -> lksame*lrules[p])
+          #repp)
+     #less)
+#rep).
+'action' replace1 + a + b - s:
+    lkrhs*lrules[a] = 0, b -> s, mark + s,
+    s -> lrules[a];  b -> lrules[a].
+'action' glue + fm + to - p1 - p2 - p3:
+    call*lglob[adm*ttag[to]] -> p1,
+  rep:(lkrhs*lrules[p1] -> p2, call*lglob[adm*ttag[fm]] -> p3,
+      (p2 = p3;$niet nodig$
+        p2 = 0, lrules[p1] -> p2, mark + p2,
+        p2 -> lrules[p1], call*lglob[adm*ttag[fm]] -> lkrhs*lrules[p1];
+    p2 -> p1, :rep)).
+'action' treat rules + x - p - q:
+    x -> q,
+  rep:(lrules[q] -> p, (less + p + 0, mark + p, treattag + p;
+    treattag + p, lkrhs*lrules[q] -> q, :rep)).
+'action' outbits + x - adm - bits:
+    adm*ttag[x] -> adm,
+        (was rules + call*lglob[adm], bits*lglob[adm] -> bits,
+            (bits = 0, print + isolated;
+             bits = 3, print + recursive;
+             bits = 11, print + recursive; + ); + ).
+'action' list tags + x:
+        x = 0;
+    list tags + left*ttag[x], list tag + x, list tags + right*ttag[x].
+'action' list tag + x - p - expr:
+    adm*ttag[x] -> p,
+               (p = 0; incr + cur repr,
+                nlcr, outint + cur repr, position + names col,
+                print + x, position + descr col,
+                    (was glob + p, outbits + x, cur repr -> repr*lglob[p],
+                print + sort*lglob[p],
+                print + type*lglob[p],
+                   (type*lglob[p] = undefined, true -> undef; + );
+                was globptr + p, print + type*lglobptr[p],
+                   (type*lglobptr[p] = undefined, true -> undef; + ),
+                expr*lglobptr[p] -> expr, cur repr -> repr*lglobptr[p],
+                    (expr = 0 # error;  outint + value*lexpr[expr]);
+                print + undefined affix, true -> undef),
+                position + entries col, entries + x, nlcr).
+'action' entries + tag - place - adm:
+    adm*ttag[tag] -> adm, #glob(was glob + adm,
+        place*lglob[adm] -> place,
+               (place = 0;  print chain of entries + place),
+               (type*lglob[adm*ttag[tag]] = list,
+                print selectors + tag; + );
+    was globptr + adm, place*lglobptr[adm] -> place,
+        (place = 0;  print chain of entries + place);
+    print chain of entries + adm, 0 -> adm*ttag[tag] #glob).
+'action' print selectors + lst - link:
+    sel*lglob[adm*ttag[lst]] -> link,
+    rep:(link = 0;  print selector + link,
+         link*lselect[link] -> link, :rep).
+'action' print selector + sel - place:
+    position + entries col, print + slt*lselect[sel],
+    prchar + tspec[colon],
+    place*lselect[sel] -> place,
+        (place = 0; print chain of entries + place).
+'action' print chain of entries + >place> - wrd:
+        ltext[place] -> wrd, get parm1 + wrd + place,
+               (place = 0, out entry + wrd;
+                add + place + min text + place, decr + place,
+                print chain of entries + place, out entry + wrd).
+'action' out entry + wrd:
+        less + right hand margin + pos, position + entries col,
+                out entry ln + wrd;
+        out entry ln + wrd.
+'action' out entry ln + wrd - ln:
+    get parm2 + wrd + ln,
+        (ln = max line, prchar + tspec[times];  outint + ln).
+'root' scan1.
+        (place = 0;  print chain of entries + place);
+    print chain of entries + adm, 0 -> adm*ttag[tag] #glob).
+'action' print selectors + lst - link:
+    sel*lglob[adm*ttag[lst]] -> link,
+    rep:(link = 0;  print selector + link,
+         link*lselect[link] -> link, :rep).
+'action' print selector + sel - place:
+    position + entries col, print + slt*lselect[sel],
+    prchar + tspec[colon],
