@@ -1,0 +1,16 @@
+ed - $1
+a
+@
+.
+g/ MACRO /s/.*/1&@2&@3&@4&@5&@6&/
+1,$s/@/\
+/g
+g/^1/s/ MACRO / macro1 /g
+g/^2/s/ MACRO / macro2 /g
+g/^3/s/ MACRO / macro3 /g
+g/^4/s/ MACRO / macro4 /g
+g/^5/s/ MACRO / macro5 /g
+g/^6/s/ MACRO / macro6 /g
+g/^[123456]/s///
+w
+q

@@ -1,0 +1,340 @@
+g/abcdefghijklmnopqrstuvwxyz/pn
+$p
+g/actual affix sequence with/pn
+$p
+g/actual rule/pn
+$p
+g/affix form/pn
+$p
+g/alternative/pn
+$p
+g/alternative series/pn
+$p
+g/alternative tail/pn
+$p
+g/and/pn
+$p
+g/applied identifier/pn
+$p
+g/area/pn
+$p
+g/area addition/pn
+$p
+g/base/pn
+$p
+g/begins with/pn
+$p
+g/body tail/pn
+$p
+g/character/pn
+$p
+g/class/pn
+$p
+g/class box/pn
+$p
+g/class series/pn
+$p
+g/class series tail/pn
+$p
+g/coincides with/pn
+$p
+g/constant/pn
+$p
+g/constant description list of/pn
+$p
+g/constant description list tail of/pn
+$p
+g/contains/pn
+$p
+g/declaration of/pn
+$p
+g/defining identifier/pn
+$p
+g/definition/pn
+$p
+g/definition list/pn
+$p
+g/definition list tail/pn
+$p
+g/denotation/pn
+$p
+g/description list of/pn
+$p
+g/destination sequence with/pn
+$p
+g/digit/pn
+$p
+g/direct/pn
+$p
+g/dot/pn
+$p
+g/element/pn
+$p
+g/equivalent with/pn
+$p
+g/expression/pn
+$p
+g/external/pn
+$p
+g/external constant description list of/pn
+$p
+g/external constant description list tail of/pn
+$p
+g/external table description list of/pn
+$p
+g/external table description list tail of/pn
+$p
+g/fallible/pn
+$p
+g/false/pn
+$p
+g/field/pn
+$p
+g/field definition/pn
+$p
+g/field definition tail/pn
+$p
+g/field destination sequence/pn
+$p
+g/field not the same tags as/pn
+$p
+g/field transport/pn
+$p
+g/field transport list/pn
+$p
+g/field transport list tail/pn
+$p
+g/file/pn
+$p
+g/file description list of/pn
+$p
+g/file description list tail of/pn
+$p
+g/file typer/pn
+$p
+g/filling/pn
+$p
+g/filling head/pn
+$p
+g/form with/pn
+$p
+g/form with in parameter/pn
+$p
+g/formal/pn
+$p
+g/formal file/pn
+$p
+g/formal init/pn
+$p
+g/formal uninit/pn
+$p
+g/formals sequence/pn
+$p
+g/free/pn
+$p
+g/free expression/pn
+$p
+g/free expression list/pn
+$p
+g/free expression list tail/pn
+$p
+g/global/pn
+$p
+g/global variable/pn
+$p
+g/halfinit/pn
+$p
+g/has calibre/pn
+$p
+g/have/pn
+$p
+g/holds/pn
+$p
+g/i/pn
+$p
+g/identifier/pn
+$p
+g/in/pn
+$p
+g/in direct identifier/pn
+$p
+g/in infallible/pn
+$p
+g/inaccessible compound/pn
+$p
+g/included in/pn
+$p
+g/index/pn
+$p
+g/index identifier/pn
+$p
+g/info sequence with/pn
+$p
+g/init/pn
+$p
+g/inout direct identifier/pn
+$p
+g/inout stack element/pn
+$p
+g/integral denotation/pn
+$p
+g/is/pn
+$p
+g/is accessible in/pn
+$p
+g/is affix split of/pn
+$p
+g/is alternative split of/pn
+$p
+g/is correct for destinations/pn
+$p
+g/is finite in/pn
+$p
+g/is member equivalent with/pn
+$p
+g/is member split of/pn
+$p
+g/is permitted in/pn
+$p
+g/is permutation of/pn
+$p
+g/label/pn
+$p
+g/label addition/pn
+$p
+g/list/pn
+$p
+g/list of/pn
+$p
+g/list of stack/pn
+$p
+g/list of table/pn
+$p
+g/local/pn
+$p
+g/local part/pn
+$p
+g/local part tail/pn
+$p
+g/new/pn
+$p
+g/no part of/pn
+$p
+g/nonside/pn
+$p
+g/not in/pn
+$p
+g/not in new/pn
+$p
+g/not the same tags as/pn
+$p
+g/or/pn
+$p
+g/out/pn
+$p
+g/out direct identifier/pn
+$p
+g/out stack element/pn
+$p
+g/plain value/pn
+$p
+g/plus minus/pn
+$p
+g/pragmat/pn
+$p
+g/pragmat definition/pn
+$p
+g/pragmat item/pn
+$p
+g/pragmat item list/pn
+$p
+g/pragmat item list tail/pn
+$p
+g/pragmat item tail/pn
+$p
+g/quote image/pn
+$p
+g/req form/pn
+$p
+g/req loc/pn
+$p
+g/root/pn
+$p
+g/rule/pn
+$p
+g/rule description list of/pn
+$p
+g/rule description list tail of/pn
+$p
+g/selection/pn
+$p
+g/selector/pn
+$p
+g/sequence with/pn
+$p
+g/side/pn
+$p
+g/size estimate/pn
+$p
+g/source/pn
+$p
+g/stack/pn
+$p
+g/stack description list tail of/pn
+$p
+g/string denotation/pn
+$p
+g/sub bus/pn
+$p
+g/table/pn
+$p
+g/table description list tail of/pn
+$p
+g/tag/pn
+$p
+g/tail/pn
+$p
+g/term/pn
+$p
+g/term head/pn
+$p
+g/times by/pn
+$p
+g/to token/pn
+$p
+g/token/pn
+$p
+g/true/pn
+$p
+g/typer/pn
+$p
+g/uninit/pn
+$p
+g/unless/pn
+$p
+g/variable/pn
+$p
+g/variable description list of/pn
+$p
+g/variable description list tail of/pn
+$p
+g/where/pn
+$p
+g/where all estimates in/pn
+$p
+g/where last block in/pn
+$p
+g/where no doubles in/pn
+$p
+g/where selector/pn
+$p
+g/where true/pn
+$p
+g/with/pn
+$p
+g/zone/pn
+$p
+g/zone series/pn
+$p
+g/zone series tail/pn
+$p

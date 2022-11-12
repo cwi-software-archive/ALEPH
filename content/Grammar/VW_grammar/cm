@@ -1,0 +1,8 @@
+cp gr.s.hdef .gd
+mac .gd
+usort .gd -o .gd
+cp gr.s.hused .gu
+mac .gu
+usort .gu -o .gu
+comm -13 .gd .gu >gr.hc
+wc gr.hc

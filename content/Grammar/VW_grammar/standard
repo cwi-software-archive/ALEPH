@@ -1,0 +1,17 @@
+STANDARD:: infallible nonside with inparameter inparameter
+	outparameter outparameter rule letter a letter d letter d;
+	fallible nonside with inparameter inparameter rule
+	letter l letter e letter s letter s;
+	infallible side with inparameter inparameter outparameter
+	rule letter r letter a letter n letter d letter o letter m;
+	fallible side with file parameter stack i parameter
+	outparameter rule letter g letter e letter t letter l
+	letter i letter n letter e;
+	constant letter z letter e letter r letter o;
+	selector letter n letter i letter l letter t
+	letter a letter b letter l letter e
+	field table letter n letter i letter l letter t
+	letter a letter b letter l letter e;
+
+		etc. see Aleph Manual 5.2.1. to 5.2.5.
+

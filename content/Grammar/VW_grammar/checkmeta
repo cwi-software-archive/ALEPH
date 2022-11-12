@@ -1,0 +1,13 @@
+ed - $1 | usort >$1.mdef
+v/=/d
+1,$s/ =.*//
+g/^ /s/^ *//
+1,$p
+q
+
+ed - $1 | tr "[a-z][1-9] (),.;:=" "[\012*]" | grep -v "^\$" | usort >$1.mused
+1,$s/.*=//
+1,$p
+q
+
+comm -3 $1.mdef $1.mused

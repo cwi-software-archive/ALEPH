@@ -1,0 +1,66 @@
+NEST>DECSETY.
+DECSETY>DECS;EMPTY.
+DECS>DEC;DECS DEC.
+DEC>DESCR TAG.
+DESCR>STACK;NONSTACK.
+NONSTACK>KIND;RULE;EXTERNAL.
+KIND>CONSTANT;VARIABLE;TABLE;FILE.
+DEF>TACK;constant;variable;rule;file;EXTERN.
+TACK>table;stack.
+EXTERN>external TYPE EFFECT rule;external table;external constant.
+EMPTY>.
+TAG>LETTER;TAG LETTER;TAG DIGIT.
+LETTER>letter ALPHA.
+ALPHA>a;b;c;d;e;f;g;h;i;j;k;l;m;n;o;p;q;r;s;t;u;v;w;x;y;z.
+DIGIT>digit zero;digit one;digit two;digit three;digit four;digit five;digit six;digit seven;digit eight;digit nine.
+TAG LETTER:TAG,LETTER.
+TAG DIGIT:TAG,DIGIT.
+letter ALPHA:ALPHA symbol.
+digit zero:zero symbol.
+digit one:one symbol.
+digit two:two symbol.
+digit three:three symbol.
+digit four:four symbol.
+digit five:five symbol.
+digit six:six symbol.
+digit seven:seven symbol.
+digit eight:eight symbol.
+digit nine:nine symbol.
+program:where NEST is NEST1 NEST2,NEST info sequence with NEST1,NEST root,NEST info sequence with NEST2,end symbol.
+NEST info sequence with EMPTY:EMPTY.
+NEST info sequence with NEST1:NEST pragmat,NEST info sequence with NEST1.
+NEST info sequence with NEST1 DECS:NEST DEF declaration of DECS,NEST info sequence with NEST1.
+NEST root:root symbol,NEST new EMPTY TYPE EFFECT NOREQ affix form,point symbol.
+NOREQ>req form EMPTY req loc EMPTY.
+RULE>TYPE EFFECT with PARAMSETY rule.
+TYPE>fallible;infallible.
+EFFECT>side;nonside.
+NEST rule declaration of TYPE EFFECT with PARAMSETY rule TAG:TYPE EFFECT typer,NEST TYPE EFFECT with PARAMSETY rule TAG defining identifier,new FORMALSETY REQ PARAMSETY formals sequence,NEST new FORMALSETY inaccessible compound TYPE EFFECT label TAG	LOCALSETY TYPE EFFECT REQ actual rule,point symbol.
+fallible nonside typer:question symbol.
+fallible side typer:predicate symbol.
+infallible nonside typer:function symbol.
+infallible side typer:action symbol.
+LF>new FORMALSETY;LF BLOCK.
+RULEBODY>alternative series;classification.
+NEST LF BLOCK TYPE EFFECT REQ actual rule:BLOCK local part,NEST LF BLOCK TYPE EFFECT REQ RULEBODY,where no doubles in LF BLOCK.
+NEST LF TYPE EFFECT REQ alternative series:NEST LF TYPE1 TYPE2 EFFECT1 REQ1 alternative,NEST LF1 TYPE1 TYPE3 EFFECT2 REQ2 body tail,where EFFECT EFFECT1 EFFECT2 holds,where TYPE TYPE2 TYPE3 holds,( LF REQ ) alternative split ( REQ1 ) ( LF1 REQ2 ).
+NEST LF TYPE TYPE nonside NOREQ body tail:EMPTY.
+NEST LF fallible TYPE EFFECT REQ body tail:semicolon symbol,NEST LF EFFECT REQ alternative series.
+NEST LF TYPE TYPE1 EFFECT REQ alternative:where TYPE1 in infallible,NEST LF1 TYPE EFFECT REQ LASTMEMBER,where last block in LF is accessible in LF1;NEST LF TYPE EFFECT1 REQ1 MEMBER,NEST LF1 TYPE1 EFFECT2 REQ2 alternative tail,where EFFECT EFFECT1 EFFECT2 holds,( LF REQ ) member split ( REQ1 ) ( LF1 REQ2 ).
+NEST LF TYPE EFFECT REQ alternative tail:comma symbol,NEST LF TYPE1 TYPE2 EFFECT REQ alternative,where TYPE TYPE1 TYPE2 holds.
+where last block inLF inaccessible compound LABELETY LOCALSETY is accessible inLF accessible compound LABELETY LOCALSETY:EMPTY.
+( LF req form FORMSETY req loc LOCALSETY ) alternative split ( req form FORMSETY req loc LOCALSETY1 ) ( LF req form FORMSETY req loc LOCALSETY2 ):where LOCALSETY is permutation of LOCALSETY1 LOCALSETY2.
+MEMBIX>member;affix.
+( LF req form FORMSETY req loc LOCALSETY ) MEMBIX split ( req form FORMSETY1 req loc LOCALSETY1 ) ( LF1 req form FORMSETY2 req loc LOCALSETY2 ):where FORMSETY is permutation of FORMSETY1 FORMSETY2,where LOCALSETY is permutation of LOCALSETY1 LOCALSETY2,where LF1 is MEMBIX equivalent with LF dot FORMSETY1 dot LOCALSETY1.
+where no doubles in LF local INIT TAG:where TAG not in LF,where no doubles in LF.
+where no doubles in LF COMPOUND TYPE EFFECT label TAG:where TAG not in LF.
+where TAG not in new EMPTY:EMPTY.
+where TAG not in LF local INIT TAG1:unless TAG is TAG1,where TAG not in LF.
+where TAG not in LF COMPOUND TYPE EFFECT label TAG1:unless TAG is TAG1,where TAG not in LF.
+where TAG not in new FORMALSETY formal INIT TAG1:unless TAG in TAG1,where TAG not in new FORMALSETY.
+TEF>TYPE;EFFECT.
+where TEF TEF1 TEF2 holds:where TEF is TEF1,where TEF is TEF2;where TEF is fallible or TEF is side,unless TEF1 is TEF2.
+REQ>req form FORMSETY req loc LOCALSETY.
+FORMSETY>FORMS;EMPTY.
+FORMS>FORM;FORMS FORM.
+FORM>formal uninit TAG.

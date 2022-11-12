@@ -1,0 +1,223 @@
+ 
+ AFFIX token 
+ BLOCK REQ REQ local part 
+ BLOCK TYPE EFFECT label addition 
+ EMPTY 
+ FIELD definition 
+ FIELD tag 
+ FIELDS definition list 
+ FIELDS field destination sequence 
+ FIELDS list of TACK TAG 
+ FIELDS list of stack TAG 
+ FIELDS list of table TAG 
+ FIELDS selection from TAG 
+ FIELDSETY definition list tail 
+ FIELDSETY field destination sequence 
+ FORMAL req form FORMSETY PARAM formal 
+ FORMALSETY req form FORMSETY PARAMSETY formals sequence 
+ FORMALSETY req form FORMSETY PARAMSETY formals sequence 
+ LF FORLOC TAG INOUT index identifier 
+ LF FORLOC TAG in direct identifier 
+ LF FORLOC TAG inout direct identifier 
+ LF FORLOC TAG out direct identifier 
+ LF FORLOC halfinit TAG applied identifier 
+ LF FORLOC init TAG applied identifier 
+ LF FORLOC uninit TAG applied identifier 
+ LF formal FIELDS stack TAG applied identifier 
+ LF formal FITAB TAG applied identifier 
+ LF formal TAG out direct identifier 
+ LF label TYPE EFFECT label TAG applied identifier 
+ LF local TAG out direct identifier 
+ LOCAL req loc LOC local 
+ LOCALS REQ REQ local part tail 
+ LOCALSETY REQ REQ local part tail 
+ MICA token 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL with SIZE 
+ NEST CONSTAGSETY EMPTY filling head CAL 
+ NEST DEF declaration of DECS 
+ NEST DEF description list of DECS 
+ NEST DEPENDSETY FIELDS stack TAG defining identifier 
+ NEST DEPENDSETY SIZE size estimate 
+ NEST DEPENDSETY constant TAG defining identifier 
+ NEST DEPENDSETY expression 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY tail 
+ NEST EMPTY constant TAG defining identifier 
+ NEST FIELDS table TAG defining identifier 
+ NEST LF BLOCK TYPE EFFECT REQ actual rule 
+ NEST LF BLOCK TYPE EFFECT REQ RULEBODY 
+ NEST LF EFFECT REQ destination sequence with PARAMS 
+ NEST LF EFFECT REQ form with PARAM 
+ NEST LF EFFECT REQ actual affix sequence with PARAMSETY 
+ NEST LF FIELDS TACK TAG applied identifier 
+ NEST LF FIELDS TACK TAG applied identifier 
+ NEST LF FIELDS field transport list 
+ NEST LF FIELDS stack TAG applied identifier 
+ NEST LF FIELDS field transport 
+ NEST LF FIELDSETY field transport list tail 
+ NEST LF INOUT index 
+ NEST LF INOUT index TACK element 
+ NEST LF TACK LIMIT 
+ NEST LF TYPE EFFECT REQ alternative series 
+ NEST LF TYPE EFFECT REQ class series 
+ NEST LF TYPE EFFECT REQ MEMBER 
+ NEST LF TYPE TYPE EFFECT REQ alternative 
+ NEST LF TYPE TYPE EFFECT REQ alternative 
+ NEST LF TYPE TYPE EFFECT REQ class 
+ NEST LF TYPE TYPE EFFECT REQ alternative 
+ NEST LF class box 
+ NEST LF file TAG applied identifier 
+ NEST LF in direct TACK element 
+ NEST LF inout direct stack element 
+ NEST LF nonside NOREQ form with in parameter 
+ NEST LF out direct stack element 
+ NEST LF source 
+ NEST LF EFFECT REQ AFFIX sequence with PARAMSETY 
+ NEST LF TYPE EFFECT REQ LASTMEMBER 
+ NEST LF TYPE EFFECT REQ alternative tail 
+ NEST LF TYPE TYPE EFFECT REQ body tail 
+ NEST LF TYPE TYPE EFFECT REQ class series tail 
+ NEST RESTRICTED base 
+ NEST RESTRICTED expression 
+ NEST RESTRICTED plain value 
+ NEST RESTRICTED term 
+ NEST RESTRICTED term head 
+ NEST TACK description list of DECS 
+ NEST TYPE EFFECT with PARAMSETY rule TAG defining identifier 
+ NEST TYPE area addition 
+ NEST area 
+ NEST constant description list of DECS 
+ NEST constant description list tail of DECSETY 
+ NEST external TYPE EFFECT rule description list of DECS 
+ NEST external TYPE EFFECT rule description list tail of DECSETY 
+ NEST external constant description list of DECS 
+ NEST external constant description list tail of DECSETY 
+ NEST external table description list of DECS 
+ NEST external table description list tail of DECSETY 
+ NEST file TAG defining identifier 
+ NEST file description list of DECS 
+ NEST file description list tail of DECSETY 
+ NEST filling CAL 
+ NEST free expression 
+ NEST free expression list CAL 
+ NEST free expression list CAL i 
+ NEST free expression list tail CALETY 
+ NEST global CONSTABLE TAG applied identifier 
+ NEST global DEPENDSETY FIELDS stack TAG applied identifier 
+ NEST global DEPENDSETY constant TAG applied identifier 
+ NEST global FITAB TAG applied identifier 
+ NEST global STABLE TAG applied identifier 
+ NEST global TYPE EFFECT with PARAMSETY rule TAG applied identifier 
+ NEST global variable TAG applied identifier 
+ NEST info sequence with NEST 
+ NEST info sequence with NEST 
+ NEST new EMPTY TYPE EFFECT NOREQ affix form 
+ NEST new EMPTY table LIMIT 
+ NEST new FORMALSETY inaccessible compound TYPE EFFECT label TAG LOCALSETY TYPE EFFECT req form FORMSETY req loc EMPTY actual rule 
+ NEST pragmat 
+ NEST pragmat TAG identifier 
+ NEST pragmat definition 
+ NEST pragmat item 
+ NEST pragmat item list 
+ NEST pragmat item list tail 
+ NEST pragmat item tail 
+ NEST root 
+ NEST stack description list tail of DECSETY 
+ NEST table description list tail of DECSETY 
+ NEST variable TAG defining identifier 
+ NEST variable description list of DECS 
+ NEST variable description list tail of DECSETY 
+ NEST zone 
+ NEST zone series 
+ NEST zone series tail 
+ NOTION 
+ PLAIN denotation 
+ SELECTOR definition 
+ SELECTORS field definition 
+ SELECTORSETY field definition tail 
+ TACK sub bus 
+ TAG 
+ TYPE EFFECT typer 
+ WHETHER ( ALPHA NOTETY ) begins with ( NOTION ) or ( NOTETY ) contains ( NOTION ) 
+ WHETHER ( ALPHA ) coincides with ( ALPHA ) in ( abcdefghijklmnopqrstuvwxyz ) and ( NOTETY ) begins with ( NOTETY ) 
+ WHETHER ( NOTETY ) begins with ( NOTETY ) and ( NOTETY ) begins with ( NOTETY ) 
+ WHETHER false 
+ WHETHER true 
+ file typer 
+ formal FIELDS TACK TAG defining identifier 
+ formal file TAG defining identifier 
+ formal init TAG defining identifier 
+ formal uninit TAG defining identifier 
+ integral denotation 
+ local TAG defining identifier 
+ plus minus 
+ quote image 
+ string denotation 
+ string item 
+ string item sequence 
+ sub bus 
+ times by 
+ to token 
+ unless ( NOTION ) is ( quote ) 
+ unless ( SIZE ) is ( absent ) 
+ unless ( TAG ) is ( TAG ) 
+ unless ( TEF ) is ( TEF ) 
+ unless THING 
+ unless THING 
+ where ( CONSTAGSETY ) is ( EMPTY ) 
+ where ( DEC ) is ( STANDARD ) 
+ where ( FIELDS ) is ( selector TAG field ) 
+ where ( INDIR ) is ( index ) or ( TACK ) is ( stack ) or ( INOUT ) is ( in ) 
+ where ( INOUT ) is ( out ) 
+ where ( INOUT ) is ( out ) and ( INDIR ) is ( direct ) 
+ where ( NEST ) is ( NEST DEPENDSETY constant TAG NEST ) 
+ where ( NEST ) is ( NEST NEST ) 
+ where ( NOTION ) contains ( ALPHA NOTETY ALPHA ) or ( NOTION ) contains ( ALPHA NOTETY ALPHA ) 
+ where ( REQ ) ( LF REQ ) is alternative split of ( LF REQ ) 
+ where ( REQ ) ( LF REQ ) is affix split of ( LF REQ ) 
+ where ( REQ ) ( LF REQ ) is alternative split of ( LF REQ ) 
+ where ( REQ ) ( LF REQ ) is member split of ( LF REQ ) 
+ where ( TACK ) is ( TACK ) or ( TACK ) is ( stack ) 
+ where ( TAG ) is ( TAG ) 
+ where ( TEF ) is ( TEF ) 
+ where ( TEF ) is ( TEF ) 
+ where ( TEF ) is ( fallible ) or ( TEF ) is ( side ) 
+ where ( TYPE ) is ( infallible ) 
+ where DEPENDSETY is finite in NEST 
+ where DEPENDSETY is finite in NEST 
+ where EFFECT EFFECT EFFECT holds 
+ where FIELD not the same tags as FIELDSETY 
+ where FIELDS has calibre CAL 
+ where FIELDS is permutation of FIELDS FIELDSETY 
+ where FIELDSETY has calibre CALETY 
+ where FORMSETY is permutation of FORMSETY FORMSETY 
+ where LF is MEMBIX equivalent with LF dot FORMSETY dot LOCALSETY 
+ where LOCALSETY is permutation of LOCALSETY LOCALSETY 
+ where MEMBIX split sets to INIT 
+ where NOTION NOTION is MEMBIX equivalent with NOTION NOTION dot FORMSETY dot EMPTY 
+ where NOTION NOTION is MEMBIX equivalent with NOTION NOTION dot FORMSETY dot LOCALSETY 
+ where OBJECTSETY OBJECTSETY is permutation of OBJECTSETY 
+ where PARAMS is correct for destinations 
+ where PARAMSETY is correct for destinations 
+ where SELECTOR no part of SELECTORSETY field 
+ where SELECTORSETY field not the same tags as FIELDS 
+ where TAG included in RESTRICTED or ( RESTRICTED ) is ( free ) 
+ where TAG is permitted in LF 
+ where TAG not in LF 
+ where TAG not in NEST 
+ where TAG not in NEST NEST 
+ where THING 
+ where THING 
+ where TYPE TYPE TYPE holds 
+ where TYPE TYPE TYPE holds 
+ where TYPE TYPE TYPE holds 
+ where all estimates in DECSETY have DEPENDSETY 
+ where all estimates in NEST have DEPENDSETY 
+ where last block in LF is accessible in LF 
+ where no doubles in LF 
+ where no doubles in LF BLOCK 
+ where selector TAG no part of FIELD 
+ where selector TAG no part of FIELDS 
+ where selector TAG no part of SELECTORSETY field 
+ where true 

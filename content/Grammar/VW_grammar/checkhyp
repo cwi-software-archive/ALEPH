@@ -1,0 +1,14 @@
+ed - $1 | sort -a | tr -d 1234567890 >$1.hdef
+g/=/d
+g/:.*/s///
+1,$p
+q
+
+ed - $1 | tr @ \\012 | grep -v "^\$" | grep -v " symbol \$" | usort | tr -d 1234567890 >$1.hused
+g/=/d
+g/.*:/s///
+g/[;,.]/s//@/g
+g/ option /s// /g
+g/ pack /s// /g
+1,$p
+q

@@ -1,0 +1,4 @@
+echo lin ; lin gr
+echo checkgr ; checkgr gr.s
+echo checkmeta ; checkmeta gr.s
+echo checkhyp ; checkhyp gr.s

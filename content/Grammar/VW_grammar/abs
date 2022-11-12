@@ -1,0 +1,10 @@
+.so /others/dick/txt/tmac
+.mc "A W-grammar of ALEPH" "D. Grune" "" "" 33
+.ab
+A W-grammar (2-level grammar) of the programming language ALEPH is
+presented. It comprises the context-free grammar as published before
+plus all static restrictions. Some comment is given on the problems
+encountered in writing and debugging a W-grammar. This paper
+should be read in parallel with the ALEPH Manual, since it by itself
+does not define or explain the language.
+.ae

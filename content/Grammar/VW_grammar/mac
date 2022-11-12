@@ -1,0 +1,52 @@
+ed - $1
+g/ uninit /s// INIT /g
+g/ halfinit /s// INIT /g
+g/ init /s// INIT /g
+g/ index /s// INDIR /g
+g/ direct /s// INDIR /g
+g/ in INDIR /s// INOUT INDIR /g
+g/ inout INDIR /s// INOUT INDIR /g
+g/ out INDIR /s// INOUT INDIR /g
+g/ CAL i /s// CAL /g
+g/ i /s// CAL /g
+g/ classification /s// RULEBODY /g
+g/ alternative series /s// RULEBODY /g
+g/ LASTMEMBER /s// MEMBER /g
+g/ affix form /s// MEMBER /g
+g/ compound member /s// MEMBER /g
+g/ OPERATION /s// MEMBER /g
+g/ transport /s// MEMBER /g
+g/ identity /s// MEMBER /g
+g/ extension /s// MEMBER /g
+g/ infallible /s// TYPE /g
+g/ fallible /s// TYPE /g
+g/ nonside /s// EFFECT /g
+g/ side /s// EFFECT /g
+g/ TYPE EFFECT with PARAMSETY rule /s// RULE /g
+g/ inaccessible compound /s// COMPOUND /g
+g/ accessible compound /s// COMPOUND /g
+g/ selector TAG /s// SELECTOR /g
+g/ formal INIT TAG /s// FORM /g
+g/ local INIT TAG /s// LOC /g
+g/ FORMAL/s// FORM/g
+g/ LOCAL/s// LOC/g
+g/ member /s// MEMBIX /g
+g/ affix /s// MEMBIX /g
+g/ dependent on TAG /s// DEPEND /g
+g/ DEPENDSETY constant /s// CONSTANT /g
+g/ req form FORMSETY req loc LOCSETY /s// REQ /g
+g/ TYPE EFFECT label TAG /s// LABEL /g
+w
+q
+ed - $1
+a
+@
+.
+g/ PLAIN /s/.*/1&@2&/
+1,$s/@/\
+/g
+g/^1/s/ PLAIN / integral /g
+g/^2/s/ PLAIN / character /g
+g/^[123456]/s///
+w
+q

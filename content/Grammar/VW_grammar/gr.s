@@ -1,0 +1,316 @@
+ NOTION = ALPHA ; NOTION ALPHA . 
+ NOTETY = NOTION ; EMPTY . 
+ THING = NOTION ; ( NOTETY1 ) NOTETY2 ; THING ( NOTETY1 ) NOTETY2 . 
+ WHETHER = where ; unless . 
+ EMPTY = . 
+ where true : EMPTY . 
+ unless false : EMPTY . 
+ where THING1 and THING2 : where THING1 , where THING2 . 
+ where THING1 or THING2 : where THING1 ; where THING2 . 
+ unless THING1 and THING2 : unless THING1 ; unless THING2 . 
+ unless THING1 or THING2 : unless THING1 , unless THING2 . 
+ WHETHER ( NOTETY1 ) is ( NOTETY2 ) : WHETHER ( NOTETY1 ) begins with ( NOTETY2 ) and ( NOTETY2 ) begins with ( NOTETY1 ) . 
+ WHETHER ( EMPTY ) begins with ( NOTION ) : WHETHER false . 
+ WHETHER ( NOTETY ) begins with ( EMPTY ) : WHETHER true . 
+ WHETHER ( ALPHA1 NOTETY1 ) begins with ( ALPHA2 NOTETY2 ) : WHETHER ( ALPHA1 ) coincides with ( ALPHA2 ) in ( abcdefghijklmnopqrstuvwxyz ) and ( NOTETY1 ) begins with ( NOTETY2 ) . 
+ where ( ALPHA ) coincides with ( ALPHA ) in ( NOTION ) : where true . 
+ unless ( ALPHA1 ) coincides with ( ALPHA2 ) in ( NOTION ) : where ( NOTION ) contains ( ALPHA1 NOTETY ALPHA2 ) or ( NOTION ) contains ( ALPHA2 NOTETY ALPHA1 ) . 
+ WHETHER ( ALPHA NOTETY ) contains ( NOTION ) : WHETHER ( ALPHA NOTETY ) begins with ( NOTION ) or ( NOTETY ) contains ( NOTION ) . 
+ WHETHER ( EMPTY ) contains ( NOTION ) : WHETHER false . 
+ NOTION pack : open symbol , NOTION , close symbol . 
+ NOTION option : EMPTY ; NOTION . 
+ NEST = DECSETY . 
+ DECSETY = DECS ; EMPTY . 
+ DECS = DEC ; DECS DEC . 
+ DEC = DESCR TAG . 
+ DESCR = STACK ; NONSTACK . 
+ NONSTACK = CONSTABLE ; TABLE ; FILE ; RULE . 
+ CONSTABLE = CONSTANT ; VARIABLE . 
+ STABLE = STACK ; TABLE . 
+ CONSTAGSETY = CONSTAGS ; EMPTY . 
+ CONSTAGS = CONSTAG ; CONSTAGS CONSTAG . 
+ CONSTAG = CONSTANT TAG . 
+ DEF = TACK ; constant ; variable ; rule ; file ; EXTERN . 
+ TACK = table ; stack . 
+ EXTERN = external constant ; external table ; external TYPE EFFECT rule ; standard . 
+ TAG = LETTER ; TAG LETTER ; TAG DIGIT . 
+ LETTER = letter ALPHA . 
+ DIGIT = digit NUMERIC . 
+ ALPHA = a ; b ; c ; d ; e ; f ; g ; h ; i ; j ; k ; l ; m ; n ; o ; p ; q ; r ; s ; t ; u ; v ; w ; x ; y ; z . 
+ NUMERIC = zero ; one ; two ; three ; four ; five ; six ; seven ; eight ; nine . 
+ LETTER : LETTER symbol . 
+ TAG LETTER : TAG , LETTER symbol . 
+ TAG DIGIT : TAG , DIGIT symbol . 
+ program : where ( NEST ) is ( NEST1 NEST2 ) , NEST info sequence with NEST1 , NEST root , NEST info sequence with NEST2 , end symbol . 
+ NEST info sequence with EMPTY : EMPTY . 
+ NEST info sequence with NEST1 : NEST pragmat , NEST info sequence with NEST1 . 
+ NEST info sequence with NEST1 DECS : NEST DEF declaration of DECS , NEST info sequence with NEST1 . 
+ NEST root : root symbol , NEST new EMPTY TYPE EFFECT NOREQ affix form , point symbol . 
+ RULE = TYPE EFFECT with PARAMSETY rule . 
+ TYPE = fallible ; infallible . 
+ EFFECT = side ; nonside . 
+ NEST rule declaration of TYPE EFFECT with PARAMSETY rule TAG : TYPE EFFECT typer , NEST TYPE EFFECT with PARAMSETY rule TAG defining identifier , FORMALSETY req form FORMSETY PARAMSETY formals sequence , NEST new FORMALSETY inaccessible compound TYPE EFFECT label TAG LOCALSETY TYPE EFFECT req form FORMSETY req loc EMPTY actual rule , point symbol . 
+ fallible nonside typer : question symbol . 
+ fallible side typer : predicate symbol . 
+ infallible nonside typer : function symbol . 
+ infallible side typer : action symbol . 
+ LF = new FORMALSETY ; LF BLOCK . 
+ RULEBODY = alternative series ; classification . 
+ MEMBIX = member ; affix . 
+ NEST LF BLOCK TYPE EFFECT REQ actual rule : BLOCK REQ REQ1 local part , NEST LF BLOCK TYPE EFFECT REQ1 RULEBODY , where no doubles in LF BLOCK . 
+ NEST LF TYPE EFFECT REQ alternative series : NEST LF TYPE1 TYPE2 EFFECT1 REQ1 alternative , NEST LF1 TYPE1 TYPE3 EFFECT2 REQ2 body tail , where EFFECT EFFECT1 EFFECT2 holds , where TYPE TYPE2 TYPE3 holds , where ( REQ1 ) ( LF1 REQ2 ) is alternative split of ( LF REQ ) . 
+ NEST LF TYPE TYPE nonside NOREQ body tail : EMPTY . 
+ NEST LF fallible TYPE EFFECT REQ body tail : semicolon symbol , NEST LF TYPE EFFECT REQ alternative series . 
+ NEST LF TYPE TYPE1 EFFECT REQ alternative : where ( TYPE1 ) is ( infallible ) , NEST LF1 TYPE EFFECT REQ LASTMEMBER , where last block in LF is accessible in LF1 ; NEST LF TYPE EFFECT1 REQ1 MEMBER , NEST LF1 TYPE1 EFFECT2 REQ2 alternative tail , where EFFECT EFFECT1 EFFECT2 holds , where ( REQ1 ) ( LF1 REQ2 ) is member split of ( LF REQ ) . 
+ NEST LF TYPE EFFECT REQ alternative tail : comma symbol , NEST LF TYPE1 TYPE2 EFFECT REQ alternative , where TYPE TYPE1 TYPE2 holds . 
+ where last block in LF inaccessible compound LABELETY LOCALSETY is accessible in LF accessible compound LABELETY LOCALSETY : where true . 
+ where ( req form FORMSETY req loc LOCSETY1 ) ( LF req form FORMSETY req loc LOCSETY2 ) is alternative split of ( LF req form FORMSETY req loc LOCSETY ) : where LOCALSETY is permutation of LOCALSETY1 LOCALSETY2 . 
+ where ( req form FORMSETY1 req loc LOCSETY1 ) ( LF1 req form FORMSETY2 req loc LOCSETY2 ) is MEMBIX split of ( LF req form FORMSETY req loc LOCSETY ) : where FORMSETY is permutation of FORMSETY1 FORMSETY2 , where LOCALSETY is permutation of LOCALSETY1 LOCALSETY2 , where LF1 is MEMBIX equivalent with LF dot FORMSETY1 dot LOCALSETY1 . 
+ where no doubles in LF local INIT TAG : where TAG not in LF , where no doubles in LF . 
+ where no doubles in LF COMPOUND TYPE EFFECT label TAG : where TAG not in LF . 
+ where no doubles in LF COMPOUND : where TAG not in LF . 
+ where TAG not in new EMPTY : where true . 
+ where TAG not in LF local INIT TAG1 : unless ( TAG ) is ( TAG1 ) , where TAG not in LF . 
+ where TAG not in LF COMPOUND TYPE EFFECT label TAG1 : unless ( TAG ) is ( TAG1 ) , where TAG not in LF . 
+ where TAG not in LF COMPOUND : where TAG not in LF . 
+ where TAG not in LF FDESCR TAG1 : unless ( TAG ) is ( TAG1 ) , where TAG not in LF . 
+ TEF = TYPE ; EFFECT . 
+ TYPE = fallible ; infallible . 
+ EFFECT = side ; nonside . 
+ where TEF TEF1 TEF2 holds : where ( TEF ) is ( TEF1 ) , where ( TEF ) is ( TEF2 ) ; where ( TEF ) is ( fallible ) or ( TEF ) is ( side ) , unless ( TEF1 ) is ( TEF2 ) . 
+ REQ = req form FORMSETY req loc LOCSETY . 
+ NOREQ = req form EMPTY req loc EMPTY . 
+ FORMSETY = FORMS ; EMPTY . 
+ FORMS = FORM ; FORMS FORM . 
+ FORM = formal uninit TAG . 
+ OBJECTSETY = OBJECTS ; EMPTY . 
+ OBJECTS = FIELDS ; LOCS ; FORMS . 
+ OBJECT = FIELD ; LOC ; FORM . 
+ where OBJECTSETY1 OBJECT OBJECTSETY2 is permutation of OBJECTSETY3 OBJECT : where OBJECTSETY1 OBJECTSETY2 is permutation of OBJECTSETY3 . 
+ where EMPTY is permutation of EMPTY : where true . 
+ where NOTION1 local INIT TAG NOTION2 is MEMBIX equivalent with NOTION3 local uninit TAG NOTION4 dot FORMSETY dot LOCALSETY local uninit TAG : where MEMBIX split sets to INIT , where NOTION1 NOTION2 is MEMBIX equivalent with NOTION3 NOTION4 dot FORMSETY dot LOCALSETY . 
+ where NOTION1 formal INIT TAG NOTION2 is MEMBIX equivalent with NOTION3 formal uninit TAG NOTION4 dot FORMSETY formal uninit TAG dot EMPTY : where MEMBIX split sets to INIT , where NOTION1 NOTION2 is MEMBIX equivalent with NOTION3 NOTION4 dot FORMSETY dot EMPTY . 
+ where NOTION is MEMBIX equivalent with NOTION dot EMPTY dot EMPTY : where true . 
+ where member split sets to init : where true . 
+ where affix split sets to halfinit : where true . 
+ MEMBER = affix form ; compound member ; OPERATION . 
+ LASTMEMBER = MEMBER ; TERMINATOR . 
+ LF = new FORMALSETY ; LF BLOCK . 
+ FORMALSETY = FORMALS ; EMPTY . 
+ FORMALS = FORMAL ; FORMALS FORMAL . 
+ FORMAL = FDESCR TAG . 
+ FDESCR = formal FITACK ; formal INIT . 
+ FITACK = FITAB ; FIELDS stack . 
+ FITAB = file ; FIELDS table . 
+ FORMAL FORMALSETY req form FORMSETY FORMSETY1 PARAM PARAMSETY formals sequence : formal affix symbol , FORMAL req form FORMSETY PARAM formal , FORMALSETY req form FORMSETY1 PARAMSETY formals sequence . 
+ EMPTY req form EMPTY EMPTY formals sequence : EMPTY . 
+ formal file TAG req form EMPTY file parameter formal : quote image , formal file TAG defining identifier . 
+ formal init TAG req form EMPTY in parameter formal : right symbol , formal init TAG defining identifier . 
+ formal uninit TAG req form formal uninit TAG out parameter formal : formal uninit TAG defining identifier , right symbol . 
+ formal init TAG req form EMPTY inout parameter formal : right symbol , formal init TAG defining identifier , right symbol . 
+ formal FIELDS TACK TAG req form EMPTY TACK CAL parameter formal : TACK sub bus , FIELDS list of TACK TAG , formal FIELDS TACK TAG defining identifier , sub bus , where FIELDS has calibre CAL . 
+ table sub bus : EMPTY . 
+ stack sub bus : sub bus . 
+ sub bus : sub symbol , bus symbol . 
+ where FIELDSETY FIELD has calibre CALETY i : where FIELDSETY has calibre CALETY . 
+ where EMPTY has calibre EMPTY : where true . 
+ BLOCKSETY = BLOCKS ; EMPTY . 
+ BLOCKS = BLOCK ; BLOCKS BLOCK . 
+ BLOCK = COMPOUND LABELETY LOCALSETY . 
+ COMPOUND = ACCESS compound . 
+ ACCESS = accessible ; inaccessible . 
+ LABELETY = LABEL ; EMPTY . 
+ LABEL = TYPE EFFECT label TAG . 
+ LOCALSETY = LOCALS ; EMPTY . 
+ LOCALS = LOCAL ; LOCALS LOCAL . 
+ LOCAL = local INIT TAG . 
+ INIT = init ; halfinit ; uninit . 
+ LOCSETY = LOCS ; EMPTY . 
+ LOCS = LOC ; LOCS LOC . 
+ LOC = local uninit TAG . 
+ inaccessible compound EMPTY EMPTY REQ REQ local part : EMPTY . 
+ inaccessible compound LABEL LOCALSETY REQ REQ1 local part : LOCALSETY REQ REQ1 local part tail . 
+ inaccessible compound EMPTY LOCALS REQ REQ1 local part : LOCALS REQ REQ1 local part tail . 
+ LOCAL LOCALSETY REQ REQ1 LOC local part tail : local affix symbol , LOCAL req loc LOC local , LOCALSETY REQ REQ1 local part tail . 
+ local uninit TAG req loc local uninit TAG local : local TAG defining identifier . 
+ EMPTY REQ REQ local part tail : colon symbol . 
+ OPERATION = transport ; identity ; extension . 
+ NEST LF infallible EFFECT REQ transport : NEST LF source , NEST LF EFFECT REQ destination sequence with PARAMS , where PARAMS is correct for destinations . 
+ NEST LF source : NEST LF nonside NOREQ form with in parameter . 
+ NEST LF fallible nonside NOREQ identity : NEST LF source , equals symbol , NEST LF source . 
+ NEST LF infallible side NOREQ extension : of symbol , NEST LF FIELDS field transport list , of symbol , NEST LF FIELDS stack TAG applied identifier . 
+ NEST LF FIELDS field transport list : NEST LF FIELDS1 field transport , NEST LF FIELDSETY2 field transport list tail , where FIELDS is permutation of FIELDS1 FIELDSETY2 . 
+ NEST LF EMPTY field transport list tail : EMPTY . 
+ NEST LF FIELDS field transport list tail : comma symbol , NEST LF FIELDS field transport list . 
+ NEST LF FIELDS field transport : NEST LF source , FIELDS field destination sequence . 
+ FIELD FIELDSETY field destination sequence : to token , FIELD tag , FIELDSETY field destination sequence . 
+ EMPTY field destination sequence : EMPTY . 
+ SELECTORSETY1 selector TAG SELECTORSETY2 field tag : TAG . 
+ to token : minus symbol , right symbol . 
+ where PARAMSETY out parameter is correct for destinations : where PARAMSETY is correct for destinations . 
+ where EMPTY is correct for destinations : where true . 
+ AFFIX = actual affix ; destination . 
+ PARAMSETY = PARAMS ; EMPTY . 
+ PARAMS = PARAM ; PARAMS PARAM . 
+ PARAM = INOUT parameter ; file parameter ; TACK CAL parameter . 
+ TACK = table ; stack . 
+ FORLOC = formal ; local . 
+ INDIR = index ; direct . 
+ INOUT = in ; inout ; out . 
+ INIT = init ; halfinit ; uninit . 
+ NEST LF TYPE EFFECT REQ affix form : NEST global TYPE EFFECT1 with PARAMSETY rule TAG applied identifier , NEST LF EFFECT2 REQ actual affix sequence with PARAMSETY , where EFFECT EFFECT1 EFFECT2 holds . 
+ NEST LF EFFECT REQ AFFIX sequence with PARAM PARAMSETY : AFFIX token , NEST LF EFFECT1 REQ1 form with PARAM , NEST LF1 EFFECT2 REQ2 AFFIX sequence with PARAMSETY , where EFFECT EFFECT1 EFFECT2 holds , where ( REQ1 ) ( LF1 REQ2 ) is affix split of ( LF REQ ) . 
+ actual affix token : actual affix symbol . 
+ destination token : to token . 
+ NEST LF nonside NOREQ AFFIX sequence with EMPTY : EMPTY . 
+ NEST LF nonside NOREQ form with file parameter : NEST LF file TAG applied identifier . 
+ NEST LF nonside NOREQ form with TACK CAL parameter : NEST LF FIELDS TACK1 TAG applied identifier , where ( TACK ) is ( TACK1 ) or ( TACK1 ) is ( stack ) , where FIELDS has calibre CAL . 
+ NEST LF nonside NOREQ form with in parameter : NEST global CONSTABLE TAG applied identifier ; PLAIN denotation ; NEST LF TACK LIMIT ; NEST LF in direct TACK element ; LF FORLOC TAG in direct identifier . 
+ NEST LF side NOREQ form with inout parameter : NEST global variable TAG applied identifier ; NEST LF inout direct stack element . 
+ NEST LF nonside NOREQ form with inout parameter : LF FORLOC TAG inout direct identifier . 
+ NEST LF side NOREQ form with out parameter : NEST global variable TAG applied identifier ; NEST LF out direct stack element . 
+ NEST LF nonside NOREQ form with out parameter : LF FORLOC TAG out direct identifier ; dummy symbol . 
+ NEST LF nonside req form formal uninit TAG req loc EMPTY form with out parameter : LF formal TAG out direct identifier . 
+ NEST LF nonside req form EMPTY req loc local uninit TAG form with out parameter : LF local TAG out direct identifier . 
+ NEST LF INOUT INDIR TACK element : FIELDS selection from TAG , NEST LF FIELDS TACK TAG applied identifier , sub symbol , NEST LF INOUT index , bus symbol , where ( INDIR ) is ( index ) or ( TACK ) is ( stack ) or ( INOUT ) is ( in ) . 
+ FIELDSETY1 SELECTORSETY1 selector TAG SELECTORSETY2 FIELDSETY2 selection from TAG1 : where ( TAG ) is ( TAG1 ) , EMPTY ; TAG , of symbol . 
+ NEST LF INOUT index : NEST global CONSTABLE TAG applied identifier ; PLAIN denotation ; NEST LF TACK LIMIT ; NEST LF INOUT index TACK element ; LF FORLOC TAG INOUT index identifier . 
+ LF FORLOC TAG INOUT INDIR identifier : LF FORLOC init TAG applied identifier ; where ( INOUT ) is ( out ) , LF FORLOC halfinit TAG applied identifier ; where ( INOUT ) is ( out ) and ( INDIR ) is ( direct ) , LF FORLOC uninit TAG applied identifier . 
+ TERMINATOR = failure ; success ; exit ; jump . 
+ FORMREQ = req form FORMSETY req loc EMPTY . 
+ NEST LF fallible nonside FORMREQ failure : failure symbol . 
+ NEST LF infallible nonside NOREQ success : success symbol . 
+ NEST LF infallible side FORMREQ exit : exit symbol , NEST free expression . 
+ NEST LF TYPE EFFECT FORMREQ jump : repeat symbol , LF label TYPE EFFECT label TAG applied identifier , where TAG is permitted in LF . 
+ where TAG is permitted in LF LOCALSETY : where TAG is permitted in LF . 
+ where TAG is permitted in LF accessible compound TYPE EFFECT label TAG1 : where ( TAG ) is ( TAG1 ) ; where TAG is permitted in LF . 
+ where TAG is permitted in LF accessible compound EMPTY : where TAG is permitted in LF . 
+ NEST LF TYPE EFFECT REQ compound member : open symbol , BLOCK TYPE EFFECT label addition , NEST LF BLOCK TYPE EFFECT REQ actual rule , close symbol . 
+ inaccessible compound EMPTY LOCALSETY TYPE EFFECT label addition : EMPTY . 
+ inaccessible compound TYPE EFFECT label TAG LOCALSETY TYPE EFFECT label addition : TAG . 
+ NEST LF TYPE EFFECT REQ classification : NEST LF class box , NEST LF TYPE EFFECT REQ class series . 
+ NEST LF class box : box symbol , NEST LF source , box symbol . 
+ NEST LF TYPE EFFECT REQ class series : NEST LF TYPE1 TYPE2 EFFECT1 REQ1 class , NEST LF1 TYPE1 TYPE3 EFFECT2 REQ2 class series tail , where TYPE TYPE2 TYPE3 holds , where EFFECT EFFECT1 EFFECT2 holds , where ( REQ1 ) ( LF REQ2 ) is alternative split of ( LF REQ ) . 
+ NEST LF TYPE infallible nonside NOREQ class series tail : EMPTY . 
+ NEST LF fallible TYPE EFFECT REQ class series tail : semicolon symbol , NEST LF TYPE EFFECT REQ class series . 
+ NEST LF TYPE TYPE1 EFFECT REQ class : NEST TYPE area addition , NEST LF TYPE2 TYPE3 EFFECT REQ alternative , where TYPE1 TYPE2 TYPE3 holds . 
+ NEST infallible area addition : EMPTY . 
+ NEST fallible area addition : NEST area , comma symbol . 
+ NEST area : sub symbol , NEST zone series , bus symbol . 
+ NEST zone series : NEST zone , NEST zone series tail option . 
+ NEST zone series tail : semicolon symbol , NEST zone series . 
+ NEST zone : NEST free expression option , up to symbol , NEST free expression option ; NEST free expression ; NEST global STABLE TAG applied identifier . 
+ RESTRICTED = free ; DEPENDSETY . 
+ PLAIN = integral ; character . 
+ NEST RESTRICTED expression : plus minus option , NEST RESTRICTED term ; NEST RESTRICTED expression , plus minus , NEST RESTRICTED term . 
+ NEST RESTRICTED term : NEST RESTRICTED term head option , NEST RESTRICTED base . 
+ NEST RESTRICTED term head : NEST RESTRICTED term , times by . 
+ NEST RESTRICTED base : NEST RESTRICTED plain value , NEST RESTRICTED expression pack . 
+ NEST RESTRICTED plain value : PLAIN denotation ; NEST global DEPENDSETY constant TAG applied identifier , where TAG included in RESTRICTED or ( RESTRICTED ) is ( free ) ; NEST new EMPTY table LIMIT . 
+ integral denotation : integral denotation option , DIGIT symbol . 
+ character denotation : absolute symbol , NOTION symbol , absolute symbol . 
+ plus minus : plus symbol ; minus symbol . 
+ times by : times symbol ; by symbol . 
+ where TAG included in DEPENDSETY1 dependent on TAG DEPENDSETY2 : where true . 
+ CONSTANT = DEPENDSETY constant . 
+ DEPENDSETY = DEPENDS ; EMPTY . 
+ DEPENDS = DEPEND ; DEPENDS DEPEND . 
+ DEPEND = dependent on TAG . 
+ NEST constant declaration of DECS : constant symbol , NEST constant description list of DECS , point symbol . 
+ NEST constant description list of DECSETY DEPENDSETY constant TAG : where DEPENDSETY is finite in NEST , NEST DEPENDSETY constant TAG defining identifier , equals symbol , NEST DEPENDSETY expression , NEST constant description list tail of DECSETY . 
+ NEST DEF description list tail of EMPTY : EMPTY . 
+ NEST DEF description list tail of DECS : comma symbol , NEST DEF description list of DECS . 
+ where DEPENDSETY dependent on TAG is finite in NEST : where ( NEST ) is ( NEST1 DEPENDSETY1 constant TAG NEST2 ) , where DEPENDSETY1 is finite in NEST , where DEPENDSETY is finite in NEST . 
+ where EMPTY is finite in NEST : where true . 
+ VARIABLE = variable . 
+ NEST variable declaration of DECS : variable symbol , NEST variable description list of DECS , point symbol . 
+ NEST variable description list of DECSETY variable TAG : NEST variable TAG defining identifier , equals symbol , NEST free expression , NEST variable description list tail of DECSETY . 
+ TABLE = FIELDS table . 
+ FIELDS = FIELD ; FIELDS FIELD . 
+ FIELDSETY = FIELDS ; EMPTY . 
+ FIELD = SELECTORS field . 
+ SELECTORS = SELECTOR ; SELECTORS SELECTOR . 
+ SELECTORSETY = SELECTORS ; EMPTY . 
+ SELECTOR = selector TAG . 
+ TACK = table ; stack . 
+ NEST TACK declaration of DECS : TACK symbol , NEST TACK description list of DECS , point symbol . 
+ NEST table description list of DECSETY CONSTAGSETY FIELDS table TAG : FIELDS list of table TAG , NEST FIELDS table TAG defining identifier , where FIELDS has calibre CAL , NEST CONSTAGSETY EMPTY filling head CAL , NEST table description list tail of DECSETY . 
+ FIELDS list of TACK TAG : where ( FIELDS ) is ( selector TAG field ) , EMPTY ; FIELDS definition list pack . 
+ FIELD FIELDSETY definition list : where FIELD not the same tags as FIELDSETY , FIELD definition , FIELDSETY definition list tail . 
+ EMPTY definition list tail : EMPTY . 
+ FIELDS definition list tail : comma symbol , FIELDS definition list . 
+ SELECTOR SELECTORSETY field definition : where SELECTOR no part of SELECTORSETY field , SELECTOR definition , SELECTORSETY field definition tail . 
+ EMPTY field definition tail : EMPTY . 
+ SELECTORS field definition tail : equals symbol , SELECTORS field definition . 
+ selector TAG definition : TAG . 
+ where FIELD not the same tags as EMPTY : where true . 
+ where selector TAG SELECTORSETY field not the same tags as FIELDS : where selector TAG no part of FIELDS , where SELECTORSETY field not the same tags as FIELDS . 
+ where EMPTY field not the same tags as FIELDS : where true . 
+ where selector TAG no part of FIELDS FIELD : where selector TAG no part of FIELD , where selector TAG no part of FIELDS . 
+ where selector TAG no part of selector TAG1 SELECTORSETY field : unless ( TAG ) is ( TAG1 ) , where selector TAG no part of SELECTORSETY field . 
+ where selector TAG no part of EMPTY field : where true . 
+ STACK = DEPENDSETY FIELDS stack . 
+ CALETY = CAL ; EMPTY . 
+ CAL = i ; CAL i . 
+ SIZE = relative ; absolute ; absent . 
+ NEST stack description list of DECSETY CONSTAGSETY DEPENDSETY FIELDS stack TAG : NEST DEPENDSETY SIZE size estimate , where all estimates in NEST have DEPENDSETY , FIELDS list of stack TAG , NEST DEPENDSETY FIELDS stack TAG defining identifier , where FIELDS has calibre CAL , NEST CONSTAGSETY DEPENDSETY filling head CAL with SIZE , NEST stack description list tail of DECSETY . 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL with SIZE : where ( CONSTAGSETY ) is ( EMPTY ) , unless ( SIZE ) is ( absent ) , EMPTY ; NEST CONSTAGSETY DEPENDSETY filling head CAL . 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL : equals symbol , NEST DEPENDSETY filling CAL list CONSTAGSETY pack . 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY : NEST filling CAL , NEST DEPENDSETY filling CAL list CONSTAGSETY tail . 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY DEPENDSETY constant TAG : NEST filling CAL , colon symbol , where DEPENDSETY is finite in NEST , NEST DEPENDSETY constant TAG defining identifier , NEST DEPENDSETY filling CAL list CONSTAGSETY tail . 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY tail : comma symbol , NEST DEPENDSETY filling CAL list CONSTAGSETY . 
+ NEST DEPENDSETY filling CAL list EMPTY tail : EMPTY . 
+ NEST filling i : string denotation ; NEST free expression . 
+ NEST filling CAL i : NEST free expression list CAL i pack . 
+ NEST free expression list CALETY i : NEST free expression , NEST free expression list tail CALETY . 
+ NEST free expression list tail EMPTY : EMPTY . 
+ NEST free expression list tail CAL : comma symbol , NEST free expression list CAL . 
+ string denotation : quote symbol , string item sequence option , quote symbol . 
+ string item sequence : string item , string item sequence option . 
+ string item : unless ( NOTION ) is ( quote ) , NOTION symbol ; quote image . 
+ quote image : quote symbol , quote symbol . 
+ NEST DEPENDSETY relative size estimate : sub symbol , NEST DEPENDSETY expression , bus symbol . 
+ NEST DEPENDSETY absolute size estimate : sub symbol , box symbol , NEST DEPENDSETY expression , box symbol , bus symbol . 
+ NEST DEPENDSETY absent size estimate : EMPTY . 
+ where all estimates in DECSETY NONSTACK TAG have DEPENDSETY : where all estimates in DECSETY have DEPENDSETY . 
+ where all estimates in DECSETY DEPENDSETY FIELDS stack TAG have DEPENDSETY : where all estimates in DECSETY have DEPENDSETY . 
+ where all estimates in EMPTY have DEPENDSETY : where true . 
+ MICA = max ; min ; calibre . 
+ LIMIT = MICA limit . 
+ min token : left symbol , left symbol . 
+ max token : right symbol , right symbol . 
+ calibre token : left symbol , right symbol . 
+ NEST LF TACK MICA limit : MICA token , NEST LF FIELDS TACK TAG applied identifier . 
+ FILE = file . 
+ NEST file declaration of DECS : file typer , NEST file description list of DECS , point symbol . 
+ NEST file description list of DECSETY file TAG : NEST file TAG defining identifier , NEST area option , equals symbol , right symbol option , string denotation , right symbol option , NEST file description list tail of DECSETY . 
+ file typer : charfile symbol ; datafile symbol . 
+ EXTERN = external constant ; external table ; external TYPE EFFECT rule ; standard . 
+ NEST external constant declaration of DECS : external symbol , constant symbol , NEST external constant description list of DECS , point symbol . 
+ NEST external constant description list of DECSETY EMPTY constant TAG : NEST EMPTY constant TAG defining identifier , equals symbol , string denotation , NEST external constant description list tail of DECSETY . 
+ NEST external table declaration of DECS : external symbol , table symbol , NEST external table description list of DECS , point symbol . 
+ NEST external table description list of DECSETY FIELDS table TAG : FIELDS list of table TAG , NEST FIELDS table TAG defining identifier , equals symbol , string denotation , NEST external table description list tail of DECSETY . 
+ NEST external TYPE EFFECT rule declaration of DECS : external symbol , TYPE EFFECT typer , NEST external TYPE EFFECT rule description list of DECS , point symbol . 
+ NEST external TYPE EFFECT rule description list of DECSETY TYPE EFFECT with PARAMSETY rule TAG : NEST TYPE EFFECT with PARAMSETY rule TAG defining identifier , FORMALSETY req form FORMSETY PARAMSETY formals sequence , equals symbol , string denotation , NEST external TYPE EFFECT rule description list tail of DECSETY . 
+ STANDARD = DEC . 
+ NEST standard declaration of DEC : where ( DEC ) is ( STANDARD ) , EMPTY . 
+ NEST pragmat : pragmat symbol , NEST pragmat item list , point symbol . 
+ NEST pragmat item list : NEST pragmat item , NEST pragmat item list tail option . 
+ NEST pragmat item list tail : comma symbol , NEST pragmat item list . 
+ NEST pragmat item : NEST pragmat TAG identifier , NEST pragmat item tail option . 
+ NEST pragmat item tail : equals symbol , NEST pragmat definition . 
+ NEST pragmat definition : integral denotation ; string denotation ; NEST pragmat item ; NEST pragmat item list pack . 
+ NEST pragmat TAG identifier : TAG . 
+ NEST1 DESCR TAG NEST2 DESCR TAG defining identifier : where TAG not in NEST1 NEST2 , TAG . 
+ FDESCR TAG defining identifier : TAG . 
+ local TAG defining identifier : TAG . 
+ where TAG not in NEST DESCR TAG1 : unless ( TAG ) is ( TAG1 ) , where TAG not in NEST . 
+ where TAG not in EMPTY : where true . 
+ FITAB = file ; FIELDS table . 
+ FITACK = FITAB ; FIELDS stack . 
+ NEST LF FITAB TAG applied identifier : LF formal FITAB TAG applied identifier ; where TAG not in LF , NEST global FITAB TAG applied identifier . 
+ NEST LF FIELDS stack TAG applied identifier : LF formal FIELDS stack TAG applied identifier ; where TAG not in LF , NEST global DEPENDSETY FIELDS stack TAG applied identifier . 
+ NEST1 DESCR TAG NEST2 global DESCR TAG applied identifier : TAG . 
+ new FORMALSETY1 FITACK TAG FORMALSETY2 BLOCKSETY formal FITACK TAG applied identifier : TAG . 
+ LF BLOCKSETY1 COMPOUND TYPE EFFECT label TAG LOCALSETY BLOCKSETY2 label TYPE EFFECT label TAG applied identifier : TAG . 
+ NOTION1 FORLOC INIT TAG NOTION2 FORLOC INIT TAG applied identifier : TAG . 

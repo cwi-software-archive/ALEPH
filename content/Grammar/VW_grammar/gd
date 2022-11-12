@@ -1,0 +1,214 @@
+ EMPTY REQ REQ local part tail 
+ EMPTY definition list tail 
+ EMPTY field definition tail 
+ EMPTY field destination sequence 
+ EMPTY req form EMPTY EMPTY formals sequence 
+ FDESCR TAG defining identifier 
+ FIELD FIELDSETY definition list 
+ FIELD FIELDSETY field destination sequence 
+ FIELDS definition list tail 
+ FIELDS list of TACK TAG 
+ FIELDSETY SELECTORSETY selector TAG SELECTORSETY FIELDSETY selection from TAG 
+ FORMAL FORMALSETY req form FORMSETY FORMSETY PARAM PARAMSETY formals sequence 
+ LETTER 
+ LF BLOCKSETY COMPOUND TYPE EFFECT label TAG LOCALSETY BLOCKSETY label TYPE EFFECT label TAG applied identifier 
+ LF FORLOC TAG INOUT INDIR identifier 
+ LOCAL LOCALSETY REQ REQ LOC local part tail 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL 
+ NEST CONSTAGSETY DEPENDSETY filling head CAL with SIZE 
+ NEST DEF description list tail of DECS 
+ NEST DEF description list tail of EMPTY 
+ NEST DEPENDSETY absent size estimate 
+ NEST DEPENDSETY absolute size estimate 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY DEPENDSETY constant TAG 
+ NEST DEPENDSETY filling CAL list CONSTAGSETY tail 
+ NEST DEPENDSETY filling CAL list EMPTY tail 
+ NEST DEPENDSETY relative size estimate 
+ NEST LF BLOCK TYPE EFFECT REQ actual rule 
+ NEST LF EFFECT REQ AFFIX sequence with PARAM PARAMSETY 
+ NEST LF EMPTY field transport list tail 
+ NEST LF FIELDS field transport 
+ NEST LF FIELDS field transport list 
+ NEST LF FIELDS field transport list tail 
+ NEST LF FIELDS stack TAG applied identifier 
+ NEST LF FITAB TAG applied identifier 
+ NEST LF INOUT INDIR TACK element 
+ NEST LF INOUT index 
+ NEST LF TACK MICA limit 
+ NEST LF TYPE EFFECT FORMREQ jump 
+ NEST LF TYPE EFFECT REQ affix form 
+ NEST LF TYPE EFFECT REQ alternative series 
+ NEST LF TYPE EFFECT REQ alternative tail 
+ NEST LF TYPE EFFECT REQ class series 
+ NEST LF TYPE EFFECT REQ classification 
+ NEST LF TYPE EFFECT REQ compound member 
+ NEST LF TYPE TYPE nonside NOREQ body tail 
+ NEST LF TYPE TYPE EFFECT REQ alternative 
+ NEST LF TYPE TYPE EFFECT REQ class 
+ NEST LF TYPE infallible nonside NOREQ class series tail 
+ NEST LF class box 
+ NEST LF fallible TYPE EFFECT REQ body tail 
+ NEST LF fallible TYPE EFFECT REQ class series tail 
+ NEST LF fallible nonside FORMREQ failure 
+ NEST LF fallible nonside NOREQ identity 
+ NEST LF infallible EFFECT REQ transport 
+ NEST LF infallible nonside NOREQ success 
+ NEST LF infallible side FORMREQ exit 
+ NEST LF infallible side NOREQ extension 
+ NEST LF nonside NOREQ AFFIX sequence with EMPTY 
+ NEST LF nonside NOREQ form with TACK CAL parameter 
+ NEST LF nonside NOREQ form with file parameter 
+ NEST LF nonside NOREQ form with in parameter 
+ NEST LF nonside NOREQ form with inout parameter 
+ NEST LF nonside NOREQ form with out parameter 
+ NEST LF nonside req form EMPTY req loc local uninit TAG form with out parameter 
+ NEST LF nonside req form formal uninit TAG req loc EMPTY form with out parameter 
+ NEST LF side NOREQ form with inout parameter 
+ NEST LF side NOREQ form with out parameter 
+ NEST LF source 
+ NEST RESTRICTED base 
+ NEST RESTRICTED expression 
+ NEST RESTRICTED plain value 
+ NEST RESTRICTED term 
+ NEST RESTRICTED term head 
+ NEST TACK declaration of DECS 
+ NEST area 
+ NEST constant declaration of DECS 
+ NEST constant description list of DECSETY DEPENDSETY constant TAG 
+ NEST external TYPE EFFECT rule declaration of DECS 
+ NEST external TYPE EFFECT rule description list of DECSETY TYPE EFFECT with PARAMSETY rule TAG 
+ NEST external constant declaration of DECS 
+ NEST external constant description list of DECSETY EMPTY constant TAG 
+ NEST external table declaration of DECS 
+ NEST external table description list of DECSETY FIELDS table TAG 
+ NEST fallible area addition 
+ NEST file declaration of DECS 
+ NEST file description list of DECSETY file TAG 
+ NEST filling CAL i 
+ NEST filling i 
+ NEST free expression list CALETY i 
+ NEST free expression list tail CAL 
+ NEST free expression list tail EMPTY 
+ NEST infallible area addition 
+ NEST info sequence with EMPTY 
+ NEST info sequence with NEST 
+ NEST info sequence with NEST DECS 
+ NEST pragmat 
+ NEST pragmat TAG identifier 
+ NEST pragmat definition 
+ NEST pragmat item 
+ NEST pragmat item list 
+ NEST pragmat item list tail 
+ NEST pragmat item tail 
+ NEST root 
+ NEST rule declaration of TYPE EFFECT with PARAMSETY rule TAG 
+ NEST stack description list of DECSETY CONSTAGSETY DEPENDSETY FIELDS stack TAG 
+ NEST standard declaration of DEC 
+ NEST table description list of DECSETY CONSTAGSETY FIELDS table TAG 
+ NEST variable declaration of DECS 
+ NEST variable description list of DECSETY variable TAG 
+ NEST zone 
+ NEST zone series 
+ NEST zone series tail 
+ NEST DESCR TAG NEST DESCR TAG defining identifier 
+ NEST DESCR TAG NEST global DESCR TAG applied identifier 
+ NOTION option 
+ NOTION pack 
+ NOTION FORLOC INIT TAG NOTION FORLOC INIT TAG applied identifier 
+ SELECTOR SELECTORSETY field definition 
+ SELECTORS field definition tail 
+ SELECTORSETY selector TAG SELECTORSETY field tag 
+ TAG DIGIT 
+ TAG LETTER 
+ WHETHER ( ALPHA NOTETY ) contains ( NOTION ) 
+ WHETHER ( ALPHA NOTETY ) begins with ( ALPHA NOTETY ) 
+ WHETHER ( EMPTY ) begins with ( NOTION ) 
+ WHETHER ( EMPTY ) contains ( NOTION ) 
+ WHETHER ( NOTETY ) begins with ( EMPTY ) 
+ WHETHER ( NOTETY ) is ( NOTETY ) 
+ actual affix token 
+ calibre token 
+ character denotation 
+ destination token 
+ fallible nonside typer 
+ fallible side typer 
+ file typer 
+ formal FIELDS TACK TAG req form EMPTY TACK CAL parameter formal 
+ formal file TAG req form EMPTY file parameter formal 
+ formal init TAG req form EMPTY in parameter formal 
+ formal init TAG req form EMPTY inout parameter formal 
+ formal uninit TAG req form formal uninit TAG out parameter formal 
+ inaccessible compound EMPTY EMPTY REQ REQ local part 
+ inaccessible compound EMPTY LOCALS REQ REQ local part 
+ inaccessible compound EMPTY LOCALSETY TYPE EFFECT label addition 
+ inaccessible compound LABEL LOCALSETY REQ REQ local part 
+ inaccessible compound TYPE EFFECT label TAG LOCALSETY TYPE EFFECT label addition 
+ infallible nonside typer 
+ infallible side typer 
+ integral denotation 
+ local TAG defining identifier 
+ local uninit TAG req loc local uninit TAG local 
+ max token 
+ min token 
+ new FORMALSETY FITACK TAG FORMALSETY BLOCKSETY formal FITACK TAG applied identifier 
+ plus minus 
+ program 
+ quote image 
+ selector TAG definition 
+ stack sub bus 
+ string denotation 
+ string item 
+ string item sequence 
+ sub bus 
+ table sub bus 
+ times by 
+ to token 
+ unless ( ALPHA ) coincides with ( ALPHA ) in ( NOTION ) 
+ unless THING and THING 
+ unless THING or THING 
+ unless false 
+ where ( ALPHA ) coincides with ( ALPHA ) in ( NOTION ) 
+ where ( req form FORMSETY req loc LOCSETY ) ( LF req form FORMSETY req loc LOCSETY ) is alternative split of ( LF req form FORMSETY req loc LOCSETY ) 
+ where ( req form FORMSETY req loc LOCSETY ) ( LF req form FORMSETY req loc LOCSETY ) is MEMBIX split of ( LF req form FORMSETY req loc LOCSETY ) 
+ where DEPENDSETY dependent on TAG is finite in NEST 
+ where EMPTY field not the same tags as FIELDS 
+ where EMPTY has calibre EMPTY 
+ where EMPTY is correct for destinations 
+ where EMPTY is finite in NEST 
+ where EMPTY is permutation of EMPTY 
+ where FIELD not the same tags as EMPTY 
+ where FIELDSETY FIELD has calibre CALETY i 
+ where NOTION is MEMBIX equivalent with NOTION dot EMPTY dot EMPTY 
+ where NOTION formal INIT TAG NOTION is MEMBIX equivalent with NOTION formal uninit TAG NOTION dot FORMSETY formal uninit TAG dot EMPTY 
+ where NOTION local INIT TAG NOTION is MEMBIX equivalent with NOTION local uninit TAG NOTION dot FORMSETY dot LOCALSETY local uninit TAG 
+ where OBJECTSETY OBJECT OBJECTSETY is permutation of OBJECTSETY OBJECT 
+ where PARAMSETY out parameter is correct for destinations 
+ where TAG included in DEPENDSETY dependent on TAG DEPENDSETY 
+ where TAG is permitted in LF LOCALSETY 
+ where TAG is permitted in LF accessible compound EMPTY 
+ where TAG is permitted in LF accessible compound TYPE EFFECT label TAG 
+ where TAG not in EMPTY 
+ where TAG not in LF COMPOUND 
+ where TAG not in LF COMPOUND TYPE EFFECT label TAG 
+ where TAG not in LF FDESCR TAG 
+ where TAG not in LF local INIT TAG 
+ where TAG not in NEST DESCR TAG 
+ where TAG not in new EMPTY 
+ where TEF TEF TEF holds 
+ where THING and THING 
+ where THING or THING 
+ where affix split sets to halfinit 
+ where all estimates in DECSETY DEPENDSETY FIELDS stack TAG have DEPENDSETY 
+ where all estimates in DECSETY NONSTACK TAG have DEPENDSETY 
+ where all estimates in EMPTY have DEPENDSETY 
+ where last block in LF inaccessible compound LABELETY LOCALSETY is accessible in LF accessible compound LABELETY LOCALSETY 
+ where member split sets to init 
+ where no doubles in LF COMPOUND 
+ where no doubles in LF COMPOUND TYPE EFFECT label TAG 
+ where no doubles in LF local INIT TAG 
+ where selector TAG SELECTORSETY field not the same tags as FIELDS 
+ where selector TAG no part of EMPTY field 
+ where selector TAG no part of FIELDS FIELD 
+ where selector TAG no part of selector TAG SELECTORSETY field 
+ where true 
