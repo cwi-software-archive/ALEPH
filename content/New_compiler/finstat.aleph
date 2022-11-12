@@ -1,0 +1,250 @@
+'external' 'action' nlcr, prsym, acknowledge.
+'macro' 'action' print ='fixt(8,0,''1'), get sym = '1':=resymbol.
+'macro' 'pointer' nil = (-2), other = (-1), max code = 255,
+    nix = 255, eof = (-4096).
+'macro' 'function' add = '3':='1'+'2', subtr = '3':='1'-'2',
+    incr = '1':='1'+1.
+'macro' 'question' less = '1'<'2', lseq = '1'_<'2'.
+'list'  [100 001 : 101 000] text(char, stack),
+        [200 001 : 200 256] conv,
+        [300 001 : 310 000] char st,
+        [400 001 : 401 000] rec st (item, next),
+        [500 001 : 500 100] item.
+'macro' 'pointer' min text = 100 000, min conv = 200 000, conv base = 200 001,
+  min char st = 300 000, min rec st = 400 000, min item = 500 000.
+'pointer' max text, max conv, max char st, max rec st, max item.
+'pointer' sb text, sb conv, sb char st, sb rec st, sb item.
+'macro' 'action' next = '2' := '2' + sb'1'.
+'macro' 'question'
+  was text =    '1'_:100000 = 1,
+  was conv =    '1'_:100000 = 2,
+  was char st = '1'_:100000 = 3,
+  was rec st  = '1'_:100000 = 4,
+  was item =    '1'_:100000 = 5.
+'pointer' max char, standard.
+'action' initialize, read items, read item, get terminator,
+  some text, enter and conv, set up tables, claim standard stack,
+  number stacks, claim stack, fill states, accomodate substack,
+  enter state, update, error, run, symbol, substacks.
+'action' dump, dump conv, dump char st, dump text, dump rec st, dump item.
+'question'
+  layout + sym: sym = 93; sym = 118; sym = 119.
+'action'
+claim text + char + stack:
+  add + max text + 2 + max text, char -> char*text[max text],
+  stack -> stack*text[max text].
+'action'
+claim conv + conv1:
+  add + max conv + 1 + max conv, conv1 -> conv[max conv].
+'action'
+claim char st + st:
+  add + max char st + 1 + max char st, st -> char st[max char st].
+'action'
+claim rec st + item1 + next1:
+  add + max rec st + 2 + max rec st, next1 -> next*recst[max rec st],
+  item1 -> item*rec st[max rec st].
+'action'
+claim item + item1:
+  add + max item + 1 + max item, item1 -> item[max item].
+'action'
+fill conv - n:
+  0 -> n, fill:( n = max code; claim conv + other, incr + n, :fill).
+$ program
+$
+
+'action'
+finite state recognizer:
+  initialize, read items, dump, set up tables, dump, run.
+'action'
+initialize:
+  100000 -> max text, 200000 -> max conv, 300000 -> max char st,
+  400000 -> max rec st, 500000 -> max item,
+  2 -> sb text, 1 -> sb conv, 1 -> sb char st, 2 -> sb rec st, 1 -> sb item,
+  0 -> max char, min char st -> standard, fill conv.
+$ input
+$
+'action'
+read items - res:
+  read item + res,
+   (res = nil;
+    claim item + res, max item -> stack*text[max text], :read items).
+'action'
+read item + >res - term:
+  get terminator + term, some text + term + res.
+'action'
+get terminator + >term:
+  get sym + term, (layout + term, :get terminator; +).
+'action'
+some text + term + >res - sym:
+  get sym + sym,
+   (sym = term, nil -> res;
+    max text -> res,
+    txt:
+     (enter and conv + sym, claim text + sym + nil, get sym + sym,
+       (sym = term; :txt))
+   ).
+'action'
+enter and conv + >sym>:
+  add + sym + conv base + sym,
+   (conv[sym] = other, incr + max char, max char -> conv[sym] -> sym;
+    conv[sym] -> sym).
+$ process input
+$
+
+'action'
+set up tables:
+  claim standard stack, number stacks, fill states.
+'action'
+claim standard stack:
+  claim stack.
+'action'
+number stacks - pr item - end - res:
+  min item -> pr item,
+  items:
+   (pr item = max item;
+    next + item + pr item, item[pr item] -> end,
+    stacks:
+     (next + text + end,
+       (was item + stack*text[end];
+        was old stack + pr item + end + res, res -> stack*text[end], :stacks;
+        max char st -> stack*text[end], claim stack, :stacks)),
+    :items).
+'question'
+was old stack + text item + end + >res - item1 - end1:
+  min item -> item1,
+  try texts:
+   (next + item + item1, less + item1 + text item,
+     ((is equal text + item[text item] + end + item[item1] + end1,
+        was char st + stack*text[end1]), stack*text[end1] -> res;
+      :try texts)
+   ).
+'question'
+is equal text + from1 + to1 + from2 + >to2:
+  from1 = to1, from2 -> to2;
+  compare:
+   (next + text + from1, next + text + from2,
+      char*text[from1] = char*text[from2],
+     (from1 = to1, from2 -> to2;
+      was char st + stack*text[from2], : compare)).
+'action'
+claim stack - cnt:
+  0 -> cnt,
+  claim: (cnt = max char; claim char st + standard, incr + cnt, :claim).
+
+$
+
+'action'
+fill states - pr item - end - state:
+  min item -> pr item,
+  items:
+   (pr item = max item;
+    next + item + pr item, item[pr item] -> end, standard -> state,
+    stacks:
+     (substacks + pr item + end + state,
+      next + text + end,
+       (was char st + stack*text[end], stack*text[end] -> state, :stacks; +)),
+    :items).
+'action'
+substacks + pr item + end + state - begin - dummy:
+  was old stack + pr item + end + dummy;
+  item[pr item] -> begin,
+  substacks:
+   (accomodate substack + begin + end + state,
+     (begin = end; next + text + begin, :substack)).
+'action'
+accomodate substack + from + to + state - pr item - pos:
+  min item -> pr item,
+  items:
+   (pr item = max item;
+    next + item + pr item,
+     (is equal text + from + to + item[pr item] + pos,
+        enter state + pos + state; +),
+    :items).
+'action'
+enter state + text item + state - new state - pos - last:
+  next + text + text item, stack*text[text item] -> new state,
+  add + state + char*text[text item] + pos,
+   (end found + new state + char st[pos], char st[pos] -> last;
+    char st[pos] -> pos,
+    chain:
+     (end found + new state + next*rec st[pos], next*rec st[pos] -> last;
+      next*rec st[pos] -> pos, :chain)),
+   (was item + new state,
+      claim rec st + new state + last, update + pos + max rec st;
+    last = standard, update + pos + new state;
+   +).
+'question'
+end found + stop state + proposed:
+                         was char st + proposed.
+'action'
+update + pos + val:
+  was char st + pos, val -> char st[pos];
+  was rec st + pos, val -> next*rec st[pos]; error + 10 + pos.
+'function'
+error + type + data:
+  nlcr, nlcr, prsym + 14, prsym + 27, print + type, print + data, nlcr, nlcr.
+
+$
+$
+
+'action'
+run - sym - state:
+  standard -> state,
+  symbols:
+   (symbol + sym,
+     (sym = nix;
+       (sym = other, standard -> state;
+        add + state + sym + sym, char st[sym] -> state,
+        rec states:
+         (was rec st + state, acknowledge + item*rec st[state],
+            next*rec st[state] -> state, :rec states;
+          +)),
+        :symbols)
+   ).
+'action'
+symbol + >sym - char:
+  get sym+ char,
+   (char = eof, nix -> sym;
+    less + char + 0, error + 20 + char, :symbol;
+    prsym + char, add + conv base + char + sym, conv[sym] -> sym).
+
+'action'
+dump: dump conv, dump item, dump text, dump char st, dump rec st.
+'action'
+dump conv - s - pnt - cnt:
+  nlcr, min conv -> pnt, subtr + 0 + 1 + cnt,
+  symb:
+   (next + conv + pnt, incr + cnt,
+     (lseq + pnt + max conv, conv[pnt] -> s,
+       (s = other; nlcr, prsym + cnt, print + s), :symb; +)).
+'action'
+dump char st - pnt - cnt:
+  nlcr, min char st -> pnt,
+  state:
+   (less + pnt + max char st, nlcr, print + pnt, 0 -> cnt,
+    ent:
+     (incr + cnt, next + char st + pnt, print + char st[pnt],
+       (cnt = max char; :ent)),
+    :state; +).
+'action'
+dump text - ch:
+    nlcr, min text -> ch,
+    chars:
+       (ch = max text;
+        next + text + ch, nlcr,
+          print + char * text[ch], print + stack*text[ch], :chars).
+'action'
+dump rec st - rs:
+    nlcr, min rec st -> rs,
+    recs:
+       (rs = max rec st;
+        next + rec st + rs, nlcr,
+          print + item*rec st[rs], print + next*rec st[rs], :recs).
+'action'
+dump item - it:
+    nlcr, min item -> it,
+    items:
+       (it = max item;
+        next + item + it, nlcr, print + item[it], :items).
+'root' finite state recognizer.
+'punchoff'
