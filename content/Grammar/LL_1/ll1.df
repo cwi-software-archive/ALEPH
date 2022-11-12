@@ -1,0 +1,50 @@
+FILE ll1 VERSUS ll1.old
+
+AT 1
+NEW:	$ LL(1) syntax of ALEPH, 810528
+---
+OLD:	$ LL(1) syntax of ALEPH, 80:09:09 $
+
+AT 127
+NEW:	    variable directive sequence;
+---
+OLD:	    destination sequence;
+
+AT 129
+NEW:	variable directive sequence:
+NEW:	    variable directive, [variable directive sequence].
+NEW:	variable directive:
+---
+OLD:	destination sequence:
+OLD:	    destination, [destination sequence].
+OLD:	destination:
+
+AT 138
+NEW:	    source, selector directive sequence.
+NEW:	selector directive sequence:
+NEW:	    selector directive, [selector directive sequence].
+NEW:	selector directive:
+---
+OLD:	    source, selector destination sequence.
+OLD:	selector destination sequence:
+OLD:	    selector destination, [selector destination sequence].
+OLD:	selector destination:
+
+AT 366
+NEW:	    tag, [equals unit, pragmat value].
+NEW:	pragmat value:
+---
+OLD:	    tag, pragmat item after tag.
+OLD:	pragmat item after tag:
+OLD:	    equals unit, item;
+OLD:	    .
+OLD:	item:
+
+AT 371
+NEW:	    open unit, pragmat value list, close unit.
+NEW:	pragmat value list:
+NEW:	    pragmat value, [comma unit, pragmat value list].
+---
+OLD:	    pragmat item list pack.
+OLD:	pragmat item list pack:
+OLD:	    open unit, pragmat item list, close unit.

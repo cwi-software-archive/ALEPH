@@ -1,0 +1,146 @@
+$ 7.2. Symbols
+m0; m1; m2; m3; m4; m5; m6; m7; m8; m9;
+
+$ other primitives
+tag;
+integral denotation;
+character denotation;
+expression.
+
+$ 3.2.1. Rule declarations
+rule declaration:
+    typer, tag, formal sequence option, actual rule.
+typer:
+    m1, action typer; m2, function typer;
+    m3, predicate typer; m4, question typer.
+action typer:
+    .
+function typer:
+    .
+predicate typer:
+    .
+question typer:
+    .
+formal sequence option:
+    m1, formal sequence; m0.
+formal sequence:
+    formal, formal sequence option.
+formal:
+    m1, formal input; m2, formal output; m3, formal inout;
+    m4, formal stack; m5, formal table; m6, formal file.
+formal input:
+    tag.
+formal output:
+    tag.
+formal inout:
+    tag.
+formal table:
+    formal field list pack option, tag.
+formal stack:
+    formal field list pack option, tag.
+formal field list pack option:
+    m1, formal field list pack; m0.
+formal field list pack:
+    field list option.
+field list option:
+    m1, field list; m0.
+formal file:
+    tag.
+
+$ 3.2.2. Actual rules
+actual rule:
+    tag sequence option, rule body.
+tag sequence option:
+    m1, tag sequence; m0.
+rule body:
+    m1, alternative series; m2, classification.
+alternative series:
+    alternative, alternative series option.
+alternative:
+    member, alternative option.
+alternative option:
+    m1, alternative; m0.
+alternative series option:
+    m1, alternative series; m0.
+
+$ 3.2.3. Members
+member:
+    m1, affix form; m2, transport; m3, identity; m4, extension;
+    m5, compound member; m6, jump; m7, exit; m8, success; m9, failure.
+
+$ 3.4. Operations
+transport:
+    source, source sequence.
+source sequence:
+    source, source sequence option.
+source sequence option:
+    m1, source sequence; m0.
+identity:
+    source, source.
+extension:
+    field transport list, tag.
+field transport list:
+    source, tag sequence, field transport list option.
+field transport list option:
+    m1, field transport list; m0.
+
+$ 3.5. Affix forms
+affix form:
+    tag, source sequence option.
+source:
+    m1, integral denotation; m2, character denotation; m3, tag;
+    m4, min limit; m5, max limit; m6, calibre;
+    m7, element; m8, dummy.
+element:
+    tag option, tag, source.
+tag option:
+    m1, tag; m0.
+dummy:
+    .
+
+$ 3.6. Terminators
+jump:
+    tag.
+exit:
+    expression.
+success:
+    .
+failure:
+    .
+
+$ 3.7. Compound members
+compound member:
+    tag option, actual rule.
+
+$ 3.8. Classifications
+classification:
+    source, class chain.
+class chain:
+    zone series, alternative, class chain option.
+zone series:
+    zone, zone series option.
+zone series option:
+    m1, zone series; m0.
+zone:
+    m1, expression option, expression option; m2, expression; m3, allzone;
+    m4, tag.
+expression option:
+    m1, expression; m0.
+allzone:
+    .
+class chain option:
+    m1, class chain; m0.
+
+$ 4.1.5. Table declarations
+field list:
+    tag sequence, field list option.
+tag sequence:
+    tag, tag sequence option.
+
+$ 4.1.7. Limits
+min limit:
+    tag.
+max limit:
+    tag.
+calibre:
+    tag.

@@ -1,0 +1,228 @@
+	
+action unit: typer
+actual affix sequence: actual affix sequence, affix form,
+	member after tag
+actual affix unit: actual affix
+actual affix: actual affix sequence
+actual rule: body after tag, local rule, rule declaration
+actual: actual affix
+affix form: root
+alternative series: rest of alternative series, rule body
+alternative: alternative series, class, class chain, rest of alternative
+area: class, file description
+base: rest term, term
+body after member tag: body after tag
+body after minus unit: body
+body after tag: body
+body: compound member
+box unit: classifier box, classifier box, size, size
+bus unit: area, non starred element, size estimate
+by unit: times by
+calibre unit: calibre
+calibre: limit
+character denotation: no tag source, plain value
+charfile unit: file typer
+class chain: classification, rest of class chain
+class: class chain
+classification: rule body, special rule body
+classifier box: classification
+classifier: classifier box
+close unit: compound member, expression pack, field list pack,
+	filling list pack, pragmat item list pack, single or compound,
+	single or compound
+colon unit: actual rule, pointer initialization, repeat unit, up to unit
+comma unit: class, constant description list, expression list,
+	external constant description list, external rule description list,
+	external table description list, field list, field transport list,
+	file description list, filling list, pragmat item list,
+	rest of alternative, single or compound, stack description list,
+	table description list, variable description list
+compound member: no tag member
+constant declaration: data declaration
+constant description list: constant declaration,
+	constant description list
+constant description: constant description list
+constant unit: constant declaration, external constant declaration
+data declaration: declaration
+datafile unit: file typer
+declaration: information
+destination sequence: destination sequence, transport or identity tail
+destination: destination sequence
+dummy unit: no tag source
+end unit: program
+equals unit: box unit, constant description,
+	external constant description, external rule description,
+	external table description, file description, pragmat item after tag,
+	selector chain, stack description, table description,
+	transport or identity tail, variable description
+exit unit: exit
+exit: special alternative, terminator
+expression list: expression list, single or compound
+expression pack: base
+expression: constant description, exit, expression list,
+	expression pack, filling, size, size, up to zone, variable description,
+	zone
+extension: no tag member
+external constant declaration: rest of external declaration
+external constant description list: external constant declaration,
+	external constant description list
+external constant description: external constant description list
+external declaration: declaration
+external rule declaration: rest of external declaration
+external rule description list: external rule declaration,
+	external rule description list
+external rule description: external rule description list
+external table declaration: rest of external declaration
+external table description list: external table declaration,
+	external table description list
+external table description: external table description list
+external unit: external declaration
+failure unit: terminator
+field list pack: external table description, no tag formal,
+	no tag formal, stack head, table head
+field list: field list, field list pack
+field transport list: extension, field transport list
+field transport: field transport list
+field: field list
+file declaration: data declaration
+file description list: file declaration, file description list
+file description: file description list
+file typer: file declaration
+filling list pack: stack description, table description
+filling list: filling list, filling list pack
+filling: filling list
+formal affix sequence: external rule description, formal affix sequence,
+	rule declaration
+formal affix unit: formal affix
+formal affix: formal affix sequence
+formal after tag: formal
+formal file: no tag formal
+formal: formal affix
+function unit: typer
+information sequence: information sequence, program, program
+information: information sequence
+integral denotation: item, no tag source, plain value
+item: pragmat item after tag
+jump: special alternative, terminator
+limit: no tag source, plain value
+local affix sequence: actual rule, local affix sequence
+local affix unit: local affix
+local affix: local affix sequence
+local rule: body after minus unit
+max limit unit: max limit
+max limit: limit
+member after tag: body after member tag, member
+member: alternative
+min limit unit: min limit
+min limit: limit
+minus unit: body, failure unit, local affix unit, plus minus
+no tag formal: formal
+no tag member: member, special alternative
+no tag source: no tag member, source
+non starred element: source after tag, starred element
+of unit: extension, extension, starred element
+open unit: compound member, expression pack, field list pack, filling,
+	filling list pack, pragmat item list pack
+plain value: base, filling
+plus minus: expression, filling, rest expression
+plus unit: actual affix unit, formal affix unit, plus minus,
+	success unit
+point unit: constant declaration, external constant declaration,
+	external rule declaration, external table declaration, file declaration,
+	pragmat, root, rule declaration, stack declaration, table declaration,
+	variable declaration
+pointer initialization: filling list
+pragmat item after tag: pragmat item
+pragmat item list pack: item
+pragmat item list: pragmat, pragmat item list, pragmat item list pack
+pragmat item: item, pragmat item list
+pragmat unit: pragmat
+pragmat: information
+predicate unit: typer
+question unit: typer
+quote image unit: formal file
+repeat unit: jump
+rest expression: expression, filling, filling, rest expression,
+	single or compound
+rest of alternative series: alternative series, body after member tag,
+	body after minus unit, special rule body
+rest of alternative: alternative, body after member tag,
+	special alternative
+rest of class chain: class chain
+rest of external declaration: external declaration
+rest term: filling, rest term, single or compound, term
+right unit: file description, file description, formal after tag,
+	no tag formal, no tag formal
+root unit: root
+root: program
+rule body: actual rule
+rule declaration: declaration
+selector chain: field, selector chain
+selector destination sequence: field transport,
+	selector destination sequence
+selector destination: selector destination sequence
+semicolon unit: rest of alternative series, rest of class chain,
+	zone series
+single or compound: filling
+size estimate: external table description, stack head
+size: size estimate
+source after tag: member after tag, source
+source: actual, classifier, destination, field transport,
+	non starred element, transport or identity tail
+special alternative: special rule body
+special rule body: body
+stack declaration: data declaration
+stack description list: stack declaration, stack description list
+stack description: stack description list
+stack head: stack description
+stack unit: stack declaration
+starred element: source after tag
+string denotation: external constant description,
+	external rule description, external table description, file description,
+	filling, item
+sub unit: area, non starred element, size estimate
+subbus unit: formal after tag, no tag formal, no tag formal,
+	no tag formal
+success unit: special alternative, terminator
+table declaration: data declaration
+table description list: table declaration, table description list
+table description: table description list
+table head: table description
+table unit: external table declaration, table declaration
+tag: affix form, body, body after minus unit, calibre,
+	constant description, extension, external constant description,
+	external rule description, external table description, file description,
+	formal, formal file, jump, local affix, max limit, member, min limit,
+	no tag formal, no tag formal, no tag formal, plain value,
+	pointer initialization, pragmat item, rule declaration, selector chain,
+	selector destination, source, stack head, starred element, table head,
+	variable description
+TERM: action unit, bus unit, by unit, calibre unit,
+	character denotation, charfile unit, close unit, colon unit, comma unit,
+	constant unit, datafile unit, dummy unit, end unit, equals unit,
+	exit unit
+term: expression
+TERM: external unit
+term: filling
+TERM: function unit, integral denotation, max limit unit,
+	min limit unit, minus unit, open unit, plus unit, point unit,
+	pragmat unit, predicate unit, question unit, quote image unit
+term: rest expression
+TERM: right unit, root unit, semicolon unit, stack unit,
+	string denotation, sub unit, subbus unit, table unit, tag, times unit,
+	to unit, variable unit
+terminator: alternative
+times by: rest term
+times unit: of unit, times by
+to unit: destination, selector destination
+transport or identity tail: member after tag, no tag member
+typer: external rule declaration, rule declaration
+up to unit: up to zone
+up to zone: zone, zone
+variable declaration: data declaration
+variable description list: variable declaration,
+	variable description list
+variable description: variable description list
+variable unit: variable declaration
+zone series: area, zone series
+zone: zone series

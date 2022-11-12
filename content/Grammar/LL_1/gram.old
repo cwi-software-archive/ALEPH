@@ -1,0 +1,387 @@
+$ syntax of aleph, 28-05-1974 $
+
+$ 7.2 symbols $
+
+open symbol             $ ( $;         $ 3.7, 4.1.1, 4.1.5, 6$
+close symbol            $ ) $;         $ 3.7, 4.1.1, 4.1.5, 6 $
+absolute symbol         $ / $;         $ 4.1.1 $
+plus symbol             $ + $;         $ 4.1.1 $
+minus symbol            $ - $;         $ 4.1.1 $
+times symbol            $ * $;         $ 4.1.1 $
+by symbol               $ / $;         $ 4.1.1 $
+left symbol             $ < $;         $ 4.1.7 $
+right symbol            $ > $;         $ 3.1.1, 4.1.7, 4.2 $
+equals symbol           $ = $;         $ 3.4, 4.1.5 $
+dummy symbol            $ ? $;         $ 3.4 $
+point symbol            $ . $;         $ 3.1.1, 3.2.1, 4.1.1, e.a.$
+colon symbol            $ : $;         $ 3.2.2, 4.1.5 $
+semicolon symbol        $ ; $;         $ 3.2.2, 3.8 $
+comma symbol            $ , $;         $ 3.2.2, 3.8, e.a. $
+sub symbol              $ [ $;         $ 3.2.1, 3.5, 3.8, 4.1.6 $
+bus symbol              $ ] $;         $ 3.2.1, 3.5, 3.8, 4.1.6 $
+quote symbol            $ " $;         $ 4.1.5 $
+formal affix symbol     $ + $;         $ 3.2.1 $
+local affix symbol      $ - $;         $ 3.2.2 $
+repeat symbol           $ : $;         $ 3.6 $
+success symbol          $ + $;         $ 3.6 $
+failure symbol          $ - $;         $ 3.6 $
+box symbol              $ = $;         $ 3.8, 4.1.6 $
+up to symbol            $ : $;         $ 3.8 $
+actual affix symbol     $ + $;         $ 3.5 $
+of symbol               $ * $;         $ 3.2.3, 3.5 $
+
+$ bold face symbols $
+constant symbol         $ 'constant',  'cst' $;  $ 4.1.2, 5.1 $
+variable symbol         $ 'variable',  'var' $;  $ 4.1.3 $
+stack symbol            $ 'stack' $;             $ 4.1.6 $
+table symbol            $ 'table' $;             $ 4.1.5, 5.1 $
+charfile symbol         $ 'charfile' $;          $ 4.2 $
+datafile symbol         $ 'datafile' $;          $ 4.2 $
+predicate symbol        $ 'predicate', 'pred' $; $ 3.2.1 $
+question symbol         $ 'question',  'qu' $;   $ 3.2.1 $
+action symbol           $ 'action',    'act' $;  $ 3.2.1 $
+function symbol         $ 'function',  'fct' $;  $ 3.2.1 $
+external symbol         $ 'external' $;          $ 5.1 $
+pragmat symbol          $ 'pragmat' $;           $ 6 $
+exit symbol             $ 'exit' $;              $ 3.6 $
+root symbol             $ 'root' $;              $ 3.1 $
+end symbol              $ 'end' $;               $ 3.1 $
+
+$ other primitives $
+tag;                                             $ 4.1.5, 6, e.a. $
+digit;                                           $ 4.1.1 $
+character;                                       $ 4.1.1 $
+non quote item.                                  $ 4.1.5 $
+
+
+$ 3.1 the program $
+program:
+    [information sequence], root, [information sequence], end symbol.
+information sequence:
+    information, [information sequence].
+information:
+    declaration; pragmat.
+root:
+    root symbol, affix form, point symbol.
+declaration:
+    rule     declaration;
+    data     declaration;
+    external declaration.
+
+$ 3.2.1 rule declarations $
+rule declaration:
+    typer, rule tag, [formal affix sequence], actual rule, point symbol.
+typer:
+    action symbol; function symbol; predicate symbol; question symbol.
+rule tag:
+    tag.
+formal affix sequence:
+    formal affix, [formal affix sequence].
+formal affix:
+    formal affix symbol, formal.
+formal:
+     formal variable; formal stack; formal table; formal file.
+formal variable:
+    [right symbol], variable tag, [right symbol].
+formal table:
+    [field list pack], table tag, sub bus.
+formal stack:
+    sub bus, [field list pack], stack tag, sub bus.
+sub bus:
+    sub symbol, bus symbol.
+formal file:
+    quote image, file tag.
+
+$ 3.2.2 actual rules $
+actual rule:
+    [local affix sequence], colon symbol, rule body.
+local affix sequence:
+    local affix, [local affix sequence].
+local affix:
+    local affix symbol, local variable.
+local variable:
+    variable tag.
+rule body:
+    alternative series; classification.
+alternative series:
+    alternative, [semicolon symbol, alternative series].
+alternative:
+    last member; member, comma symbol, alternative.
+
+$ 3.2.3 members $
+last member:
+    member; terminator.
+member:
+    affix form; operation; compound member.
+
+$ 3.4 operations $
+operation:
+    transport; identity; extension.
+transport:
+    source, destination sequence.
+destination sequence:
+    destination, [destination sequence].
+destination:
+    to token, source.
+to token:
+    minus symbol, right symbol.
+identity:
+    source, equals symbol, source.
+extension:
+    of symbol, field transport list, of symbol, stack tag.
+field transport list:
+    field transport, [comma symbol, field transport list].
+field transport:
+    source, selector destination sequence.
+selector destination sequence:
+    selector destination, [selector destination sequence].
+selector destination:
+    to token, selector.
+
+$ 3.5 affix forms $
+affix form:
+    rule tag, [actual affix sequence].
+actual affix sequence:
+    actual affix, [actual affix sequence].
+actual affix:
+    actual affix symbol, actual.
+actual:
+    source; list tag; file tag.
+source:
+    constant; variable.
+constant:
+    plain value; table element.
+variable:
+    variable tag; stack element; dummy symbol.
+table element:
+    [selector, of symbol], table tag, sub symbol, source, bus symbol.
+
+stack element:
+    [selector, of symbol], stack tag, sub symbol, source, bus symbol.
+
+$ 3.6 terminators $
+terminator:
+    jump; exit; success symbol; failure symbol.
+jump:
+    repeat symbol, rule tag.
+exit:
+    exit symbol, expression.
+
+$ 3.7 compound members $
+compound member:
+    open symbol, [local part, colon symbol], rule body, close symbol.
+local part:
+    rule tag, [local affix sequence]; local affix sequence.
+
+$ 3.8 classifications $
+classification:
+    classifier box, class chain.
+classifier box:
+    box symbol, classifier, box symbol.
+classifier:
+    source.
+class chain:
+    class, semicolon symbol, class chain; last class.
+class:
+    area, comma symbol, alternative.
+area:
+    sub symbol, zone series, bus symbol.
+zone series:
+    zone, [semicolon symbol, zone series].
+zone:
+    [expression], up to symbol, [expression]; expression; list tag.
+last class:
+    class; alternative.
+
+$ 4 data declarations $
+data declaration:
+    constant declaration;
+    variable declaration;
+    stack    declaration;
+    table    declaration;
+    file     declaration.
+
+$ 4.1.1 expressions $
+expression:
+    [plus minus], term; expression, plus minus, term.
+term:
+    [term, times by], base.
+base:
+    plain value; expression pack.
+plain value:
+    integral denotation; character denotation; constant tag; limit.
+integral denotation:
+    [integral denotation], digit.
+character denotation:
+    absolute symbol, character, absolute symbol.
+expression pack:
+    open symbol, expression, close symbol.
+plus minus:
+    plus symbol; minus symbol.
+times by:
+    times symbol; by symbol.
+
+$ 4.1.2 constant declarations $
+constant declaration:
+    constant symbol, constant description list, point symbol.
+constant description list:
+    constant description, [comma symbol, constant description list].
+constant description:
+    constant tag, equals symbol, expression.
+constant tag:
+    tag.
+
+$ 4.1.3 variable declarations $
+variable declaration:
+    variable symbol, variable  description list, point symbol.
+variable description list:
+    variable description, [comma symbol, variable description list].
+variable description:
+    variable tag, equals symbol, expression.
+variable tag:
+    tag.
+
+$ 4.1.5 table declarations $
+table declaration:
+    table symbol, table description list, point symbol.
+table description list:
+    table description, [comma symbol, table description list].
+table description:
+    table head, equals symbol, filling list pack.
+table head:
+    [field list pack], table tag.
+table tag:
+    tag.
+field list pack:
+    open symbol, field list, close symbol.
+field list:
+    field, [comma symbol, field list].
+field:
+    selector chain.
+selector chain:
+    selector, [equals symbol, selector chain].
+selector:
+    tag.
+
+filling list pack:
+    open symbol, filling list, close symbol.
+filling list:
+    filling, [comma symbol, filling list].
+filling:
+    single block; compound block; string filling.
+single block:
+    expression, [pointer initialization].
+compound block:
+    expression list proper pack, [pointer initialization].
+pointer initialization:
+    colon symbol, constant tag.
+expression list proper pack:
+    open symbol, expression list proper, close symbol.
+expression list proper:
+    expression, comma symbol, expression list.
+expression list:
+    expression, [comma symbol, expression list].
+string filling:
+    string denotation, [pointer initialization].
+string denotation:
+    quote symbol, [string item sequence], quote symbol.
+string item sequence:
+    string item, [string item sequence].
+string item:
+    non quote item; quote image.
+quote image:
+    quote symbol, quote symbol.
+
+$ 4.1.6 stack declarations $
+stack declaration:
+    stack symbol, stack description list, point symbol.
+stack description list:
+    stack description, [comma symbol, stack description list].
+stack description:
+    stack head, [equals symbol, filling list pack].
+stack head:
+    [size estimate], [field list pack], stack tag.
+size estimate:
+    relative size; absolute size.
+relative size:
+    sub symbol, expression, bus symbol.
+absolute size:
+    sub symbol, box symbol, expression, box symbol, bus symbol.
+stack tag:
+    tag.
+
+$ 4.1.7 limits $
+limit:
+    min limit; max limit; calibre.
+min limit:
+    min token, list tag.
+max limit:
+    max token, list tag.
+calibre:
+    calibre token, list tag.
+list tag:
+    stack tag; table tag.
+min token:
+    left symbol, left symbol.
+max token:
+    right symbol, right symbol.
+calibre token:
+    left symbol, right symbol.
+
+$ 4.2 file declarations $
+file declaration:
+    file typer, file description list, point symbol.
+file typer:
+    charfile symbol; datafile symbol.
+file description list:
+    file description, [comma symbol, file description list].
+file description:
+    file tag, [area],
+        equals symbol, [right symbol], string denotation, [right symbol].
+file tag:
+    tag.
+
+$ 5.1 external declarations $
+external declaration:
+    external rule declaration;
+    external table declaration;
+    external constant declaration.
+external rule declaration:
+    external symbol, typer, external rule description list, point symbol.
+external rule description list:
+    external rule description,
+       [comma symbol, external rule description list].
+external rule description:
+    rule tag, [formal affix sequence], equals symbol, string denotation.
+external table declaration:
+    external symbol, table symbol,
+        external table description list, point symbol.
+external table description list:
+    external table description,
+       [comma symbol, external table description list].
+external table description:
+    size estimate, [field list pack], table tag, equals symbol,
+        string denotation.
+external constant declaration:
+    external symbol, constant symbol,
+        external constant description list, point symbol.
+external constant description list:
+    external constant description,
+       [comma symbol, external constant description list].
+external constant description:
+    constant tag, equals symbol, string denotation.
+
+
+$ 6 pragmats $
+pragmat:
+    pragmat symbol, pragmat item list, point symbol.
+pragmat item list:
+    pragmat item, [comma symbol, pragmat item list].
+pragmat item:
+    tag;
+    tag, equals symbol, integral denotation;
+    tag, equals symbol, string   denotation;
+    tag, equals symbol, pragmat item;
+    tag, equals symbol, pragmat item list pack.
+pragmat item list pack:
+    open symbol, pragmat item list, close symbol.

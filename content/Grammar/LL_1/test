@@ -1,0 +1,27 @@
+PATH=/usr/ucb:/bin:/usr/bin
+D=`phd dick`
+
+$D/grm/condense $1 | $D/lib/sort | sed '
+s/; */;@/g
+s/: */:@/g
+s/, */,@/g
+s/\[//g
+s/]//g
+' | tr @ '\012' >.c
+
+grep : .c | tr -d : | $D/lib/sort >.de
+grep '[,;.]' .c | tr -d ',;.' | $D/lib/sort -u | grep -v '^TERM$' >.ap
+
+echo Multiple declarations:
+uniq -c .de | grep -v ' 1 '
+uniq .de >.du
+
+echo ''
+echo ''
+echo 'Over-  Under-'
+echo '  declared'
+comm -3 .du .ap
+
+if test -z $DEBUG""
+then	rm .c .ap .de .du
+fi

@@ -1,0 +1,200 @@
+6,7c6,8
+< digit;
+< character.
+---
+> integral denotation;
+> character denotation;
+> expression.
+11c12
+<     typer, rule tag, [formal affix sequence], actual rule, point symbol.
+---
+>     typer, tag, [formal affix sequence], actual rule, point symbol.
+13,16c14,23
+<     action symbol; function symbol;
+<     predicate symbol; question symbol.
+< rule tag:
+<     tag.
+---
+>     action typer; function typer;
+>     predicate typer; question typer.
+> action typer:
+>     action symbol.
+> function typer:
+>     function symbol.
+> predicate typer:
+>     predicate symbol.
+> question typer:
+>     question symbol.
+24c31,37
+<     [right symbol], variable tag, [right symbol].
+---
+>     formal input; formal output; formal inout.
+> formal input:
+>     right symbol, tag.
+> formal output:
+>     tag, right symbol.
+> formal inout:
+>     right symbol, tag, right symbol.
+26c39
+<     [formal field list pack], table tag, sub bus.
+---
+>     [formal field list pack], tag, sub symbol, bus symbol.
+28,30c41
+<     sub bus, [formal field list pack], stack tag, sub bus.
+< sub bus:
+<     sub symbol, bus symbol.
+---
+>     sub symbol, bus symbol, [formal field list pack], tag, sub symbol, bus symbol.
+34c45
+<     quote image, file tag.
+---
+>     quote symbol, quote symbol, tag.
+44c55
+<     variable tag.
+---
+>     tag.
+50c61
+<     last member; member, comma symbol, alternative.
+---
+>     member, [comma symbol, alternative].
+53,54d63
+< last member:
+<     member; terminator.
+56c65
+<     affix form; operation; compound member.
+---
+>     affix form; operation; compound member; terminator.
+66,68c75
+<     to token, variable.
+< to token:
+<     minus symbol, right symbol.
+---
+>     minus symbol, right symbol, source.
+72c79
+<     of symbol, field transport list, of symbol, stack tag.
+---
+>     of symbol, field transport list, of symbol, tag.
+80c87
+<     to token, selector.
+---
+>     minus symbol, right symbol, selector.
+84c91
+<     rule tag, [actual affix sequence].
+---
+>     tag, [actual affix sequence].
+90c97
+<     source; list tag; file tag.
+---
+>     source.
+92,100c99,104
+<     constant; variable.
+< constant:
+<     plain value; table element.
+< variable:
+<     variable tag; stack element; dummy symbol.
+< table element:
+<     [selector, of symbol], table tag, sub symbol, source, bus symbol.
+< stack element:
+<     [selector, of symbol], stack tag, sub symbol, source, bus symbol.
+---
+>     integral denotation; character denotation; tag; limit;
+>     element; dummy.
+> element:
+>     [selector, of symbol], tag, sub symbol, source, bus symbol.
+> dummy:
+>     dummy symbol.
+104c108
+<     jump; exit; success symbol; failure symbol.
+---
+>     jump; exit; success; failure.
+106c110
+<     repeat symbol, rule tag.
+---
+>     repeat symbol, tag.
+108a113,116
+> success:
+>     success symbol.
+> failure:
+>     failure symbol.
+112,114c120
+<     open symbol, [local part, colon symbol], rule body, close symbol.
+< local part:
+<     rule tag, [local affix sequence]; local affix sequence.
+---
+>     open symbol, [tag], actual rule, close symbol.
+124c130
+<     class, semicolon symbol, class chain; last class.
+---
+>     class, [semicolon symbol, class chain].
+132,157c138
+<     [expression], up to symbol, [expression]; expression; list tag.
+< last class:
+<     class; alternative.
+< 
+< $ 4.1.1. Expressions
+< expression:
+<     [plus minus], term; expression, plus minus, term.
+< term:
+<     [term, times by], base.
+< base:
+<     plain value; expression pack.
+< plain value:
+<     integral denotation; character denotation; constant tag; limit.
+< integral denotation:
+<     [integral denotation], digit.
+< character denotation:
+<     absolute symbol, character, absolute symbol.
+< expression pack:
+<     open symbol, expression, close symbol.
+< plus minus:
+<     plus symbol; minus symbol.
+< times by:
+<     times symbol; by symbol.
+< 
+< $ 4.1.2. Constant declarations
+< constant tag:
+---
+>     [expression], up to symbol, [expression]; expression; allzone;
+158a140,141
+> allzone:
+>     .
+160,163d142
+< $ 4.1.3. Variable declarations
+< variable tag:
+<     tag.
+< 
+165,166d143
+< table tag:
+<     tag.
+175,176d151
+< quote image:
+<     quote symbol, quote symbol.
+178,181d152
+< $ 4.1.6. Stack declarations
+< stack tag:
+<     tag.
+< 
+186c157
+<     min token, list tag.
+---
+>     left symbol, left symbol, tag.
+188c159
+<     max token, list tag.
+---
+>     right symbol, right symbol, tag.
+190,202c161
+<     calibre token, list tag.
+< list tag:
+<     stack tag; table tag.
+< min token:
+<     left symbol, left symbol.
+< max token:
+<     right symbol, right symbol.
+< calibre token:
+<     left symbol, right symbol.
+< 
+< $ 4.2. File declarations
+< file tag:
+<     tag.
+---
+>     left symbol, right symbol, tag.

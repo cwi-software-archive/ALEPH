@@ -1,0 +1,1552 @@
+`act`
+ fill_conv:
+    (rep: more, scratch;
+          plus,
+              next, :rep).
+`act`
+ init_conv:
+    (rep:
+ +;
+ incr, :rep).
+`qu`
+ is_letter:
+ +.
+`qu`
+ is_digit:
+    was, lseq.
+`qu`
+ is_letgit:
+    was, lseq.
+`pred`
+ @read_line:
+    get_line + input,
+        treat_linenumber.
+`act`
+ treat_linenumber:
+        (skip_rubble:
+           incr,
+             (more;
+              plus,
+                 (is_digit,
+                     (treat_digits:
+                          (no_mult_overflow,
+                           no_add_overflow
+                          ),
+  incr,
+                              (more;
+                               plus,
+                                   (is_digit, :treat_digits; +));
+ +
+                   );
+                  :skip_rubble
+                 )
+             )
+        ),
+        incr,
+        (less, +; +).
+`qu`
+ no_mult_overflow:
+    mult, +.
+`qu`
+ no_add_overflow:
+    add, +.
+`act`
+ init_buffer:
+ +.
+`act`
+ init_buffer_bounds:
+    minus,
+        plus,
+ decr,
+  plus.
+`act`
+ next_char:
+    incr,
+        (lseq,
+             plus;
+         read_buffer, :next_char;
+ +).
+`pred`
+ read_buffer:
+    (is_false, print_line; +),
+        scratch,
+            read_line,
+                (less,
+ +;
+ +
+              ),
+ +.
+`act`
+ skip_spaces:
+        next_char, :skip_spaces;
+    +.
+`act`
+ skip_spaces_and_comment:
+    skip_spaces,
+        (
+    (skip:
+                  incr,
+                  ((more;
+ +
+                 ),
+  next_char, :skip_spaces_and_comment;
+                   :skip));
+             (skip:
+                  incr,
+                  ((more;
+ +
+                 ),
+                       next_char, :skip_spaces_and_comment;
+                   plus,
+                       ((was,
+                         lseq
+                        ),
+                            :skip;
+                        :skip_spaces_and_comment)));
+         +).
+`act`
+ to_chrs:
+    minus,
+ incr.
+`pred`
+ r_char:
+ next_char.
+`act`
+ next_unit:
+    (again:
+        skip_spaces_and_comment,
+        (read_unit;
+         read_tag;
+         read_integral_denotation;
+         read_char_den_or_by_unit;
+         read_string_den_or_quote_image_unit;
+         read_compound_unit;
+         read_bold;
+         char_error,
+             next_char, :again)).
+`pred`
+ read_unit:
+    was,
+ next_char.
+`act`
+ init_tags:
+        (rep:
+     decr, ( +; :rep)
+        ),
+        divrem.
+`pred`
+ read_tag:
+    is_letter,
+        (next: to_chrs,
+                    next_char,
+                    skip_spaces,
+                    (is_letgit, :next; +)
+        ),
+      (lseq;
+         error,
+ +
+      ),
+        pack_string,
+        scratch.
+`act`
+ search_tag
+:
+       incr, insert;
+    divrem,
+        ( decr; +),
+        minus,
+        (rep:
+(
+    (
+ decr,
+ :search_tag;
+      decr,
+                       incr, :rep);
+              compare_string
+,
+                 ( +
+                     [],
+ decr,
+ :search_tag;
+        [  a ],
+ :search_tag;
+            unstack_string
+                  )
+             )
+        ).
+`act`
+ insert:
+ +
+  * global_info,
+       (rep: lseq,
+                 (
+                      decr;
+ incr, :rep);
+     incr,
+                  divrem
+        ),
+        (may_be_redilution; +).
+`pred`
+ may_be_redilution:
+        minus,
+        divrem,
+        ( +; incr),
+        (rep:
+     incr, incr,
+                  ( +; :rep)
+        ),
+        move_diluted_list,
+        divrem.
+`act`
+ move_diluted_list:
+        decr,
+        (repa: +;
+  (repa:
+                       global_info * diluted_list
+                           decr, decr, decr,
+                           (
+    decr, :repa;
+                            :repa)
+                   )
+        ).
+`pred`
+ read_integral_denotation:
+    is_digit,
+        (next: to_chrs,
+                    next_char,
+                    skip_spaces,
+                    (is_digit, :next; +)
+        ),
+      (lseq;
+         error,
+ +
+      ),
+        drop_denotation,
+        scratch,
+ +.
+`pred`
+ read_char_den_or_by_unit:
+    r_char,
+         (is_by_operator,
+ +;
+           ( char_error;
+             to_chrs
+              ),
+            drop_denotation,
+            scratch,
+              next_char,
+              (r_char; char_error),
+ +
+      ).
+`qu`
+ is_by_operator:
+ +;
+ was;
+    is_integral_denotation;
+    is_character_denotation.
+`pred`
+ read_string_den_or_quote_image_unit:
+        (is_quote_image,
+             next_char, skip_spaces_and_comment,
+             (r_char;
+              char_error
+             ), +;
+         is_string_denotation,
+             to_chrs,
+             next_char,
+             (next:
+                  r_char,
+                      to_chrs,
+                      (r_char,
+                           to_chrs, :next;
+                       +);
+                      char_error,
+                      to_chrs;
+                  to_chrs,
+                      next_char, :next
+             ),
+             drop_string, +;
+         char_error,
+             next_char, next_unit
+        ).
+`qu`
+ is_quote_image:
+ +.
+`qu`
+ is_string_denotation:
+ +;
+ +;
+ +;
+ +.
+`pred`
+ read_compound_unit:
+         next_char, skip_spaces_and_comment,
+         (( +;
+ +
+        ), next_char;
+          error, next_unit);
+         next_char, skip_spaces_and_comment,
+         (
+    next_char;
+ +);
+         next_char, skip_spaces_and_comment,
+         (
+              next_char;
+ +);
+     next_char, skip_spaces_and_comment,
+         (
+    next_char;
+ +).
+`pred`
+ read_bold:
+        (rep: next_char,
+                  (is_letter,
+                       to_chrs, :rep;
+                   r_char;
+                   char_error)
+        ),
+        (lseq;
+         error,
+             plus, decr,
+             unstack_to,
+ +
+      ),
+        pack_string,
+        search_bold,
+        scratch.
+`act`
+ search_bold:
+        (rep: more,
+                  bolds_error;
+              compare_string
+,
+                 ( +
+                      [], bolds_error;
+                      [ a ], next, :rep;
+ +
+                 )
+        ).
+`act`
+ bolds_error:
+    may_be_other_bold;
+    previous,
+        (may_be_other_bold;
+         skip_bold).
+`pred`
+ may_be_other_bold:
+    was,
+compare_chars,
+            compare_chars,
+                compare_chars,
+                    error.
+`qu`
+ compare_chars:
+    string_elem,
+        string_elem,
+ +.
+`act`
+ skip_bold:
+    error,
+        next_unit.
+`pred`
+ r_unit:
+ next_unit.
+`act`
+ req_unit:
+    r_unit;
+    error.
+`pred`
+ rd_unit:
+ dropp, next_unit.
+`act`
+ reqd_unit:
+    rd_unit;
+    error,
+        dropp_immediate.
+`act`
+ req_point_unit:
+        check_line_printed,
+ next_unit;
+    error,
+ +.
+`pred`
+ is_tag:
+    was,
+        search_tag.
+`pred`
+ r_tag:
+    is_tag, next_unit.
+`act`
+ req_tag:
+    r_tag;
+    error, +.
+`act`
+ global_tag:
+        (is_tag, check_definition, next_unit;
+         error,
+             create_global_info_block
+        ), +.
+`act`
+ check_definition:
+ +;
+ double_definition,
+        create_global_info_block.
+`pred`
+ r_string_denotation:
+ next_unit.
+`act`
+ req_string_denotation:
+    r_string_denotation;
+    error,
+ +.
+`qu`
+ is_integral_denotation:
+ +.
+`qu`
+ is_character_denotation:
+ +.
+`act`
+ set_word:
+    left_clear, bool_or.
+`act`
+ program:
+    prog,
+        (r_unit; error).
+`act`
+ prog:
+    text,
+        req_unit.
+`act`
+ text:
+    (information; recoverable_error), :text;
+     +.
+`pred`
+ information:
+    declaration;
+    pragmat;
+    root.
+`pred`
+ root:
+    r_unit,
+        affix_form, req_point_unit.
+`act`
+ affix_form:
+     req_tag,
+        actual_affix_sequence_option.
+`pred`
+ declaration:
+    rule_declaration;
+    data_declaration;
+    external_declaration.
+`pred`
+ rule_declaration
+:
+   rule_typer,
+        global_tag,
+        formal_affix_sequence_option,
+        set_word,
+      drop_rules,
+        actual_rule,
+        req_point_unit, drop_calls, +.
+`pred`
+ rule_typer:
+    r_unit, +;
+    r_unit, +;
+    r_unit, +;
+    r_unit, +.
+`act`
+ formal_affix_sequence_option:
+       (next_formal:
+            (formal_affix, incr;
+             recoverable_error
+            ), :next_formal;
+            ( +; +)).
+`pred`
+ formal_affix:
+    r_unit, formal.
+`act`
+ formal:
+    r_formal_tag, formal_after_tag;
+    no_tag_formal;
+    error, drop_formals.
+`act`
+ formal_after_tag:
+    r_unit, set_word,
+        drop_formals;
+    r_unit, drop_formals;
+    drop_formals.
+`pred`
+ no_tag_formal:
+    r_unit,
+        req_formal_tag,
+        (r_unit, drop_formals;
+         drop_formals);
+    r_unit,
+      (field_list_pack; +),
+        req_formal_tag,
+        req_unit,
+        set_word,
+        drop_formals;
+    field_list_pack,
+        req_formal_tag,
+        req_unit,
+        set_word,
+        drop_formals;
+    r_unit,
+        req_formal_tag,
+        drop_formals.
+`act`
+ actual_rule:
+    local_affix_sequence_option,
+        req_unit,
+        rule_body.
+`act`
+ local_affix_sequence_option:
+    (local_affix;
+     recoverable_error
+    ),
+  :local_affix_sequence_option;
+    +.
+`pred`
+ local_affix:
+    r_unit,
+        req_local_tag.
+`act`
+ rule_body:
+    classification;
+    alternative_series.
+`act`
+ alternative_series:
+    alternative,
+        rest_of_alternative_series.
+`act`
+ alternative:
+    member,
+        rest_of_alternative.
+`act`
+ rest_of_alternative:
+    r_unit,
+        alternative;
+        error, alternative;
+    recoverable_error,
+        :rest_of_alternative;
+    +.
+`act`
+ rest_of_alternative_series:
+    r_unit,
+        alternative_series;
+    +.
+`act`
+ member:
+    r_tag,
+        member_after_tag;
+    no_tag_member;
+    req_tag.
+`act`
+ member_after_tag:
+    source_after_tag,
+        req_transport_or_identity_tail;
+    transport_or_identity_tail;
+    actual_affix_sequence_option,
+        drop_calls.
+`pred`
+ no_tag_member:
+    extension;
+    compound_member;
+    terminator;
+    no_tag_source,
+        req_transport_or_identity_tail.
+`pred`
+ transport_or_identity_tail:
+    destination,
+        destination_sequence_option;
+    r_unit,
+        source.
+`act`
+ req_transport_or_identity_tail:
+    transport_or_identity_tail;
+    req_to_tag.
+`act`
+ req_to_tag:
+    error,
+        dropp_immediate, dropp_immediate.
+`act`
+ destination_sequence_option:
+    (destination;
+     recoverable_error
+    ),
+  :destination_sequence_option;
+    +.
+`pred`
+ destination:
+    r_unit,
+        source.
+`pred`
+ extension:
+    r_unit,
+        field_transport_list,
+        req_unit,
+        req_tag.
+`act`
+ field_transport_list:
+    field_transport,
+        (rest_of_field_transport_list:
+             r_unit,
+                 :field_transport_list;
+             recoverable_error,
+                 :rest_of_field_transport_list;
+             +).
+`act`
+ field_transport:
+    source,
+        (selector_destination;
+         req_to_tag
+        ),
+        (rest_of_selector_destination:
+             selector_destination,
+                 :rest_of_selector_destination;
+             +)    .
+`pred`
+ selector_destination:
+    r_unit,
+        req_tag.
+`act`
+ actual_affix_sequence_option:
+    (actual_affix;
+     recoverable_error
+    ),
+  :actual_affix_sequence_option;
+    +.
+`pred`
+ actual_affix:
+    r_unit,
+        actual.
+`act`
+ actual:
+    source.
+`act`
+ source:
+    r_tag,
+        (source_after_tag; +);
+    no_tag_source;
+    req_tag.
+`pred`
+ source_after_tag:
+    starred_element;
+    non_starred_element.
+`pred`
+ starred_element:
+    r_unit,
+        req_tag,
+        req_unit,
+        source,
+        req_unit.
+`pred`
+ non_starred_element:
+    r_unit,
+        source,
+        req_unit.
+`pred`
+ no_tag_source:
+    (is_integral_denotation, +;
+     is_character_denotation, +
+    ),
+  generatea,
+        drop_def, next_unit;
+    (r_unit;
+     r_unit;
+     r_unit
+    ),
+  req_tag;
+    r_unit.
+`pred`
+ terminator:
+    jump;
+    exit;
+    r_unit;
+    r_unit.
+`pred`
+ jump:
+    r_unit,
+        req_tag.
+`pred`
+ exit:
+    r_unit,
+        expression.
+`pred`
+ compound_member:
+    r_unit,
+        body,
+        req_unit.
+`act`
+ body:
+    r_tag,
+        body_after_tag;
+    r_unit,
+        body_after_minus_unit;
+    rule_body.
+`act`
+ body_after_tag:
+    is_actual_rule,
+        actual_rule;
+    body_after_member_tag.
+`qu`
+ is_actual_rule:
+ +;
+ +.
+`act`
+ body_after_member_tag:
+    member_after_tag,
+        rest_of_alternative,
+        rest_of_alternative_series.
+`act`
+ body_after_minus_unit:
+    r_tag,
+        local_rule;
+    rest_of_alternative,
+        rest_of_alternative_series.
+`act`
+ local_rule:
+    actual_rule.
+`pred`
+ classification:
+    classifier_box,
+        class_chain.
+`pred`
+ classifier_box:
+    r_unit,
+        classifier,
+        req_unit.
+`act`
+ classifier:
+    source.
+`act`
+ class_chain:
+    class,
+        (r_unit,
+             :class_chain;
+         +)   .
+`act`
+ class:
+    area,
+        req_unit,
+        alternative;
+    alternative.
+`pred`
+ area:
+    r_unit,
+        zone_series,
+        req_unit.
+`act`
+ zone_series:
+    zone,
+        (r_unit,
+             :zone_series;
+         +)   .
+`act`
+ zone:
+    up_to_zone;
+    expression,
+        (up_to_zone; +).
+`pred`
+ up_to_zone:
+    r_unit,
+        (is_end_of_zone;
+         expression).
+`qu`
+ is_end_of_zone:
+ +;
+ +.
+`act`
+ expression:
+    expr, drop_def.
+`act`
+ expr:
+    (plusminus; +),
+        term,
+        ( +;
+         generatea
+,
++
+      ),
+        rest_expression.
+`act`
+ rest_expression
+:
+   plus_minus,
+        term,
+        generatea,
+ :rest_expression;
+    recoverable_error,
+        :rest_expression;
+    +.
+`act`
+ term:
+    base,
+        rest_term.
+`act`
+ rest_term
+:
+   times_by,
+        base,
+        generatea,
+ :rest_term;
+    +.
+`act`
+ base:
+    plain_value;
+    expression_pack;
+    error,
+ +.
+`pred`
+ plain_value:
+    (is_integral_denotation, +;
+     is_character_denotation, +
+    ),
+  generatea,
+ next_unit;
+    r_tag, +;
+    (r_unit, +;
+     r_unit, +;
+     r_unit, +
+    ),
+  req_tag.
+`pred`
+ expression_pack:
+    r_unit,
+        expr,
+        (r_unit;
+         error).
+`pred`
+ plus_minus:
+    r_unit, +;
+    r_unit, +.
+`pred`
+ times_by:
+    r_unit, +;
+    r_unit, +.
+`pred`
+ data_declaration:
+    constant_declaration;
+    variable_declaration;
+    stack_declaration;
+    table_declaration;
+    file_declaration.
+`pred`
+ constant_declaration:
+    r_unit,
+        constant_description_list,
+        req_point_unit.
+`act`
+ constant_description_list:
+    constant_description,
+        (rest_of_constant_description_list:
+             r_unit,
+                 :constant_description_list;
+             recoverable_error,
+                 :rest_of_constant_description_list;
+             +).
+`act`
+ constant_description:
+    global_tag,
+        req_unit,
+        expr,
+        ( +; generatea),
+        drop_declaration.
+`pred`
+ variable_declaration:
+    r_unit,
+        variable_description_list,
+        req_point_unit.
+`act`
+ variable_description_list:
+    variable_description,
+        (rest_of_variable_description_list:
+             r_unit,
+                 :variable_description_list;
+             recoverable_error,
+                 :rest_of_variable_description_list;
+             +).
+`act`
+ variable_description:
+    global_tag,
+        req_unit,
+        expr,
+        ( +; generatea),
+        drop_declaration.
+`pred`
+ table_declaration:
+    r_unit,
+        table_description_list,
+        req_point_unit.
+`act`
+ table_description_list:
+    table_description,
+        (rest_of_table_description_list:
+             r_unit, :table_description_list;
+             recoverable_error,
+                 :rest_of_table_description_list;
+             +).
+`act`
+ table_description
+:
+   list_head,
+        treat_fixed_list,
+        req_unit,
+        filling_list_pack
+.
+`act`
+ list_head
+:
+        (field_list_pack; +),
+        global_tag,
+        (noteq;
+         drop_fields,
+             drop_selectors,
+             drop_selectors, +
+        ),
+        set_word,
+        drop_list_declarationa.
+`pred`
+ field_list_pack:
+    r_unit,
+        ((is_true, r_unit);
+         field_list, req_unit).
+`act`
+ field_list:
+    drop_fields,
+        field, incr,
+        (rest_of_field_list:
+             r_unit, :field_list;
+             recoverable_error,
+                 :rest_of_field_list;
+             +).
+`act`
+ field:
+    selector,
+        drop_selectors,
+        (r_unit, :field;
+         drop_delectors).
+`act`
+ selector: +.
+`act`
+ filling_list_pack
+:
+   req_unit,
+        drop_fillings,
+        filling_list,
+        drop_fillings,
+        set_nr, drop_list_declarationa,
+        req_unit.
+`act`
+ set_nr:
+ +;
+ generatea,
+        generatean.
+`act`
+ filling_list:
+    filling,
+        (pointer_initialization; +),
+        (rest_of_filling_list:
+             r_unit, :filling_list;
+             recoverable_error,
+                 :rest_of_filling_list;
+             +).
+`act`
+ filling_expr:
+    expr,
+        expr_nr.
+`act`
+ expr_nr:
+ +;
+ generatea.
+`act`
+ filling:
+    r_string_denotation,
+        drop_fillings,
+        ( +; error),
+        set_nr,
+        generatea,
+        generatean,
+ +;
+ (:
+         r_unit,
+             expr,
+             single_or_compound;
+         filling  expr,
+             drop_fillings,
+ +
+  ),
+        ( +; error),
+        plus.
+`act`
+ single_or_compound:
+    r_unit,
+        expr_nr,
+        drop_fillings,
+        expression_list,
+        req_unit;
+    req_unit,
+        rest_term,
+        rest_expression,
+        expr_nr,
+        drop_fillings.
+`pred`
+ pointer_initialization:
+    r_unit,
+        global_tag,
+        set_nr,
+        drop_declaration.
+`act`
+ expression_list:
+    filling_expr,
+        drop_fillings,
+        incr,
+        (rest_of_expression_list:
+             r_unit,
+                 :expression_list;
+             recoverable_error,
+                 :rest_of_expression_list;
+             +).
+`pred`
+ stack_declaration:
+    r_unit,
+        stack_description_list,
+        req_point_unit.
+`act`
+ stack_description_list:
+    stack_description,
+        (rest_of_stack_description_list:
+             r_unit,
+                  :stack_description_list;
+             recoverable_error,
+                  :rest_of_stack_description_list;
+             +).
+`act`
+ stack_description
+:
+   (size_estimate;
+     may_be_expr_missing, +;
+ +
+  ),
+list_head,
+      ( +
+        [ fixed ],
+          treat_fixed_list;
+        [ abs   ],
+          treat_abs_stack;
+          treat_rel_stack
+      ),
+      (r_unit,
+           filling_list_pack
+;
+      drop_list_declarationa).
+`pred`
+ size_estimate:
+    r_unit,
+        size,
+        req_unit.
+`pred`
+ may_be_expr_missing:
+        error, next_unit.
+`act`
+ size:
+    r_unit,
+ estimate,
+        req_unit;
+        estimate.
+`act`
+ estimate:
+    expr,
+        ( +; generatea).
+`pred`
+ file_declaration:
+    file_typer,
+        file_description_list,
+        req_point_unit.
+`pred`
+ file_typer:
+    r_unit, +;
+    r_unit, +.
+`act`
+ file_description_list:
+    file_description,
+        (rest_of_file_description_list:
+             r_unit, :file_description_list;
+             recoverable_error,
+                :rest_of_file_description_list;
+             +).
+`act`
+ file_description:
+    global_tag,
+        (area, drop_file_area; +),
+        req_unit,
+        (r_unit, plus; +),
+        req_string_denotation,
+        (r_unit, plus; +),
+        drop_file_declaration.
+`pred`
+ external_declaration:
+    r_unit,
+        rest_of_external_declaration.
+`act`
+ rest_of_external_declaration:
+    external_rule_declaration;
+    external_table_declaration;
+    external_constant_declaration;
+    error.
+`pred`
+ external_rule_declaration:
+    rule_typer,
+        external_rule_description_list,
+        req_point_unit.
+`act`
+ external_rule_description_list:
+    external_rule_description,
+        (rest_of_external_rule_description_list:
+             r_unit,
+                 :external_rule_description_list;
+             recoverable_error,
+                 :rest_of_external_rule_description_list;
+             +).
+`act`
+ external_rule_description:
+    def_tag,
+        formal_affix_sequence_option,
+        req_unit,
+        req_string_denotation.
+`pred`
+ external_table_declaration:
+    r_unit,
+        external_table_description_list,
+        req_point_unit.
+`act`
+ external_table_description_list:
+    external_table_description,
+        (rest_of_external_table_description_list:
+             r_unit,
+                 :external_table_description_list;
+             recoverable_error,
+                 :rest_of_external_table_description_list;
+             +).
+`act`
+ external_table_description:
+    list_head,
+        req_unit,
+        req_string_denotation,
+        treat_ext_table.
+`pred`
+ external_constant_declaration:
+    r_unit,
+        external_constant_description_list,
+        req_point_unit.
+`act`
+ external_constant_description_list:
+    external_constant_description,
+        (rest_of_external_constant_description_list:
+             r_unit,
+                 :external_constant_description_list;
+             recoverable_error,
+                 :rest_of_external_constant_description_list;
+             +).
+`act`
+ external_constant_description:
+    global_tag,
+        req_unit,
+        req_string_denotation,
+        drop_declaration.
+`pred`
+ pragmat:
+    r_unit,
+        pragmat_item_list,
+        req_point_unit.
+`act`
+ pragmat_item_list:
+    pragmat_item,
+        (rest_of_pragmat_item_list:
+             r_unit,
+                 :pragmat_item_list;
+             recoverable_error,
+                 :rest_of_pragmat_item_list;
+             +).
+`act`
+ pragmat_item:
+    req_tag,
+        pragmat_item_after_tag.
+`act`
+ pragmat_item_after_tag:
+    r_unit,
+        item;
+    +.
+`act`
+ item:
+    is_integral_denotation,
+        dropp, dropn_immediate, next_unit;
+    r_string_denotation;
+    is_pragmat_item,
+        pragmat_item;
+    pragmat_item_list_pack;
+    error,
+        dropp_immediate.
+`qu`
+ is_pragmat_item:
+    was.
+`pred`
+ pragmat_item_list_pack:
+    r_unit,
+        pragmat_item_list,
+        req_unit.
+`act`
+ scana:
+    init,
+        next_char, next_unit,
+        program,
+        finish_def_gen,
+        drop_adm.
+`act`
+ init:
+    init_conv, fill_conv,
+        init_buffer_bounds,
+        init_buffer,
+        init_tags,
+        init_string_denotation,
+        init_def_gen,
+        put_newpage.
+`act`
+ char_error:
+    (is_false, print_line, +; +),
+        message, +.
+`act`
+ error:
+    check_line_printed,
+        message, +.
+`act`
+ message:
+    put_line_position,
+        puts,
+        puts,
+        put_signal.
+`act`
+ put_signal:
+    minus,
+        plus,
+        put_col_position, putc + .
+`act`
+ double_definition:
+    check_line_printed,
+        put_line_position,
+        puts,
+        puts.
+`pred`
+ recoverable_error:
+    (was,
+bool_and,
+ +;
+     was,
+unstack_string;
+     +
+    ),
+   (is_true, put_signal;
+          error, +
+         ),
+         next_unit.
+`act`
+ check_line_printed:
+    ( is_false),
+        print_line, +;
+    +.
+`act`
+ print_line:
+    (is_true,
+        put_line_position, put_line_position,
+ +;
+  +),
+put_line_position,
+        put_col_position,
+      put_number,
+        put_col_position,
+        put_line.
+`act`
+ put_line_position:
+    ( put_newpage; +),
+        put_char,
+        incr,
+ +.
+`act`
+ put_newpage:
+    put_char,
+        put_string,
+      incr, put_number,
+        put_char,
+        put_char,
+ +.
+`act`
+ put_col_position:
+    (more, put_line_position; +),
+        minus, put_spaces.
+`act`
+ put_spaces:
+ +;
+ putc + , decr, :put_spaces.
+`act`
+ put_number:
+    unpack_int,
+        (repa:
+             (
+    (is_true; putc + ),
+                  incr, :repa;
+              (repa:
+plus+,
+                    putc,
+                    ( +; incr, :repa)
+              ))
+        ), scratch.
+`act`
+ putc:
+    put_char,
+        incr.
+`act`
+ puts:
+ +;
+ put_string,
+        string_length,
+        plus.
+`act`
+ treat_fixed_list
+:
+   generatea,
+        generatean,
+        generatea;
+        drop_list_declarationa,
+        generatean,
+ +.
+`act`
+ treat_abs_stack
+:
+   generatea,
+        generatean,
+        generatean,
+        drop_list_declarationa,
+ +.
+`act`
+ treat_rel_stack
+:
+   generatean,
+        generatean,
+        generatea,
+        generatean,
+        generatean,
+        generatean,
+        generatean
+,
+       generatean
+,
+       drop_list_declarationa,
+ +.
+`act`
+ treat_ext_table
+:
+   generatea,
+        generatean,
+        generatea,
+        generatean,
+        drop_list_declarationa,
+        drop_list_declarationa,
+ +.
+`act`
+ init_def_gen:
+    generatea,
+    generatea,
+    create_global_info_block,
+    generatea,
+    create_global_info_block,
+    generatea,
+    create_global_info_block,
+    generatea,
+    create_global_info_block,
+    generatea.
+`act`
+ finish_def_gen:
+    drop_declaration,
+        drop_declaration,
+        drop_declaration,
+        generatea,
+        generatean,
+        drop_declaration.
+`act`
+ create_global_info_block:
+ +
+  * global_info, +.
+`act`
+ dropp_immediate:
+    is_true, put_data; +.
+`act`
+ dropp:
+    is_true, check_linecount,
+        put_data;
+    +.
+`act`
+ dropn_immediate:
+    is_true, put_data; +.
+`act`
+ drop_def:
+    is_true, dropp,
+        ( dropn_immediate;
+         dropp_immediate);
+    +.
+`act`
+ drop_denotation:
+        pack_string,
+        (drop:
+             incr,
+             put_data,
+             incr,
+             ( +; :drop)).
+`act`
+ drop_string:
+    (rep:
+lseq,
+             drop_denotation,
+             incr,
+             put_data,
+             incr;
+             drop_denotation,
+             incr,
+             minus,
+             unstack_to,
+             minus, :rep
+    ).
+`act`
+ init_string_denotation:
+    drop_string, +.
+`act`
+ check_linecount:
+    less,
+        put_data,
+        incr,
+        dropp_immediate,
+        dropn_immediate,
+ +;
+    +.
+`act`
+ put_defref:
+    put_data,
+        ( put_data;
+         put_data).
+`act`
+ generatea:
+    put_data,
+        put_defref,
+        incr, +.
+`act`
+ generatea
+:
+   put_data,
+        put_defref,
+        put_defref,
+        incr, +.
+`act`
+ generatean:
+    generatea
+.
+`act`
+ generatea:
+    put_data,
+        put_data,
+        incr, +.
+`act`
+ drop_tag_occurrence:
+    put_data,
+        put_data,
+        incr,
+ +.
+`act`
+ drop_declaration:
+    put_data,
+        put_data,
+        put_data,
+        put_data.
+`act`
+ drop_file_declaration
+:
+   put_data,
+        put_data,
+        put_data,
+        put_data,
+        put_data.
+`act`
+ drop_list_declarationa:
+    put_data,
+        put_data,
+        put_data,
+        put_data.
+`act`
+ drop_list_declarationa
+:
+   put_data,
+        put_data,
+        put_data,
+        put_data,
+        put_data.
+`act`
+ drop_list_declarationa:
+    put_data.
+`act`
+ drop_rules:
+    put_data,
+        put_data,
+        put_data,
+        put_data,
+        put_data,
+        drop_calls.
+`act`
+ drop_calls:
+    put_data.
+`act`
+ drop_fields:
+    (is_true;
+    put_data,
+        incr).
+`act`
+ drop_selectors:
+    (is_true;
+    put_data,
+        put_data,
+        incr).
+`act`
+ drop_formals:
+    put_data,
+        incr.
+`act`
+ drop_fillings:
+    put_data,
+        put_data.
+`act`
+ drop_adm:
+    put_data,
+    put_data,
+    put_data,
+    put_data,
+    put_data,
+    put_data,
+    put_data,
+    list_length,
+        divrem,
+        put_data,
+    list_length,
+        put_data,
+    list_length,
+        put_data,
+        (rep: more;
+              put_data,
+              ((was; +),
+                   put_data;
+               put_data),
+              put_data,
+                  next, :rep),
+        (rep: more;
+              put_data,
+                  next, :rep),
+        (rep: more;
+             put_data,
+                  next, :rep).

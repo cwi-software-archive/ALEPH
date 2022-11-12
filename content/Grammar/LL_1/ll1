@@ -1,0 +1,378 @@
+$ LL(1) syntax of ALEPH, 810528
+
+$ units
+open unit             $ ( $;
+close unit            $ ) $;
+plus unit             $ + $;
+minus unit            $ - $;
+times unit            $ * $;
+by unit               $ / $;
+right unit            $ > $;
+equals unit           $ = $;
+point unit            $ . $;
+colon unit            $ : $;
+semicolon unit        $ ; $;
+comma unit            $ , $;
+sub unit              $ [ $;
+bus unit              $ ] $;
+dummy unit            $ ? $;
+
+$ bold face units
+constant unit         $ CONSTANT,  CST $;
+variable unit         $ VARIABLE,  VAR $;
+stack unit            $ STACK $;
+table unit            $ TABLE $;
+charfile unit         $ CHARFILE $;
+datafile unit         $ DATAFILE $;
+predicate unit        $ PREDICATE, PRED $;
+question unit         $ QUESTION,  QU $;
+action unit           $ ACTION,    ACT $;
+function unit         $ FUNCTION,  FCT $;
+external unit         $ EXTERNAL $;
+pragmat unit          $ PRAGMAT $;
+exit unit             $ EXIT $;
+root unit             $ ROOT $;
+end unit              $ END $;
+
+$ other primitives
+tag;
+integral denotation;
+character denotation;
+string denotation;
+quote image unit      $ "" $;
+subbus unit           $ [] $;
+to unit               $ -> $;
+min limit unit        $ << $;
+max limit unit        $ >> $;
+calibre unit          $ <> $.
+actual affix unit: plus unit.
+formal affix unit: plus unit.
+local affix unit: minus unit.
+success unit: plus unit.
+failure unit: minus unit.
+repeat unit: colon unit.
+box unit: equals unit.
+up to unit: colon unit.
+of unit: times unit.
+
+$ 3.1. The program
+program:
+    [information sequence], root, [information sequence], end unit.
+information sequence:
+    information, [information sequence].
+information:
+    declaration; pragmat.
+root:
+    root unit, tag, [actual affix sequence], point unit.
+declaration:
+    rule declaration;
+    data declaration;
+    external declaration.
+
+$ 3.2.1. Rule declarations
+rule declaration:
+    typer, tag, [formal affix sequence], actual rule, point unit.
+typer:
+    action unit; function unit; predicate unit; question unit.
+formal affix sequence:
+    formal affix, [formal affix sequence].
+formal affix:
+    formal affix unit, formal.
+formal:
+    right unit, tag, [right unit];
+    subbus unit, [formal field list pack], tag, subbus unit;
+    formal field list pack, tag, subbus unit;
+    quote image unit, tag;
+    tag, formal after tag.
+formal field list pack:
+    open unit, [field list], close unit.
+formal after tag:
+    right unit;
+    subbus unit.
+
+$ 3.2.2. Actual rules
+actual rule:
+    [local affix sequence], colon unit, rule body.
+local affix sequence:
+    local affix unit, tag, [local affix sequence].
+rule body:
+    alternative series; classification.
+alternative series:
+    alternative, rest of alternative series.
+alternative:
+    member, rest of alternative;
+    terminator.
+rest of alternative:
+    comma unit, alternative;
+    .
+rest of alternative series:
+    semicolon unit, alternative series;
+    .
+
+$ 3.2.3. Members
+member:
+    tag, member after tag;
+    no tag member.
+member after tag:
+    source after tag, transport or identity tail;
+    transport or identity tail;
+    actual affix sequence;
+    .
+no tag member:
+    no tag source, transport or identity tail;
+    extension;
+    compound member.
+
+$ 3.4. Operations
+transport or identity tail:
+    variable directive sequence;
+    equals unit, source.
+variable directive sequence:
+    variable directive, [variable directive sequence].
+variable directive:
+    to unit, source.
+extension:
+    of unit, field transport list, of unit, tag.
+field transport list:
+    field transport, [comma unit, field transport list].
+field transport:
+    source, selector directive sequence.
+selector directive sequence:
+    selector directive, [selector directive sequence].
+selector directive:
+    to unit, tag.
+
+$ 3.5. Affix forms
+actual affix sequence:
+    actual affix, [actual affix sequence].
+actual affix:
+    actual affix unit, source.
+source:
+    tag, source after tag option;
+    no tag source.
+source after tag option:
+    source after tag;
+    .
+source after tag:
+    of unit, tag, non starred element;
+    non starred element.
+non starred element:
+    sub unit, source, bus unit.
+no tag source:
+    integral denotation;
+    character denotation;
+    limit;
+    dummy unit.
+
+$ 3.6. Terminators
+terminator:
+    jump; exit; success unit; failure unit.
+jump:
+    repeat unit, tag.
+exit:
+    exit unit, expression.
+
+$ 3.7. Compound members
+compound member:
+    open unit, body, close unit.
+body:
+    tag, body after tag;
+    minus unit, body after minus;
+    special rule body.
+body after tag:
+    actual rule;
+    member after tag, rest of alternative, rest of alternative series.
+body after minus:
+    tag, actual rule;
+    rest of alternative series.
+special rule body:
+    special alternative, rest of alternative series;
+    classification.
+special alternative:
+    no tag member, rest of alternative;
+    jump;
+    exit;
+    success unit.
+
+$ 3.8. Classifications
+classification:
+    box unit, source, box unit, class chain.
+class chain:
+    class, rest of class chain;
+    alternative.
+rest of class chain:
+    semicolon unit, class chain;
+    .
+class:
+    area, comma unit, alternative.
+area:
+    sub unit, zone series, bus unit.
+zone series:
+    zone, [semicolon unit, zone series].
+zone:
+    expression, [up to zone];
+    up to zone.
+up to zone:
+    up to unit, [expression].
+
+$ 4. Data declarations
+data declaration:
+    constant declaration;
+    variable declaration;
+    stack declaration;
+    table declaration;
+    file declaration.
+
+$ 4.1.1. Expressions
+expression:
+    [plus minus], term, rest expression.
+rest expression:
+    plus minus, term, rest expression;
+    .
+term:
+    base, rest term.
+rest term:
+    times by, base, rest term;
+    .
+base:
+    plain value; expression pack.
+plain value:
+    integral denotation; character denotation; tag; limit.
+expression pack:
+    open unit, expression, close unit.
+plus minus:
+    plus unit; minus unit.
+times by:
+    times unit; by unit.
+
+$ 4.1.2. Constant declarations
+constant declaration:
+    constant unit, constant description list, point unit.
+constant description list:
+    constant description, [comma unit, constant description list].
+constant description:
+    tag, equals unit, expression.
+
+$ 4.1.3. Variable declarations
+variable declaration:
+    variable unit, variable description list, point unit.
+variable description list:
+    variable description, [comma unit, variable description list].
+variable description:
+    tag, equals unit, expression.
+
+$ 4.1.5. Table declarations
+table declaration:
+    table unit, table description list, point unit.
+table description list:
+    table description, [comma unit, table description list].
+table description:
+    table head, equals unit, filling list pack.
+table head:
+    [field list pack], tag.
+field list pack:
+    open unit, field list, close unit.
+field list:
+    field, [comma unit, field list].
+field:
+    selector chain.
+selector chain:
+    tag, [equals unit, selector chain].
+filling list pack:
+    open unit, filling list, close unit.
+filling list:
+    filling, [pointer initialization], [comma unit, filling list].
+filling:
+    string denotation;
+    open unit, expression, single or compound;
+    plain value, rest term, rest expression;
+    plus minus, term, rest expression.
+single or compound:
+    close unit, rest term, rest expression;
+    comma unit, expression list, close unit.
+pointer initialization:
+    colon unit, tag.
+expression list:
+    expression, [comma unit, expression list].
+
+$ 4.1.6. Stack declarations
+stack declaration:
+    stack unit, stack description list, point unit.
+stack description list:
+    stack description, [comma unit, stack description list].
+stack description:
+    stack head, [equals unit, filling list pack].
+stack head:
+    [size estimate], [field list pack], tag.
+size estimate:
+    sub unit, size, bus unit.
+size:
+    box unit, expression, box unit;
+    expression.
+
+$ 4.1.7. Limits
+limit:
+    min limit; max limit; calibre.
+min limit:
+    min limit unit, tag.
+max limit:
+    max limit unit, tag.
+calibre:
+    calibre unit, tag.
+
+$ 4.2. File declarations
+file declaration:
+    file typer, file description list, point unit.
+file typer:
+    charfile unit; datafile unit.
+file description list:
+    file description, [comma unit, file description list].
+file description:
+    tag, [area],
+        equals unit, [right unit], string denotation, [right unit].
+
+$ 5.1. External declarations
+external declaration:
+    external unit, rest of external declaration.
+rest of external declaration:
+    external rule declaration;
+    external table declaration;
+    external constant declaration.
+external rule declaration:
+    typer, external rule description list, point unit.
+external rule description list:
+    external rule description,
+        [comma unit, external rule description list].
+external rule description:
+    tag, [formal affix sequence], equals unit, string denotation.
+external table declaration:
+    table unit, external table description list, point unit.
+external table description list:
+    external table description,
+        [comma unit, external table description list].
+external table description:
+    table head, equals unit, string denotation.
+external constant declaration:
+    constant unit, external constant description list, point unit.
+external constant description list:
+    external constant description,
+        [comma unit, external constant description list].
+external constant description:
+    tag, equals unit, string denotation.
+
+$ 6. Pragmats
+pragmat:
+    pragmat unit, pragmat item list, point unit.
+pragmat item list:
+    pragmat item, [comma unit, pragmat item list].
+pragmat item:
+    tag, [equals unit, pragmat value or list pack].
+pragmat value or list pack:
+    pragmat value;
+    open unit, pragmat value list, close unit.
+pragmat value:
+    tag;
+    integral denotation;
+    string denotation.
+pragmat value list:
+    pragmat value, [comma unit, pragmat value list].

@@ -1,0 +1,28 @@
+'variable' char linenumber = zero.
+'action' treat linenumber - p - number - c:
+    virt last in buff -> p, zero -> number,
+        (skip rubble:
+           incr + p,
+             (more + p + >>buffer;
+              plus + <<conv + buffer[p] + c,
+                 (is digit + c,
+                     (treat digits:
+                          (no mult overflow + number + 10,
+                           no add overflow + number + specials[conv[c]]
+                          ),
+                              incr + p,
+                              (more + p + >>buffer;
+                               plus + <<conv + buffer[p] + c,
+                                   (is digit + c, :treat digits; +));
+                          zero -> number
+                     );
+                  :skip rubble
+                 )
+             )
+        ),
+        incr + char linenumber,
+        (less + char linenumber + number, number -> char linenumber; +).
+'question' no mult overflow + >number> + >m - head:
+    mult + number + m + head + number, head = zero.
+'question' no add overflow + >number> + >a - head:
+    add + number + a + head + number, head = zero.

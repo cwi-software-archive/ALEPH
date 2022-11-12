@@ -1,0 +1,88 @@
+2c2
+< $ none
+---
+> m0; m1; m2; m3; m4; m5; m6; m7; m8; m9;
+14,15c14,15
+<     action typer; function typer;
+<     predicate typer; question typer.
+---
+>     m1, action typer; m2, function typer;
+>     m3, predicate typer; m4, question typer.
+25c25
+<     formal sequence; .
+---
+>     m1, formal sequence; m0.
+29,30c29,30
+<     formal input; formal output; formal inout;
+<     formal stack; formal table; formal file.
+---
+>     m1, formal input; m2, formal output; m3, formal inout;
+>     m4, formal stack; m5, formal table; m6, formal file.
+42c42
+<     formal field list pack; .
+---
+>     m1, formal field list pack; m0.
+46c46
+<     field list; .
+---
+>     m1, field list; m0.
+54c54
+<     tag sequence; .
+---
+>     m1, tag sequence; m0.
+56c56
+<     alternative series; classification.
+---
+>     m1, alternative series; m2, classification.
+62c62
+<     alternative; .
+---
+>     m1, alternative; m0.
+64c64
+<     alternative series; .
+---
+>     m1, alternative series; m0.
+68,69c68,69
+<     affix form; transport; identity; extension;
+<     compound member; jump; exit; success; failure.
+---
+>     m1, affix form; m2, transport; m3, identity; m4, extension;
+>     m5, compound member; m6, jump; m7, exit; m8, success; m9, failure.
+77c77
+<     source sequence; .
+---
+>     m1, source sequence; m0.
+85c85
+<     field transport list; .
+---
+>     m1, field transport list; m0.
+91,93c91,93
+<     integral denotation; character denotation; tag;
+<     min limit; max limit; calibre;
+<     element; dummy.
+---
+>     m1, integral denotation; m2, character denotation; m3, tag;
+>     m4, min limit; m5, max limit; m6, calibre;
+>     m7, element; m8, dummy.
+113c113
+<     tag; .
+---
+>     m1, tag; m0.
+123c123
+<     zone series; .
+---
+>     m1, zone series; m0.
+125,126c125,126
+<     expression option, expression option; expression; allzone;
+<     tag.
+---
+>     m1, expression option, expression option; m2, expression; m3, allzone;
+>     m4, tag.
+128c128
+<     expression; .
+---
+>     m1, expression; m0.
+132c132
+<     class chain; .
+---
+>     m1, class chain; m0.

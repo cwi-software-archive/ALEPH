@@ -1,0 +1,161 @@
+$ 7.2. Symbols
+$ none
+
+$ other primitives
+tag;
+integral denotation;
+character denotation;
+expression.
+
+$ 3.2.1. Rule declarations
+rule declaration:
+    typer, tag, [formal affix sequence], actual rule.
+typer:
+    action typer; function typer;
+    predicate typer; question typer.
+action typer:
+    .
+function typer:
+    .
+predicate typer:
+    .
+question typer:
+    .
+formal affix sequence:
+    formal affix, [formal affix sequence].
+formal affix:
+    formal.
+formal:
+    formal variable; formal stack; formal table; formal file.
+formal variable:
+    formal input; formal output; formal inout.
+formal input:
+    tag.
+formal output:
+    tag.
+formal inout:
+    tag.
+formal table:
+    [formal field list pack], tag.
+formal stack:
+    [formal field list pack], tag.
+formal field list pack:
+    [field list].
+formal file:
+    tag.
+
+$ 3.2.2. Actual rules
+actual rule:
+    [local affix sequence], rule body.
+local affix sequence:
+    local affix, [local affix sequence].
+local affix:
+    local variable.
+local variable:
+    tag.
+rule body:
+    alternative series; classification.
+alternative series:
+    alternative, [alternative series].
+alternative:
+    member, [alternative].
+
+$ 3.2.3. Members
+member:
+    affix form; operation; compound member; terminator.
+
+$ 3.4. Operations
+operation:
+    transport; identity; extension.
+transport:
+    source, variable directive sequence.
+variable directive sequence:
+    variable directive, [variable directive sequence].
+variable directive:
+    source.
+identity:
+    source, source.
+extension:
+    field transport list, tag.
+field transport list:
+    field transport, [field transport list].
+field transport:
+    source, selector directive sequence.
+selector directive sequence:
+    selector directive, [selector directive sequence].
+selector directive:
+    selector.
+
+$ 3.5. Affix forms
+affix form:
+    tag, [actual affix sequence].
+actual affix sequence:
+    actual affix, [actual affix sequence].
+actual affix:
+    actual.
+actual:
+    source.
+source:
+    integral denotation; character denotation; tag; limit;
+    element; dummy.
+element:
+    [selector], tag, source.
+dummy:
+    .
+
+$ 3.6. Terminators
+terminator:
+    jump; exit; success; failure.
+jump:
+    tag.
+exit:
+    expression.
+success:
+    .
+failure:
+    .
+
+$ 3.7. Compound members
+compound member:
+    [tag], actual rule.
+
+$ 3.8. Classifications
+classification:
+    classifier box, class chain.
+classifier box:
+    classifier.
+classifier:
+    source.
+class chain:
+    class, [class chain].
+class:
+    area, alternative.
+area:
+    zone series.
+zone series:
+    zone, [zone series].
+zone:
+    [expression], [expression]; expression; allzone;
+    tag.
+allzone:
+    .
+
+$ 4.1.5. Table declarations
+field list:
+    field, [field list].
+field:
+    selector chain.
+selector chain:
+    selector, [selector chain].
+selector:
+    tag.
+
+$ 4.1.7. Limits
+limit:
+    min limit; max limit; calibre.
+min limit:
+    tag.
+max limit:
+    tag.
+calibre:
+    tag.

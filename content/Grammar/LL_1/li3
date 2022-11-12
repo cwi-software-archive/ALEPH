@@ -1,0 +1,146 @@
+$ 7.2. Symbols
+$ none
+
+$ other primitives
+tag;
+integral denotation;
+character denotation;
+expression.
+
+$ 3.2.1. Rule declarations
+rule declaration:
+    typer, tag, formal sequence option, actual rule.
+typer:
+    action typer; function typer;
+    predicate typer; question typer.
+action typer:
+    .
+function typer:
+    .
+predicate typer:
+    .
+question typer:
+    .
+formal sequence option:
+    formal sequence; .
+formal sequence:
+    formal, formal sequence option.
+formal:
+    formal input; formal output; formal inout;
+    formal stack; formal table; formal file.
+formal input:
+    tag.
+formal output:
+    tag.
+formal inout:
+    tag.
+formal table:
+    formal field list pack option, tag.
+formal stack:
+    formal field list pack option, tag.
+formal field list pack option:
+    formal field list pack; .
+formal field list pack:
+    field list option.
+field list option:
+    field list; .
+formal file:
+    tag.
+
+$ 3.2.2. Actual rules
+actual rule:
+    tag sequence option, rule body.
+tag sequence option:
+    tag sequence; .
+rule body:
+    alternative series; classification.
+alternative series:
+    alternative, alternative series option.
+alternative:
+    member, alternative option.
+alternative option:
+    alternative; .
+alternative series option:
+    alternative series; .
+
+$ 3.2.3. Members
+member:
+    affix form; transport; identity; extension;
+    compound member; jump; exit; success; failure.
+
+$ 3.4. Operations
+transport:
+    source, source sequence.
+source sequence:
+    source, source sequence option.
+source sequence option:
+    source sequence; .
+identity:
+    source, source.
+extension:
+    field transport list, tag.
+field transport list:
+    source, tag sequence, field transport list option.
+field transport list option:
+    field transport list; .
+
+$ 3.5. Affix forms
+affix form:
+    tag, source sequence option.
+source:
+    integral denotation; character denotation; tag;
+    min limit; max limit; calibre;
+    element; dummy.
+element:
+    tag option, tag, source.
+tag option:
+    tag; .
+dummy:
+    .
+
+$ 3.6. Terminators
+jump:
+    tag.
+exit:
+    expression.
+success:
+    .
+failure:
+    .
+
+$ 3.7. Compound members
+compound member:
+    tag option, actual rule.
+
+$ 3.8. Classifications
+classification:
+    source, class chain.
+class chain:
+    zone series, alternative, class chain option.
+zone series:
+    zone, zone series option.
+zone series option:
+    zone series; .
+zone:
+    expression option, expression option; expression; allzone;
+    tag.
+expression option:
+    expression; .
+allzone:
+    .
+class chain option:
+    class chain; .
+
+$ 4.1.5. Table declarations
+field list:
+    tag sequence, field list option.
+tag sequence:
+    tag, tag sequence option.
+
+$ 4.1.7. Limits
+min limit:
+    tag.
+max limit:
+    tag.
+calibre:
+    tag.

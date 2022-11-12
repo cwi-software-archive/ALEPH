@@ -1,0 +1,78 @@
+12c12
+<     typer, tag, [formal affix sequence], actual rule.
+---
+>     typer, tag, [formal sequence], actual rule.
+24,27c24,25
+< formal affix sequence:
+<     formal affix, [formal affix sequence].
+< formal affix:
+<     formal.
+---
+> formal sequence:
+>     formal, [formal sequence].
+49,55c47
+<     [local affix sequence], rule body.
+< local affix sequence:
+<     local affix, [local affix sequence].
+< local affix:
+<     local variable.
+< local variable:
+<     tag.
+---
+>     [tag sequence], rule body.
+71,75c63,65
+<     source, variable directive sequence.
+< variable directive sequence:
+<     variable directive, [variable directive sequence].
+< variable directive:
+<     source.
+---
+>     source, source sequence.
+> source sequence:
+>     source, [source sequence].
+83,87c73
+<     source, selector directive sequence.
+< selector directive sequence:
+<     selector directive, [selector directive sequence].
+< selector directive:
+<     selector.
+---
+>     source, tag sequence.
+91,97c77
+<     tag, [actual affix sequence].
+< actual affix sequence:
+<     actual affix, [actual affix sequence].
+< actual affix:
+<     actual.
+< actual:
+<     source.
+---
+>     tag, [source sequence].
+102c82
+<     selector, tag, source.
+---
+>     tag, tag, source.
+124,128c104
+<     classifier box, class chain.
+< classifier box:
+<     classifier.
+< classifier:
+<     source.
+---
+>     source, class chain.
+132,134c108
+<     area, alternative.
+< area:
+<     zone series.
+---
+>     zone series, alternative.
+147,151c121,123
+<     selector chain.
+< selector chain:
+<     selector, [selector chain].
+< selector:
+<     tag.
+---
+>     tag sequence.
+> tag sequence:
+>     tag, [tag sequence].

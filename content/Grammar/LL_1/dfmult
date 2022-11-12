@@ -1,0 +1,6 @@
+PATH=/usr/ucb:/bin:/usr/bin
+D=`phd dick`
+while test $# -ge 2
+do	diff $1 $2 >$1-$2
+	shift
+done

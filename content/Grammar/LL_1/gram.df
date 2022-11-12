@@ -1,0 +1,69 @@
+FILE gram VERSUS gram.old
+
+AT 1
+NEW:	$ Syntax of ALEPH, 810526
+---
+OLD:	$ syntax of aleph, 28-05-1974 $
+
+AT 85
+NEW:	    [formal field list pack], table tag, sub bus.
+---
+OLD:	    [field list pack], table tag, sub bus.
+
+AT 87
+NEW:	    sub bus, [formal field list pack], stack tag, sub bus.
+---
+OLD:	    sub bus, [field list pack], stack tag, sub bus.
+
+AT 90
+NEW:	formal field list pack:
+NEW:	    open symbol, [field list], close symbol.
+
+AT 121
+NEW:	    source, variable directive sequence.
+NEW:	variable directive sequence:
+NEW:	    variable directive, [variable directive sequence].
+NEW:	variable directive:
+NEW:	    to token, variable.
+---
+OLD:	    source, destination sequence.
+OLD:	destination sequence:
+OLD:	    destination, [destination sequence].
+OLD:	destination:
+OLD:	    to token, source.
+
+AT 135
+NEW:	    source, selector directive sequence.
+NEW:	selector directive sequence:
+NEW:	    selector directive, [selector directive sequence].
+NEW:	selector directive:
+---
+OLD:	    source, selector destination sequence.
+OLD:	selector destination sequence:
+OLD:	    selector destination, [selector destination sequence].
+OLD:	selector destination:
+
+AT 361
+NEW:	    table head, equals symbol, string denotation.
+---
+OLD:	    size estimate, [field list pack], table tag, equals symbol,
+OLD:	        string denotation.
+
+AT 378
+NEW:	    tag, equals symbol, pragmat value.
+NEW:	pragmat value:
+NEW:	    integral denotation;
+NEW:	    string denotation;
+NEW:	    pragmat item;
+NEW:	    pragmat value list pack.
+NEW:	pragmat value list pack:
+NEW:	    open symbol, pragmat value list, close symbol.
+NEW:	pragmat value list:
+NEW:	    pragmat value, [comma symbol, pragmat value list].
+---
+OLD:	    tag, equals symbol, integral denotation;
+OLD:	    tag, equals symbol, string   denotation;
+OLD:	    tag, equals symbol, pragmat item;
+OLD:	    tag, equals symbol, pragmat item list pack.
+OLD:	pragmat item list pack:
+OLD:	    open symbol, pragmat item list, close symbol.

@@ -1,0 +1,1849 @@
+$ aleph scan1
+
+$ conversion of the character code to a pointer in conv:
+$     <<conv + "integer value of the character"
+
+'stack' [ = max char + 1 = ] conv.
+'stack' [ 1 ] (char, name) alf chars = (
+    ( / /, char space),             ( /"/, char quote),
+    ( 48 , char short comment),     ( 43 , char long comment),
+$ compiler bug
+    ( /'/, char accent),            ( /(/, open unit),
+    ( /)/, close unit),             ( /*/, times unit),
+    ( /+/, plus unit),              ( /,/, comma unit),
+    ( /-/, char minus),             ( /./, point unit),
+    ( ///, char by),                ( /0/, char 0),
+    ( /1/, char 1),                 ( /2/, char 2),
+    ( /3/, char 3),                 ( /4/, char 4),
+    ( /5/, char 5),                 ( /6/, char 6),
+    ( /7/, char 7),                 ( /8/, char 8),
+    ( /9/, char 9),                 ( /:/, colon unit),
+    ( /;/, semicolon unit),         ( /</, char left),
+    ( /=/, equals unit),            ( />/, char right),
+    ( /?/, dummy unit),             ( /a/, letter),
+    ( /b/, letter),                 ( /c/, letter),
+    ( /d/, letter),                 ( /e/, letter),
+    ( /f/, letter),                 ( /g/, letter),
+    ( /h/, letter),                 ( /i/, letter),
+    ( /j/, letter),                 ( /k/, letter),
+    ( /l/, letter),                 ( /m/, letter),
+    ( /n/, letter),                 ( /o/, letter),
+    ( /p/, letter),                 ( /q/, letter),
+    ( /r/, letter),                 ( /s/, letter),
+    ( /t/, letter),                 ( /u/, letter),
+    ( /v/, letter),                 ( /w/, letter),
+    ( /x/, letter),                 ( /y/, letter),
+    ( /z/, letter),                 ( /[/, char sub),
+    ( /]/, bus unit)).
+'action' fill conv - p - q:
+    <<alf chars -> p,
+    (rep: more + p + >>alf chars, scratch + alf chars;
+          plus + <<conv + char * alf chars[p] + q,
+              name * alf chars[p] -> conv[q],
+              next + alf chars + p, :rep).
+'action' init conv - n:
+    zero -> n,
+    (rep: n = max char,
+              * eof unit -> conv * conv, >>conv -> eof;
+          * nil -> conv * conv, incr + n, :rep).
+'variable' eof = nil   $ := >>conv $.
+'pragmat' newpage.
+'table' specials = (
+    0   : char 0,             1   : char 1,
+    2   : char 2,             3   : char 3,
+    4   : char 4,             5   : char 5,
+    6   : char 6,             7   : char 7,
+    8   : char 8,             9   : char 9,
+    nil : letter,             nil : char space,
+    nil : char quote,         nil : char short comment,
+    nil : char long comment,  nil : char accent,
+    nil : char minus,         nil : char by,
+    nil : char left,          nil : char right,
+    nil : char sub).
+'question' is letter + >ch:
+    conv[ch] = letter.
+'question' is digit + >ch:
+    was + specials + conv[ch], lseq + conv[ch] + char 9.
+'question' is letgit + >ch:
+    was + specials + conv[ch], lseq + conv[ch] + letter.
+'pragmat' newpage.
+$$$ postlude nog inlezen !!!
+'charfile' input = >"input\\i".
+'stack' [ 2 ] buffer.
+'predicate' read line:
+    get line + input + buffer + ?,
+        treat linenumber.
+'variable' char linenumber = zero.
+'action' treat linenumber - p - number - c:
+    virt last in buff -> p, zero -> number,
+        (skip rubble:
+           incr + p,
+             (more + p + >>buffer;
+              plus + <<conv + buffer[p] + c,
+                 (is digit + c,
+                     (treat digits:
+                          (no mult overflow + number + 10,
+                           no add overflow + number + specials[conv[c]]
+                          ),
+                              incr + p,
+                              (more + p + >>buffer;
+                               plus + <<conv + buffer[p] + c,
+                                   (is digit + c, :treat digits; +));
+                          zero -> number
+                     );
+                  :skip rubble
+                 )
+             )
+        ),
+        incr + char linenumber,
+        (less + char linenumber + number, number -> char linenumber; +).
+'question' no mult overflow + >number> + >m - head:
+    mult + number + m + head + number, head = zero.
+'question' no add overflow + >number> + >a - head:
+    add + number + a + head + number, head = zero.
+'action' init buffer:
+    >>buffer -> buff entry -> last in buff.
+'variable' first col = one, last col = 72.
+'action' init buffer bounds - p:
+    minus +  first col + 2 + p,
+        plus + <<buffer + p + first not in buff,
+        last col -> p, decr + p,
+        plus + <<buffer + p + virt last in buff.
+'pragmat' newpage.
+'action' next char:
+    incr + buff entry,
+        (lseq + buff entry + last in buff,
+             plus + buffer[buff entry] + <<conv + char;
+         read buffer, :next char;
+         eof -> char,
+             true -> line printed).
+'variable' char = nil      $ pointer in conv $.
+'predicate' read buffer:
+    (is false + line printed, print line; +),
+        scratch + buffer,
+            read line,
+                first not in buff -> buff entry,
+                (less + >>buffer + virt last in buff,
+                     >>buffer -> last in buff;
+                 virt last in buff -> last in buff
+                ),
+                false -> line printed.
+'variable' first not in buff = nil,
+           virt last in buff = nil,
+           last in buff = nil,
+           buff entry = nil.
+'variable' line printed = true.
+'pragmat' newpage.
+'action' skip spaces:
+    conv[char] = char space,
+        next char, :skip spaces;
+    +.
+'action' skip spaces and comment - b:
+    skip spaces,
+        (conv[char] = char long comment, buffer[buff entry] -> b,
+             (skip:
+                  incr + buff entry,
+                  ((more + buff entry + last in buff;
+                    buffer[buff entry] = b
+                   ),
+                       next char, :skip spaces and comment;
+                   :skip));
+         conv[char] = char short comment, buffer[buff entry] -> b,
+             (skip:
+                  incr + buff entry,
+                  ((more + buff entry + last in buff;
+                    buffer[buff entry] = b
+                   ),
+                       next char, :skip spaces and comment;
+                   plus + <<conv + buffer[buff entry] + char,
+                       ((was + specials + conv[char],
+                         lseq + conv[char] + char space
+                        ),
+                            :skip;
+                        :skip spaces and comment)));
+         +).
+'stack' [1] chrs.
+'action' to chrs + >ch + >n>:
+    minus + ch + <<conv + ch,
+        * ch -> chrs * chrs, incr + n.
+'predicate' r char + >ch:
+    conv[char] = ch, next char.
+'pragmat' newpage.
+$ units:
+$     message:
+$         pointer in the table messages, used when there are errors.
+$     err bit:
+$         a constant, user for error recovery
+$         (see the rule 'recoverable error').
+
+'table' (message, err bit) units = (
+   (m plus unit       , eb plumineq )  : plus unit,
+   (m minus unit      , eb plumineq )  : minus unit,
+   (m times unit      , eb of       )  : times unit,
+   (m by unit         , eb rest     )  : by unit,
+   (m open unit       , eb open     )  : open unit,
+   (m close unit      , eb close    )  : close unit,
+   (m equals unit     , eb plumineq )  : equals unit,
+   (m comma unit      , eb semicomma)  : comma unit,
+   (m point unit      , eb point    )  : point unit,
+   (m sub unit        , eb rest     )  : sub unit,
+   (m bus unit        , eb bus      )  : bus unit,
+   (m colon unit      , eb colon    )  : colon unit,
+   (m dummy unit      , eb rest     )  : dummy unit,
+   (m right unit      , eb rest     )  : right unit,
+   (m semicolon unit  , eb semicomma)  : semicolon unit,
+
+   (m constant unit   , eb boldeof  )  : constant unit,
+   (m variable unit   , eb boldeof  )  : variable unit,
+   (m stack unit      , eb boldeof  )  : stack unit,
+   (m table unit      , eb boldeof  )  : table unit,
+   (m charfile unit   , eb boldeof  )  : charfile unit,
+   (m datafile unit   , eb boldeof  )  : datafile unit,
+   (m predicate unit  , eb boldeof  )  : predicate unit,
+   (m question unit   , eb boldeof  )  : question unit,
+   (m action unit     , eb boldeof  )  : action unit,
+   (m function unit   , eb boldeof  )  : function unit,
+   (m external unit   , eb boldeof  )  : external unit,
+   (m pragmat unit    , eb boldeof  )  : pragmat unit,
+   (m exit unit       , eb exit     )  : exit unit,
+   (m root unit       , eb boldeof  )  : root unit,
+   (m end unit        , eb boldeof  )  : end unit,
+
+   (m calibre unit    , eb rest     )  : calibre unit,
+   (m min limit unit  , eb rest     )  : min limit unit,
+   (m max limit unit  , eb rest     )  : max limit unit,
+   (m to unit         , eb rest     )  : to unit,
+   (m subbus unit     , eb rest     )  : subbus unit,
+   (m quote image unit, eb rest     )  : quote image unit,
+
+   (m eof unit        , eb boldeof  )  : eof unit,
+
+$ auxiliary units
+   (nil               , nil         )  : ext table unit,
+   (nil               , nil         )  : ext constant unit).
+'constant' actual affix unit = plus unit,
+           formal affix unit = plus unit,
+           local affix unit  = minus unit,
+           success unit      = plus unit,
+           failure unit      = minus unit,
+           repeat unit       = colon unit,
+           box unit          = equals unit,
+           up to unit        = colon unit,
+           of unit           = times unit.
+'pragmat' newpage.
+'action' next unit:
+    unit -> last unit,
+    (again:
+        skip spaces and comment,
+        buff entry -> buffer position,
+        char linenumber -> unit linenumber,
+        (read unit;
+         read tag;
+             $ note: unit is a pointer in text tags $
+         read integral denotation;
+         read char den or by unit;
+         read string den or quote image unit;
+         read compound unit;
+         read bold;
+         char error + m character + m illegal skipped,
+             next char, :again)).
+'variable' unit = nil, last unit = nil,
+           unit linenumber = zero,
+               $ line number of the first character of the unit
+           buffer position = nil
+               $ a pointer in buffer to the first character of the unit;
+               $ in case of an error, a signal is printed
+               $ at that character $.
+'table' markers =
+    (nil: line mark,
+     nil: int mark,
+     nil: char mark,
+     nil: string mark).
+'predicate' read unit:
+    was + units + conv[char],
+        conv[char] -> unit, next char.
+'pragmat' newpage.
+$$$ het behandelen van tags is nog niet correct;
+$$$ voorlopig zijn alle tags global.
+
+'stack' [ 30 ] (text, decl info, xref) global info =
+               ((dummy str, undefined, zero): error tag),
+        [ 10 ] (global info) diluted list,
+        [ 20 ] text tags = ("": dummy str).
+'constant' s = 25, rmin1 = 9, init places = 25.
+'variable' l diluted list = zero,
+               $ the list length of the stack diluted list.
+$$         empty cnt = zero,
+$$         empty bound = zero.
+'action' init tags - n:
+    init places -> n,
+        (rep: * nil -> global info * diluted list,
+                  decr + n, (n = zero; :rep)
+        ),
+        init places -> l diluted list -> empty cnt,
+        divrem + l diluted list + s + empty bound + ?.
+$$ 'constant' max str length = 100  $ for debugging $.
+'predicate' read tag - n:
+    is letter + char, zero -> n,
+        (next: to chrs + char + n,
+                    next char,
+                    skip spaces,
+                    (is letgit + char, :next; +)
+        ),
+$$      (lseq + n + max str length;
+         error + m tag + m long,
+             max str length -> n
+        ),
+        pack string + chrs + n + text tags,
+        >>text tags -> unit,
+        scratch + chrs.
+'action' search tag + >str + >rptr + >length + res> - val - rem
+                    - rlength - llength - mptr - ptr - entry:
+    length = zero,
+        incr + rptr, insert + str + rptr + res;
+    divrem + length + 2 + rlength + rem,
+        rlength -> llength,
+        (rem = zero, decr + llength; +),
+        minus + rptr + rlength + mptr,
+        mptr -> ptr,
+
+        (rep:
+             global info * diluted list[ptr] -> entry,
+             (entry = nil,
+                  (ptr = rptr,
+                        mptr -> rptr, decr + rptr,
+                            llength -> length, :search tag;
+                   decr + rlength,
+                       incr + ptr, :rep);
+              compare string + text tags + str
+                             + text tags + text * global info[entry]
+                             + val,
+                  ( = val =
+                     [ -1 ],
+                         mptr -> rptr, decr + rptr,
+                         llength -> length, :search tag;
+                     [  1 ],
+                          rlength -> length, :search tag;
+                     entry -> res,
+                         unstack string + text tags
+                  )
+             )
+        ).
+'action' insert + >str + >ptr + res> - p - entry:
+    * str -> text,
+      undefined -> decl info,
+      zero -> xref
+    * global info,
+       >>global info -> p -> res,
+       (rep: lseq + ptr + >>diluted list,
+                 global info * diluted list[ptr] -> entry,
+                 (entry = nil,
+                      p -> global info * diluted list[ptr],
+                      decr + empty cnt;
+                  p -> global info * diluted list[ptr],
+                       entry -> p, incr + ptr, :rep);
+              * p -> global info * diluted list,
+                  incr + l diluted list,
+                  divrem + l diluted list + s + empty bound + ?
+        ),
+        (may be redilution; +).
+'predicate' may be redilution - n - rem - ptr:
+    empty cnt = empty bound,
+        minus + l diluted list + empty bound + n,
+        divrem + n + rmin1 + empty bound + rem,
+        (rem = zero; incr + empty bound),
+        >>diluted list -> ptr,
+        (rep: * nil -> global info * diluted list,
+                  incr + empty cnt, incr + l diluted list,
+                  (empty cnt = empty bound; :rep)
+        ),
+        move diluted list + ptr,
+        divrem + l diluted list + s + empty bound + ?.
+'action' move diluted list + >ptr - p - n:
+    >>diluted list -> p,
+        decr + p,
+        (rep1: p = ptr;
+               rmin1 -> n,
+                   (rep2:
+                       global info * diluted list[ptr]
+                           -> global info * diluted list[p],
+                           decr + ptr, decr + p, decr + n,
+                           (n = zero,
+                                nil -> global info * diluted list[p],
+                                decr + p, :rep1;
+                            :rep2)
+                   )
+        ).
+'pragmat' newpage.
+'predicate' read integral denotation - n:
+    is digit + char, zero -> n,
+        (next: to chrs + char + n,
+                    next char,
+                    skip spaces,
+                    (is digit + char, :next; +)
+        ),
+$$      (lseq + n + max str length;
+         error + m int den + m long,
+             max str length -> n
+$$$          de eerste max str length - n characters worden geskipt
+        ),
+        drop denotation + n,
+        scratch + chrs,
+        int mark -> unit.
+'pragmat' newpage.
+'predicate' read char den or by unit - n:
+    r char + char by,
+         (is by operator,
+              by unit -> unit;
+          zero -> n,
+              (conv[char] = nil, char error + m character + m illegal;
+$$             to chrs + char + n
+              ),
+$$            drop denotation + n,
+$$            scratch + chrs,
+              next char,
+              (r char + char by; char error + m absolute + m missing),
+              char mark -> unit
+        ).
+'question' is by operator:
+    last unit = close unit;
+    was + text tags + last unit;
+    is integral denotation + last unit;
+    is character denotation + last unit.
+'pragmat' newpage.
+'predicate' read string den or quote image unit - c:
+    conv[char] = char quote,
+        (is quote image,
+             next char, skip spaces and comment,
+             (r char + char quote;
+              char error + m quote + m missing inserted
+             ), quote image unit -> unit;
+         is string denotation, zero -> str length,
+             to chrs + char + str length, char -> c,
+             next char,
+             (next:
+                  r char + char quote,
+                      to chrs + c + str length,
+                      (r char + char quote,
+                           to chrs + c + str length, :next;
+                       +);
+                  char = eof,
+                      char error + m eof in string + nil,
+                      to chrs + c + str length;
+                  to chrs + char + str length,
+                      next char, :next
+             ),
+             drop string + str length, string mark -> unit;
+         char error + m quote + m illegal skipped,
+             next char, next unit
+        ).
+'variable' str length = zero   $ the string length used in fillings $.
+'question' is quote image:
+    last unit = formal affix unit.
+'question' is string denotation:
+    last unit = equals unit;
+    last unit = open unit;
+    last unit = comma unit;
+    last unit = right unit.
+'pragmat' newpage.
+'predicate' read compound unit:
+    conv[char] = char left,
+         next char, skip spaces and comment,
+         ((conv[char] = char right, calibre unit -> unit;
+           conv[char] = char left, min limit unit -> unit
+          ), next char;
+          error + m character + m illegal skipped, next unit);
+    conv[char] = char right,
+         next char, skip spaces and comment,
+         (conv[char] = char right,
+              max limit unit -> unit,
+              next char;
+          right unit -> unit);
+    conv[char] = char minus,
+         next char, skip spaces and comment,
+         (conv[char] = char right,
+              to unit -> unit,
+              next char;
+          minus unit -> unit);
+    conv[char] = char sub,
+         next char, skip spaces and comment,
+         (conv[char] = bus unit,
+              subbus unit -> unit,
+              next char;
+          sub unit -> unit).
+'pragmat' newpage.
+'table' text bolds = (
+    "act"          : b act,
+    "action"       : b action,
+    "charfile"     : b charfile,
+    "constant"     : b constant,
+    "cst"          : b cst,
+    "datafile"     : b datafile,
+    "end"          : b end,
+    "exit"         : b exit,
+    "external"     : b external,
+    "fct"          : b fct,
+    "function"     : b function,
+    "pragmat"      : b pragmat,
+    "pred"         : b pred,
+    "predicate"    : b predicate,
+    "qu"           : b qu,
+    "question"     : b question,
+    "root"         : b root,
+    "stack"        : b stack,
+    "table"        : b table,
+    "var"          : b var,
+    "variable"     : b variable).
+'table' (text, unit) bolds = (
+  ( b act      , action unit   ),
+  ( b action   , action unit   ),
+  ( b charfile , charfile unit ),
+  ( b constant , constant unit ),
+  ( b cst      , constant unit ),
+  ( b datafile , datafile unit ),
+  ( b end      , end unit      ),
+  ( b exit     , exit unit     ),
+  ( b external , external unit ),
+  ( b fct      , function unit ),
+  ( b function , function unit ),
+  ( b pragmat  , pragmat unit  ),
+  ( b pred     , predicate unit),
+  ( b predicate, predicate unit),
+  ( b qu       , question unit ),
+  ( b question , question unit ),
+  ( b root     , root unit     ),
+  ( b stack    , stack unit    ),
+  ( b table    , table unit    ),
+  ( b var      , variable unit ),
+  ( b variable , variable unit )).
+'constant' max bold = 9.
+'predicate' read bold - n - ptr:
+    conv[char] = char accent, zero -> n,
+        (rep: next char,
+                  (is letter + char,
+                       to chrs + char + n, :rep;
+                   r char + char accent;
+                   char error + m accent + m missing inserted)
+        ),
+        (lseq + n + max bold;
+         error + m bold + m long,
+             plus + <<chrs + max bold + ptr, decr + ptr,
+             unstack to + chrs + ptr,
+             max bold -> n
+        ),
+        pack string + chrs + n + chrs,
+        search bold + >>chrs,
+        scratch + chrs.
+'action' search bold + >str - p - val:
+    <<bolds -> p,
+        (rep: more + p + >>bolds,
+                  bolds error + str + p;
+              compare string + chrs + str
+                             + text bolds + text * bolds[p] + val,
+                  ( = val =
+                      [-1 ], bolds error + str + p;
+                      [ 1 ], next + bolds + p, :rep;
+                      unit * bolds[p] -> unit
+                   )
+        ).
+'action' bolds error + >str + >p:
+    may be other bold + str + p;
+    previous + bolds + p,
+        (may be other bold + str + p;
+         skip bold).
+'predicate' may be other bold + >str + >p:
+    was + bolds + p,
+        compare chars + str + p + zero,
+            compare chars + str + p + one,
+                compare chars + str + p + 2,
+                    unit * bolds[p] -> unit,
+                    error + message * units[unit] + m inserted.
+'question' compare chars + >str + >p + >n - c1 - c2:
+    string elem + chrs + str + n + c1,
+        string elem + text bolds + text * bolds[p] + n + c2,
+            c1 = c2.
+'action' skip bold:
+    error + m bold + m illegal skipped,
+        next unit.
+'pragmat' newpage.
+'predicate' r unit + >u:
+    unit = u, next unit.
+'action' req unit + >u:
+    r unit + u;
+    error + message * units[u] + m missing inserted.
+'predicate' rd unit + >u:
+    unit = u, dropp + u, next unit.
+'action' reqd unit + >u:
+    rd unit + u;
+    error + message * units[u] + m missing inserted,
+        dropp immediate + u.
+'variable' point encountered = false.
+'action' req point unit:
+    unit = point unit,
+        check line printed,
+$$      true -> point encountered, $ rule text $ next unit;
+    error + m point unit + m missing inserted,
+$$      true -> point encountered $ rule text $.
+'predicate' is tag + tag>:
+    was + text tags + unit,
+        search tag + unit + >>diluted list + l diluted list + tag.
+'predicate' r tag + tag>:
+    is tag + tag, next unit.
+'action' req tag + tag>:
+    r tag + tag;
+    error + m tag + m missing inserted, error tag -> tag.
+'constant' undefined = zero, defined = one.
+'action' global tag + tag> + line nr>:
+    unit linenumber -> line nr,
+        (is tag + tag, check definition + tag, next unit;
+         error + m tag + m missing inserted,
+             create global info block + tag
+        ), defined -> decl info * global info[tag].
+'action' check definition + >tag>:
+    decl info * global info[tag] = undefined;
+    double definition + tag,
+        create global info block + tag.
+'predicate' r string denotation + nr> + length>:
+    unit = string mark, str length -> length,
+        n denotation -> nr, next unit.
+'action' req string denotation + nr>:
+    r string denotation + nr;
+    error + m string + m missing inserted,
+        error string -> nr.
+'question' is integral denotation + >unit:
+    unit = int mark.
+'question' is character denotation + >unit:
+    unit = char mark.
+'pragmat' newpage.
+$ types:
+'constant'
+    t action = zero, t function = one, t predicate = 2, t question = 3.
+'constant'
+    t table = zero, t stack = one, t ext table = 2, t file = 3,
+    t scratch = 4, t in = 5, t out = 6, t inout = 7.
+'constant'
+    t constant = zero, t variable = one, t ext constant = 2.
+$ shift counts:
+'constant' rule shift = 3, formal shift = 4, list shift = 3.
+'action' set word + >type + >nr + >shift + word>:
+    left clear + nr + shift, bool or + nr + type + word.
+'pragmat' newpage.
+'action' program:
+    prog,
+        (r unit + eof unit; error + m eof + m missing).
+'action' prog:
+    text,
+        req unit + end unit.
+'action' text:
+    (information; recoverable error + ew text), :text;
+     +.
+'predicate' information:
+    declaration;
+    pragmat;
+    root.
+'predicate' root:
+    r unit + root unit,
+        affix form, req point unit.
+'variable' root tag = nil.
+'action' affix form:
+     req tag + root tag,
+        actual affix sequence option.
+'predicate' declaration:
+    rule declaration;
+    data declaration;
+    external declaration.
+'pragmat' newpage.
+'predicate' rule declaration - type - tag - line nr - entry
+                             - nr of formals - word:
+    rule typer + type, true -> rule decl,
+        global tag + tag + line nr,
+        formal affix sequence option + entry + nr of formals,
+        set word + type + nr of formals + rule shift + word,
+$$      drop rules + line nr + word + entry + $$ 0 $$ + tag,
+        actual rule,
+        req point unit, drop calls + nil, false -> rule decl.
+'variable' rule decl = false.
+'predicate' rule typer + type>:
+    r unit + action unit, t action ->type;
+    r unit + function unit, t function -> type;
+    r unit + predicate unit, t predicate -> type;
+    r unit + question unit, t question -> type.
+'action' formal affix sequence option + entry> + nr of formals>:
+    n formals -> entry, zero -> nr of formals,
+       (next formal:
+            (formal affix, incr + nr of formals;
+             recoverable error + ew formal local affix
+            ), :next formal;
+            (nr of formals = zero, no formals -> entry; +)).
+'predicate' formal affix:
+    r unit + formal affix unit, formal.
+'action' formal:
+    r formal tag + ?, formal after tag;
+    no tag formal;
+    error + m tag + m missing inserted, drop formals + t scratch.
+'action' formal after tag - word:
+    r unit + subbus unit, set word + t table + 1 + formal shift + word,
+        drop formals + word;
+    r unit + right unit, drop formals + t out;
+    drop formals + t scratch.
+'predicate' no tag formal - word - nr of fields:
+    r unit + right unit,
+        req formal tag + ?,
+        (r unit + right unit, drop formals + t inout;
+         drop formals + t in);
+    r unit + subbus unit,
+$$      (field list pack + nr of fields; one -> nr of fields),
+        req formal tag + ?,
+        req unit + subbus unit,
+        set word + t stack + nr of fields + formal shift + word,
+        drop formals + word;
+    field list pack + nr of fields,
+        req formal tag + ?,
+        req unit + subbus unit,
+        set word + t table + nr of fields + formal shift + word,
+        drop formals + word;
+    r unit + quote image unit,
+        req formal tag + ?,
+        drop formals + t file.
+'action' actual rule:
+    local affix sequence option,
+        req unit + colon unit,
+        rule body.
+'action' local affix sequence option:
+    (local affix;
+     recoverable error + ew formal local affix
+    ),
+        :local affix sequence option;
+    +.
+'predicate' local affix:
+    r unit + local affix unit,
+        req local tag + ?.
+'action' rule body:    $ must remain in order $
+    classification;
+    alternative series.
+'action' alternative series:
+    alternative,
+        rest of alternative series.
+'action' alternative:
+    member,
+        rest of alternative.
+'action' rest of alternative:
+    r unit + comma unit,
+        alternative;
+    unit = open unit,
+        error + m comma unit + m missing inserted, alternative;
+    recoverable error + ew alt dest seq,
+        :rest of alternative;
+    +.
+'action' rest of alternative series:     $ no rec error $
+    r unit + semicolon unit,
+        alternative series;
+    +.
+'action' member - tag:
+    r tag + tag,
+        member after tag + tag;
+    no tag member;
+    req tag + ?.
+'action' member after tag + >tag:
+    source after tag,
+        req transport or identity tail;
+    transport or identity tail;
+    actual affix sequence option,
+        drop calls + tag.
+'predicate' no tag member:
+    extension;
+    compound member;
+    terminator;
+    no tag source,
+        req transport or identity tail.
+'predicate' transport or identity tail:
+    destination,
+        destination sequence option;
+    r unit + equals unit,
+        source.
+'action' req transport or identity tail:
+    transport or identity tail;
+    req to tag.
+'action' req to tag:
+    error + m to tag + m missing inserted,
+        dropp immediate + to unit, dropp immediate + error tag.
+'action' destination sequence option:
+    (destination;
+     recoverable error + ew alt dest seq
+    ),
+        :destination sequence option;
+    +.
+'predicate' destination:
+    r unit + to unit,
+        source.
+'predicate' extension:
+    r unit + of unit,
+        field transport list,
+        req unit + of unit,
+        req tag + ?.
+'action' field transport list:
+    field transport,
+        (rest of field transport list:
+             r unit + comma unit,
+                 :field transport list;
+             recoverable error + ew field transp list,
+                 :rest of field transport list;
+             +).
+'action' field transport:
+    source,
+        (selector destination;
+         req to tag
+        ),
+        (rest of selector destination:
+             selector destination,
+                 :rest of selector destination;
+             +)    $ no rec error ! $.
+'predicate' selector destination:
+    r unit + to unit,
+        req tag + ?.
+'pragmat' newpage.
+'action' actual affix sequence option:
+    (actual affix;
+     recoverable error + ew actual affix
+    ),
+        :actual affix sequence option;
+    +.
+'predicate' actual affix:
+    r unit + actual affix unit,
+        actual.
+'action' actual:
+    source.
+'action' source:
+    r tag + ?,
+        (source after tag; +);
+    no tag source;
+    req tag + ?.
+'predicate' source after tag:
+    starred element;
+    non starred element.
+'predicate' starred element:
+    r unit + of unit,
+        req tag + ?,
+        req unit + sub unit,
+        source,
+        req unit + bus unit.
+'predicate' non starred element:
+    r unit + sub unit,
+        source,
+        req unit + bus unit.
+'predicate' no tag source - op - n:
+    (is integral denotation + unit, int denot op -> op;
+     is character denotation +  unit, char denot op -> op
+    ),
+        generate3 + op + n denotation + n,
+        drop def + number + n, next unit;
+    (r unit + min limit unit;
+     r unit + max limit unit;
+     r unit + calibre unit
+    ),
+        req tag + ?;
+    r unit + dummy unit.
+'predicate' terminator:
+    jump;
+    exit;
+    r unit + success unit;
+    r unit + failure unit.
+'predicate' jump:
+    r unit + repeat unit,
+        req tag + ?.
+'predicate' exit:
+    r unit + exit unit,
+        expression.
+'pragmat' newpage.
+'predicate' compound member:
+    r unit + open unit,
+        body,
+        req unit + close unit.
+'action' body - tag:      $ must remain in order $
+    r tag + tag,
+        body after tag + tag;
+    r unit + minus unit,
+        body after minus unit;
+    rule body.
+'action' body after tag + >tag:
+    is actual rule,
+        actual rule;
+    body after member tag + tag.
+'question' is actual rule:
+    unit = local affix unit;
+    unit = colon unit.
+'action' body after member tag + >tag:
+    member after tag + tag,
+        rest of alternative,
+        rest of alternative series.
+'action' body after minus unit:
+    r tag + ?,
+        local rule;
+    rest of alternative,
+        rest of alternative series.
+'action' local rule:
+    actual rule.
+'pragmat' newpage.
+'predicate' classification:
+    classifier box,
+        class chain.
+'predicate' classifier box:
+    r unit + box unit,
+        classifier,
+        req unit + box unit.
+'action' classifier:
+    source.
+'action' class chain:             $ !!!!!!! $
+    class,
+        (r unit + semicolon unit,
+             :class chain;
+         +)   $ no rec error ! $.
+'action' class:   $ !!!!!!! $
+    area,
+        req unit + comma unit,
+        alternative;
+    alternative.
+'predicate' area:
+$$$ no drop while reading file declaration !; subbus unit ?
+    r unit + sub unit,
+        zone series,
+        req unit + bus unit.
+'action' zone series:
+    zone,
+        (r unit + semicolon unit,
+             :zone series;
+         +)   $ no rec error $.
+'action' zone:    $ must remain in order $
+    up to zone;
+    expression,
+        (up to zone; +).
+'predicate' up to zone:
+    r unit + up to unit,
+        (is end of zone;
+         expression).
+'question' is end of zone:
+    unit = semicolon unit;
+    unit = bus unit.
+'pragmat' newpage.
+'action' expression - type - defref:
+    expr + type + defref, drop def + type + defref.
+'action' expr + type> + defref> - operator:
+    (plusminus + operator; plus op -> operator),
+        term + type + defref,
+        (operator = plus op;
+         generate2 + minus op + number + defref of zero
+                              + type + defref + defref,
+             number -> type
+        ),
+        rest expression + type + defref.
+'action' rest expression + >type> + >defref>
+                         - operator - type1 - defref1:
+    plus minus + operator,
+        term + type1 + defref1,
+        generate2 + operator + type + defref + type1 + defref1 + defref,
+        number -> type, :rest expression;
+    recoverable error + ew expression,
+        :rest expression;
+    +.
+'action' term + type> + defref>:
+    base + type + defref,
+        rest term + type + defref.
+'action' rest term + >type> + >defref>
+                   - operator - type1 - defref1:
+    times by + operator,
+        base + type1 + defref1,
+        generate2 + operator + type + defref + type1 + defref1 + defref,
+        number -> type, :rest term;
+    +.
+'action' base + type> + defref>:
+    plain value + type + defref;
+    expression pack + type + defref;
+    error + m base + m missing inserted,
+        number -> type, defref of zero -> defref.
+'predicate' plain value + type> + defref> - op:
+    (is integral denotation + unit, int denot op -> op;
+     is character denotation + unit, char denot op -> op
+    ),
+        generate3 + op + n denotation + defref,
+        number -> type, next unit;
+    r tag + defref, const tag -> type;
+    (r unit + min limit unit, minlim -> type;
+     r unit + max limit unit, maxlim -> type;
+     r unit + calibre unit, calibre -> type
+    ),
+        req tag + defref.
+'predicate' expression pack + type> + defref>:
+    r unit + open unit,
+        expr + type + defref,
+        (r unit + close unit;
+         error + m close unit + m missing inserted).
+'predicate' plus minus + type>:
+    r unit + plus unit, plus op -> type;
+    r unit + minus unit, minus op -> type.
+'predicate' times by + type>:
+    r unit + times unit, times op -> type;
+    r unit + by unit, by op -> type.
+'pragmat' newpage.
+'predicate' data declaration:
+    constant declaration;
+    variable declaration;
+    stack declaration;
+    table declaration;
+    file declaration.
+'predicate' constant declaration:
+    r unit + constant unit,
+        constant description list,
+        req point unit.
+'action' constant description list:
+    constant description,
+        (rest of constant description list:
+             r unit + comma unit,
+                 :constant description list;
+             recoverable error + ew descr list1,
+                 :rest of constant description list;
+             +).
+'action' constant description - tag - type - defref - linenr:
+    global tag + tag + line nr,
+        req unit + equals unit,
+        expr + type + defref,
+        (type = number; generate1 + type + defref + defref),
+        drop declaration + line nr + defref + t constant + tag.
+'pragmat' newpage.
+'predicate' variable declaration:
+    r unit + variable unit,
+        variable description list,
+        req point unit.
+'action' variable description list:
+    variable description,
+        (rest of variable description list:
+             r unit + comma unit,
+                 :variable description list;
+             recoverable error + ew descr list1,
+                 :rest of variable description list;
+             +).
+'action' variable description - tag - type - defref - line nr:
+    global tag + tag + line nr,
+        req unit + equals unit,
+        expr + type + defref,
+        (type = number; generate1 + type + defref + defref),
+        drop declaration + line nr + defref + t variable + tag.
+'pragmat' newpage.
+'predicate' table declaration:
+    r unit + table unit,
+        table description list,
+        req point unit.
+'action' table description list:
+    table description,
+        (rest of table description list:
+             r unit + comma unit, :table description list;
+             recoverable error + ew descr list2,
+                 :rest of table description list;
+             +).
+'action' table description - tag - nr of fields - virtual size
+                           - virtual min:
+    list head + t table + tag + nr of fields,
+        treat fixed list + nr of fields + virtual size + virtual min,
+        req unit + equals unit,
+        filling list pack + tag + virtual size + nr of fields
+                          + virtual min.
+'action' list head + >list type + tag> + nr of fields>
+                   - entry - line nr - word:
+    n fields -> entry,
+        (field list pack + nr of fields; zero -> nr of fields),
+        global tag + tag + line nr,
+        (noteq + nr of fields + zero;
+         drop fields + n selectors,
+             drop selectors + line nr + text * global info[tag],
+             drop selectors + zero + nil, one -> nr of fields
+        ),
+        set word + list type + nr of fields + list shift + word,
+        drop list declaration1 + line nr + word + entry + tag.
+'predicate' field list pack + nr of fields>:
+    r unit + open unit, zero -> nr of fields,
+        ((is true + rule decl, r unit + close unit);
+         field list + nr of fields, req unit + close unit).
+'action' field list + >nr of fields>:
+    drop fields + n selectors,
+        field, incr + nr of fields,
+        (rest of field list:
+             r unit + comma unit, :field list;
+             recoverable error + ew field pragmat list,
+                 :rest of field list;
+             +).
+'action' field - tag - line nr:
+    selector + tag + line nr,
+        drop selectors + line nr + text * global info[tag],
+        (r unit + equals unit, :field;
+         $ no rec error $
+         drop delectors + zero + nil).
+'action' selector + tag> + line nr>: +.
+'pragmat' newpage.
+'action' filling list pack + >tag + >virtual size + >nr of fields
+                           + >virtual min - max limit:
+    req unit + open unit, zero -> offset,
+        virtual min -> last nr,
+        drop fillings + tag + virtual size,
+        filling list + nr of fields,
+        drop fillings + end mark + zero,
+        set nr + max limit, drop list declaration3 + max limit,
+        req unit + close unit.
+'action' set nr + nr> - n:
+    offset = zero, last nr -> nr;
+    generate3 + int op + offset + n,
+        generate2n + plus op + last nr + n + nr.
+'variable' last nr = zero, offset = zero.
+'action' filling list + >cal:
+    filling + cal,
+        (pointer initialization; +),
+        (rest of filling list:
+             r unit + comma unit, :filling list;
+             recoverable error + ew filling list,
+                 :rest of filling list;
+             +).
+'action' filling expr + def nr> - type - defref:
+    expr + type + defref,
+        expr nr + type + defref + def nr.
+'action' expr nr + >type + >defref + def nr>:
+    type = number, defref -> def nr;
+    generate1 + type + defref + def nr.
+'action' filling + >cal - str nr - nr - n - cal1 - length:
+    r string denotation + str nr + length,
+        drop fillings + string mark + str nr,
+        (cal = one; error + m cal + nil),
+        set nr + nr,
+        generate3 + strlength op + length + n,
+        generate2n + plus op + nr + n + last nr,
+        zero -> offset;
+    (- type - defref - def nr:
+         r unit + open unit,
+             expr + type + defref, one -> cal1,
+             single or compound + type + defref + cal1;
+         filling  expr + def nr,
+             drop fillings + expr mark + def nr,
+             one -> cal1
+    ),
+        (cal = cal1; error + m cal + nil),
+        plus + offset + cal1 + offset.
+'action' single or compound + >type + >defref + >cal> - def nr:
+    r unit + comma unit,
+        expr nr + type + defref + def nr,
+        drop fillings + expr mark + def nr,
+        expression list + cal,
+        req unit + close unit;
+    req unit + close unit,
+        rest term + type + defref,
+        rest expression + type + defref,
+        expr nr + type + defref + def nr,
+        drop fillings + expr mark + def nr.
+'predicate' pointer initialization - tag - nr - line nr:
+    r unit + colon unit,
+        global tag + tag + line nr,
+        set nr + nr,
+        drop declaration + line nr + nr + t constant + tag.
+'action' expression list + >cal> - def nr:
+    filling expr + def nr,
+        drop fillings + expr mark + def nr,
+        incr + cal,
+        (rest of expression list:
+             r unit + comma unit,
+                 :expression list;
+             recoverable error + ew expression list,
+                 :rest of expression list;
+             +).
+'pragmat' newpage.
+'predicate' stack declaration:
+    r unit + stack unit,
+        stack description list,
+        req point unit.
+'action' stack description list:
+    stack description,
+        (rest of stack description list:
+             r unit + comma unit,
+                  :stack description list;
+             recoverable error + ew descr list2,
+                  :rest of stack description list;
+             +).
+'constant' fixed = zero, abs = one, rel = 2.
+'action' stack description - type - virtual size - tag - nr of fields
+                           - virtual min:
+    (size estimate + type + virtual size;
+     may be expr missing, rel -> type, defref of zero -> virtual size;
+     fixed -> type, zero -> virtual size
+    ),
+      list head + t stack + tag + nr of fields,
+      (= type =
+        [ fixed ],
+          treat fixed list + nr of fields + virtual size + virtual min;
+        [ abs   ],
+          treat abs stack + nr of fields + virtual size + virtual min;
+      $ [ rel   ] $
+          treat rel stack + nr of fields + virtual size + virtual min
+      ),
+      (r unit + equals unit,
+           filling list pack + tag + virtual size + nr of fields
+                             + virtual min;
+       drop list declaration3 + virtual min).
+'predicate' size estimate + type> + defnr>:
+    r unit + sub unit,
+        size + type + defnr,
+        req unit + bus unit.
+'predicate' may be expr missing:
+    unit = subbus unit,
+        error + m expr + m missing inserted, next unit.
+'action' size + type> + defnr>:
+    r unit + box unit,
+        abs -> type, estimate + defnr,
+        req unit + box unit;
+    rel -> type,
+        estimate + defnr.
+'action' estimate + defref> - type:
+    expr + type + defref,
+        (type = number; generate1 + type + defref + defref).
+'pragmat' newpage.
+'predicate' file declaration - alice type:
+    file typer + alice type,
+        file description list + alice type,
+        req point unit.
+'predicate' file typer + alice type>:
+    r unit + charfile unit, zero -> alice type;
+    r unit + datafile unit, one -> alice type.
+'action' file description list + >alice type:
+    file description + alice type,
+        (rest of file description list:
+             r unit + comma unit, :file description list;
+             recoverable error + ew descr list1,
+                :rest of file description list;
+             +).
+'action' file description + >alice type - tag - line nr - string - p:
+    global tag + tag + line nr, n file area -> p,
+        (area, drop file area + zero + nil; no file area -> p),
+        req unit + equals unit,
+        (r unit + right unit, plus + alice type + 2 + alice type; +),
+        req string denotation + string + ?,
+        (r unit + right unit, plus + alice type + 4 + alice type; +),
+        drop file declaration + line nr + alice type + p + string + tag.
+'pragmat' newpage.
+'predicate' external declaration:
+    r unit + external unit,
+        rest of external declaration.
+'action' rest of external declaration:
+    external rule declaration;
+    external table declaration;
+    external constant declaration;
+    error + m ext decl + m missing skipped.
+'predicate' external rule declaration:
+    rule typer + ?,
+        external rule description list,
+        req point unit.
+'action' external rule description list:
+    external rule description,
+        (rest of external rule description list:
+             r unit + comma unit,
+                 :external rule description list;
+             recoverable error + ew descr list1,
+                 :rest of external rule description list;
+             +).
+'action' external rule description - tag - line nr - nr:
+    def tag + tag + line nr,
+        formal affix sequence option,
+        req unit + equals unit,
+        req string denotation + nr.
+'predicate' external table declaration:
+    r unit + table unit,
+        external table description list,
+        req point unit.
+'action' external table description list:
+    external table description,
+        (rest of external table description list:
+             r unit + comma unit,
+                 :external table description list;
+             recoverable error + ew descr list1,
+                 :rest of external table description list;
+             +).
+'action' external table description - tag - nr of fields - string:
+    list head + t ext table + tag + nr of fields,
+        req unit + equals unit,
+        req string denotation + string + ?,
+        treat ext table + nr of fields + string.
+'predicate' external constant declaration:
+    r unit + constant unit,
+        external constant description list,
+        req point unit.
+'action' external constant description list:
+    external constant description,
+        (rest of external constant description list:
+             r unit + comma unit,
+                 :external constant description list;
+             recoverable error + ew descr list1,
+                 :rest of external constant description list;
+             +).
+'action' external constant description - tag - line nr - nr:
+    global tag + tag + line nr,
+        req unit + equals unit,
+        req string denotation + nr + ?,
+        drop declaration + line nr + nr + t ext constant + tag.
+'pragmat' newpage.
+'predicate' pragmat:
+    r unit + pragmat unit,
+        pragmat item list,
+        req point unit.
+'action' pragmat item list:
+    pragmat item,
+        (rest of pragmat item list:
+             r unit + comma unit,
+                 :pragmat item list;
+             recoverable error + ew field pragmat list,
+                 :rest of pragmat item list;
+             +).
+'action' pragmat item - tag:
+    req tag + tag,
+        pragmat item after tag.
+'action' pragmat item after tag:
+    r unit + equals unit,
+        item;
+    +.
+'action' item:
+    is integral denotation + unit,
+        dropp + unit, dropn immediate + n denotation, next unit;
+    r string denotation + ?;
+    is pragmat item,
+        pragmat item;
+    pragmat item list pack;
+    error + m tag + m missing inserted,
+        dropp immediate + error tag.
+'question' is pragmat item:
+    was + text tags + unit.
+'predicate' pragmat item list pack:
+    r unit + open unit,
+        pragmat item list,
+        req unit + close unit.
+'pragmat' newpage.
+'root' scan1.
+'action' scan1:
+    init,
+        next char, next unit,
+        program,
+        finish def gen,
+        drop adm.
+'action' init:
+    init conv, fill conv,
+        init buffer bounds,
+        init buffer,
+        init tags,
+        init string denotation,
+        init def gen,
+        put newpage.
+'pragmat' newpage.
+$$$ comment !
+'variable' scan1 error = false.
+'action' char error + >m1 + >m2:
+    (is false + line printed, print line, true -> line printed; +),
+        message + m1 + m2 + buff entry, true -> scan1 error.
+'action' error + >m1 + >m2:
+    check line printed,
+        message + m1 + m2 + buffer position, true -> scan1 error.
+'action' message + >m1 + >m2 + >pos:
+    put line position,
+        puts + messages + m1,
+        puts + messages + m2,
+        put signal + pos.
+'action' put signal + >pos - col:
+    minus + pos + <<buffer + col,
+        plus + prog col + col + col,
+        put col position + col, putc + /*/.
+'action' double definition + >tag:
+    check line printed,
+        put line position,
+        puts + messages + m double definition,
+        puts + text tags + string * global info[tag].
+'variable' rec error = false.
+$$$ commentaar !!
+'predicate' recoverable error + >word:
+    (was + units + unit,
+         bool and + word + err bit * units[unit] + word,
+             word = zero;
+     was + text tags + unit,
+         unstack string + text tags;
+     +
+    ),
+         (is true + rec error, put signal + buffer position;
+          error + m unit + m illegal skipped, true -> rec error
+         ),
+         next unit.
+'constant'
+    eb boldeof    = 1024,
+    eb point      =  512,
+    eb semicomma  =  256,
+    eb close      =  128,
+    eb open       =   64,
+    eb colon      =   32,
+    eb exit       =   16,
+    eb plumineq   =    8,
+    eb bus        =    4,
+    eb of         =    2,
+    eb rest       =    1,
+
+    ew text = eb boldeof,
+    ew formal local affix =
+        eb boldeof + eb point + eb semicomma + eb open +
+        eb colon + eb exit + eb plumineq,
+    ew alt dest seq =
+        eb boldeof + eb point + eb semicomma + eb close + eb open,
+    ew field transp list = ew alt dest seq + eb of,
+    ew actual affix = ew alt dest seq + eb exit,
+    ew expression = ew alt dest seq + eb colon + eb plumineq + eb bus,
+    ew descr list1 = eb boldeof + eb point,
+    ew descr list2 = ew descr list1 + eb open,
+    ew field pragmat list = ew descr list1 + eb close,
+    ew filling list = ew field pragmat list + eb open,
+    ew expression list = ew filling list + eb colon.
+'pragmat' newpage.
+'table' messages = (
+    "aleph/1 compiler scan1, level 1, november 1977, page ": m title,
+
+    " missing; inserted."               : m missing inserted,
+    " missing; skipped."                : m missing skipped,
+    " missing."                         : m missing,
+    " illegal; skipped."                : m illegal skipped,
+    " inserted."                        : m inserted,
+    " illegal."                         : m illegal,
+
+    "absolute symbol"                   : m absolute,
+    "quote symbol"                      : m quote,
+    "accent symbol"                     : m accent,
+    "eof reached in string denotation"  : m eof in string,
+
+    "character denotation"              : m char den,
+    "integral denotation"               : m int den,
+    "string"                            : m string,
+    "tag"                               : m tag,
+    "bold"                              : m bold,
+    "character"                         : m character,
+    "space"                             : m space,
+
+    " too long."                        : m long,
+
+    "expression"                        : m expr,
+    "unit(s)"                           : m unit,
+    "plus unit"                         : m plus unit,
+    "minus unit"                        : m minus unit,
+    "times unit"                        : m times unit,
+    "by unit"                           : m by unit,
+    "open unit"                         : m open unit,
+    "close unit"                        : m close unit,
+    "equals unit"                       : m equals unit,
+    "comma unit"                        : m comma unit,
+    "point unit"                        : m point unit,
+    "sub unit"                          : m sub unit,
+    "bus unit"                          : m bus unit,
+    "colon unit"                        : m colon unit,
+    "dummy unit"                        : m dummy unit,
+    "right unit"                        : m right unit,
+    "semicolon unit"                    : m semicolon unit,
+    "constant unit"                     : m constant unit,
+    "variable unit"                     : m variable unit,
+    "stack unit"                        : m stack unit,
+    "table unit"                        : m table unit,
+    "charfile unit"                     : m charfile unit,
+    "datafile unit"                     : m datafile unit,
+    "predicate unit"                    : m predicate unit,
+    "question unit"                     : m question unit,
+    "action unit"                       : m action unit,
+    "function unit"                     : m function unit,
+    "external unit"                     : m external unit,
+    "pragmat unit"                      : m pragmat unit,
+    "exit unit"                         : m exit unit,
+    "root unit"                         : m root unit,
+    "end unit"                          : m end unit,
+    "calibre unit"                      : m calibre unit,
+    "min limit unit"                    : m min limit unit,
+    "max limit unit"                    : m max limit unit,
+    "to unit"                           : m to unit,
+    "subbus unit"                       : m subbus unit,
+    "quote image unit"                  : m quote image unit,
+    "eof unit"                          : m eof unit,
+
+    "tag, right unit"                   : m tag right,
+    "to unit, tag"                      : m to tag,
+    "base"                              : m base,
+    "external declaration"              : m ext decl,
+    "calibre incorrect"                 : m cal,
+
+    "double definition of "             : m double definition,
+
+    "text after end; skipped"           : m eof).
+'pragmat' newpage.
+'charfile' output = "output\c\l">.
+'constant' prog col = 44,
+           line col = prog col - 2 - intsize.
+'action' check line printed:
+    (char linenumber = unit linenumber, is false + line printed),
+        print line, true -> line printed;
+    +.
+'action' print line:
+    (is true + point encountered,
+        put line position, put line position,
+        false -> point encountered;
+     +),
+        put line position,
+        false -> rec error,
+        put col position + line col,
+$$      put number + char linenumber + false,
+        put col position + prog col,
+        put line + output + buffer + restline.
+'constant' max line position = 60.
+'variable' line position = one.
+'action' put line position:
+    (line position = max line position, put newpage; +),
+        put char + output + newline,
+        incr + line position,
+        one -> col position.
+'variable' page = zero.
+'action' put newpage:
+    put char + output + newpage,
+        put string + output + messages + m title,
+$$      incr + page, put number + page + true,
+        put char + output + newline,
+        put char + output + newline,
+        3 -> line position.
+'variable' col position = one.
+'action' put col position + >col:
+    (more + col position + col, put line position; +),
+        minus + col + col position + col, put spaces + col.
+'action' put spaces + >n:
+    n = zero;
+    putc + / /, decr + n, :put spaces.
+'stack' [ = intsize = ] ldigits.
+'action' put number + >nr + >skip - l:
+$$$ note: nr > 0 !!
+    unpack int + nr + ldigits,
+        <<ldigits -> l,
+        (rep1:
+             (ldigits[l] = zero,
+                  (is true + skip; putc + / /),
+                  incr + l, :rep1;
+              (rep2 - d:
+                    plus + ldigits[l] + /0/ + d,
+                    putc + d,
+                    (l = >>ldigits; incr + l, :rep2)
+              ))
+        ), scratch + ldigits.
+'action' putc + >c:
+    put char + output + c,
+        incr + col position.
+'action' puts + t[] + >p - n:
+    p = nil;
+    put string + output + t + p,
+        string length + t + p + n,
+        plus + col position + n + col position.
+'pragmat' newpage.
+'action' treat fixed list + >nr of fields + virtual size>
+                          + virtual min> - n1 - n2 - n3:
+    generate3 + int op + nr of fields + n1,
+        generate2n + plus op + last fixed + n1 + n2,
+        generate1 + maxlim + tag + n3;
+        drop list declaration2 + last fixed + n2 + n1 + n3 + no string,
+        generate2n + minus op + n3 + last fixed + virtual size,
+        last fixed -> virtual min, n3 -> last fixed.
+'action' treat abs stack + >nr of fields + >virtual size
+                         + virtual min> - n1 - n2 - n3:
+    generate3 + int op + nr of fields + n1,
+        generate2n + plus op + last ast + n1 + n2,
+        generate2n + plus op + last ast + virtual size + n3,
+        drop list declaration2 + last ast + n2 + n1 + n3 + no string,
+        last ast -> virtual min, n3 -> last ast.
+'action' treat rel stack + >nr of fields + >virtual size>
+                         + virtual min>  - n1 - n2 - n3 - n5 - n6:
+    generate2n + by op + last virtleftover + last sizeleftover + n5,
+        generate2n + times op + n5 + virtual size + n6,
+        generate3 + int op + nr of fields + n1,
+        generate2n + plus op + last rst + n1 + n2,
+        generate2n + plus op + last rst + n6 + n3,
+        generate2n + plus op + last sumsize + size + last sumsize,
+        generate2n + minus op + last virtleftover + n6
+                              + last virtleftover,
+        generate2n + minus op + last sizeleftover + virtual size
+                              + last sizeleftover,
+        drop list declaration2 + last rst + n2 + n1 + n3 + no string,
+        n6 -> virtual size, last rst -> virtual min, n3 -> last rst.
+'action' treat ext table + >nr of fields + >string
+                         - n1 - n2 - n3 - n4:
+    generate3 + int op + nr of fields + n1,
+        generate2n + plus op + last fixed + n1 + n2,
+        generate3 + extsize op + string + n4,
+        generate2n + plus op + last fixed + n4 + n3,
+        drop list declaration2 + last fixed + n2 + n1 + n3 + string,
+        drop list declaration3 + last fixed,
+        n3 -> last fixed.
+'constant' defref of zero = zero.
+'variable' last fixed = zero, last ast = zero, last rst = zero,
+           last sumsize = zero, last sizeleftover = zero,
+           last virtleftover = zero,
+           ast = nil, rst = nil, sumsize = nil, virtleftover = nil.
+'constant' minvirt = true, maxvirt = false.
+'action' init def gen:
+$ defref of zero:
+    generate3 + int op + zero + defref of zero,
+$ last fixed:
+    generate3 + manfcon op + minvirt + last fixed,
+$ last ast:
+    create global info block + ast,
+    generate1 + const tag + ast + last ast,
+$ last rst:
+    create global info block + rst,
+    generate1 + const tag + rst + last rst,
+$ last sumsize:
+    defref of zero -> last sumsize,
+$ last sizeleftover:
+    create global info block + sumsize,
+    generate1 + const tag + sumsize + last sizeleftover,
+$ last virtleftover:
+    create global info block + virtleftover,
+    generate1 + const tag + virtleftover + last virtleftover.
+'action' finish def gen - n:
+    drop declaration + zero + last fixed + t constant + ast,
+        drop declaration + zero + last ast + t constant + rst,
+        drop declaration + zero + last sumsize + t constant + sumsize,
+        generate3 + manfcon op + maxvirt + n,
+        generate2n + minus op + n + last ast + n,
+        drop declaration + zero + n + t constant + virtleftover.
+'action' create global info block + ptr>:
+    * dummy str -> text,
+      undefined -> decl info,
+      zero -> xref
+    * global info, >>global info -> ptr.
+'pragmat' newpage.
+'datafile' f ruledecl
+$$           [units; global info; defref types; markers; : ]
+$$$        = "aaaaaic">.
+$$         = "rdecl\\r">.
+'action' dropp immediate + >p:
+    is true + rule decl, put data + f ruledecl + p + pointer; +.
+'action' dropp + >p:
+    is true + rule decl, check linecount,
+        put data + f ruledecl + p + pointer;
+    +.
+'action' dropn immediate + >n:
+    is true + rule decl, put data + f ruledecl + n + numerical; +.
+'action' drop def + >type + >defref:
+    is true + rule decl, dropp + type,
+        (type = number, dropn immediate + defref;
+         dropp immediate + defref);
+    +.
+'pragmat' newpage.
+'datafile' f denotation = "den\\s">.
+'variable' n denotation = -1.
+'action' drop denotation + >n - ptr:
+    >>chrs -> ptr,
+        pack string + chrs + n + chrs,
+        (drop:
+             incr + ptr,
+             put data + f denotation + chrs[ptr] + numerical,
+             incr + n denotation,
+             (ptr = >>chrs; :drop)).
+'action' drop string + >n - m - ptr:
+    zero -> m,
+    (rep:
+         lseq + n + max str length,
+             drop denotation + n,
+             incr + m,
+             put data + f denotation + m + numerical,
+             incr + n denotation;
+         >>chrs -> ptr,
+             drop denotation + max str length,
+             incr + m,
+             minus + ptr + max str length + ptr,
+             unstack to + chrs + ptr,
+             minus + n + max str length + n, :rep
+    ).
+'variable' error string = zero.
+'action' init string denotation:
+    drop string + zero, n denotation -> error string.
+'pragmat' newpage.
+'datafile' f lines [ : ] = "lines\\z">.
+'variable' n lines = -1,        $ word counter $
+           drop linenumber = zero.
+'action' check linecount:
+    less + drop linenumber + unit linenumber,
+        put data + f lines + unit linenumber + numerical,
+        incr + n lines,
+        dropp immediate + line mark,
+        dropn immediate + n lines,
+        unit linenumber -> drop linenumber;
+    +.
+'pragmat' newpage.
+'datafile' f deflist
+           [global info; operators; defref types; : ]
+           = "deflist\\b">.
+'variable' n deflist = -1     $ block counter $.
+'table' operators = (
+    nil: no op,
+    nil: plus op,
+    nil: minus op,
+    nil: times op,
+    nil: by op,
+    nil: int op,
+    nil: strlength op,
+    nil: int denot op,
+    nil: char denot op,
+    nil: manfcon op,
+    nil: extsize op).
+'table' defref types = (
+    nil: const tag,
+    nil: minlim,
+    nil: calibre,
+    nil: maxlim,
+    nil: number).
+'action' put defref + >type + >defref:
+    put data + f deflist + type + pointer,
+        (type = number, put data + f deflist + defref + numerical;
+         put data + f deflist + defref + pointer).
+$ no op.
+'action' generate1 + >type + >defref + defnr>:
+    put data + f deflist + no op + pointer,
+        put defref + type + defref,
+        incr + n deflist, n deflist -> defnr.
+$ plus op, minus op, times op, by op.
+'action' generate2 + >operator + >type1 + >defref1
+                               + >type2 + >defref2 + defnr>:
+    put data + f deflist + operator + pointer,
+        put defref + type1 + defref1,
+        put defref + type2 + defref2,
+        incr + n deflist, n deflist -> defnr.
+'action' generate2n + >operator + >defref1 + >defref2 + defnr>:
+    generate2 + operator + number + defref1
+                         + number + defref2 + defnr.
+$ int op, strlength op, int denot op, char denot op,
+$ manfcon op, extsize op.
+'action' generate3 + >operator + >operand + defnr>:
+    put data + f deflist + operator + pointer,
+        put data + f deflist + operand + numerical,
+        incr + n deflist, n deflist -> defnr.
+'pragmat' newpage.
+'datafile' f tag occurrences = "tagocc\\t">.
+'variable' n tag occurrences = zero
+    $ block counter; = 0, because of prefilling in scan2 $.
+'action' drop tag occurrence + >n>:
+    put data + f tag occurrences + unit linenumber + numerical,
+        put data + f tag occurrences + n + numerical,
+        incr + n tag occurrences,
+        n tag occurrences -> n.
+'pragmat' newpage.
+'datafile' f declaration
+               [global info; : ]
+           = "ddecl\\d">.
+'action' drop declaration + >line nr + >def nr + >decl type + >tag:
+    put data + f declaration + tag + pointer,
+        put data + f declaration + decl type + numerical,
+        put data + f declaration + line nr + numerical,
+        put data + f declaration + def nr + numerical.
+'action' drop file declaration + >line nr + >alice type + >file area
+                               + >string + >tag:
+    put data + f declaration + tag + pointer,
+        put data + f declaration + t file + numerical,
+        put data + f declaration + line nr + numerical,
+        put data + f declaration + alice type + numerical,
+        put data + f declaration + string + numerical.
+'pragmat' newpage.
+'datafile' f lists [global info; : ] = "lists\\l">.
+'action' drop list declaration1 + >line nr + >word + >n fields + >tag:
+    put data + f lists + tag + pointer,
+        put data + f lists + line nr + numerical,
+        put data + f lists + word + numerical,
+        put data + f lists + n fields + numerical.
+'action' drop list declaration2 + >virtual min + >min limit + >calibre
+                                + >virtual max + >string:
+    put data + f lists + virtual min + numerical,
+        put data + f lists + min limit + numerical,
+        put data + f lists + calibre + numerical,
+        put data + f lists + virtual max + numerical,
+        put data + f lists + string + numerical.
+'action' drop list declaration3 + >max limit:
+    put data + f lists + max limit + numerical.
+'pragmat' newpage.
+'datafile' f rules
+               [global info; : ]
+           = "rules\\n">.
+'action' drop rules + >line nr + >word + >a formals  + >string + >tag:
+    put data + f rules + tag + pointer,
+        put data + f rules + line nr + numerical,
+        put data + f rules + word + numerical,
+        put data + f rules + a formals + numerical,
+        put data + f rules + string + numerical,
+        drop calls + tag.
+'pragmat' newpage.
+'datafile' f calls
+               [global info; nilst ]
+           = "calls\\p">.
+'action' drop calls + >tag:
+    put data + f calls + tag + pointer.
+'pragmat' newpage.
+'datafile' f fields [ : ] = "fields\\f">,
+           f selectors [text tags; nilst; : ] = "sel\\s">.
+'variable' n fields = zero, n selectors = zero.
+'action' drop fields + >selectors:
+    (is true + rule decl;
+    put data + f fields + selectors + numerical,
+        incr + n fields).
+'action' drop selectors + >line nr + >text:
+    (is true + rule decl;
+    put data + f selectors + line nr + numerical,
+        put data + f selectors + text + pointer,
+        incr + n selectors).
+'pragmat' newpage.
+'datafile' f formals [ : ] = "formals\\f">.
+'constant' no formals = -1.
+'variable' n formals = no formals + 1.
+'action' drop formals + >n:
+    put data + f formals + n + numerical,
+        incr + n formals.
+'pragmat' newpage.
+               [global info; list fillings markers; : ]
+           = "fill\\f">.
+'action' drop fillings + >marker + >filling:
+    put data + f fillings + marker + pointer,
+        put data + f fillings + filling + numerical.
+'table' list fillings markers =
+    (nil: expr mark, nil: string mark, nil: end mark).
+'pragmat' newpage.
+'datafile' f adm
+              [global info; text tags; units; lists; nilst; : ]
+           = "adm\\a">.
+'action' drop adm - n - p:
+    put data + f adm + n denotation + numerical,
+    put data + f adm + n lines + numerical,
+    put data + f adm + n tag occurrences + numerical,
+
+    put data + f adm + n deflist + numerical,
+    put data + f adm + page + numerical,
+    put data + f adm + root tag + pointer,
+    put data + f adm + scan1 error + numerical,
+
+    list length + global info + n,
+        divrem + n + <>global info + n + ?,
+        put data + f adm + n + numerical,
+    list length + text tags + n,
+        put data + f adm + n + numerical,
+    list length + diluted list + n,
+        put data + f adm + n + numerical,
+
+    <<global info -> p,
+        (rep: more + p + >>global info;
+              put data + f adm + string * global info[p] + pointer,
+              decl info * global info[p] -> n,
+              ((was + lists + n; n = nil),
+                   put data + f adm + n + pointer;
+               put data + f adm + n + numerical),
+              put data + f adm + cross ref * global info[p] + numerical,
+                  next + global info + p, :rep),
+
+    <<text tags -> p,
+        (rep: more + p + >>text tags;
+              put data + f adm + text tags[p] + numerical,
+                  next + text tags + p, :rep),
+
+    <<diluted list -> p,
+        (rep: more + p + >>diluted list;
+             put data + f adm + global info * diluted list[p] + pointer,
+                  next + diluted list + p, :rep).
+'end'

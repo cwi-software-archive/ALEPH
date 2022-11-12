@@ -1,0 +1,3 @@
+PATH=.:/usr/ucb:/bin:/usr/bin
+D=`phd dick`
+diff $1 $2 |more

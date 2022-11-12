@@ -1,0 +1,170 @@
+2c2
+< $ various symbols
+---
+> $ none
+5d4
+< $ various symbols;
+13c12
+<     typer, tag, [formal affix sequence], actual rule, point symbol.
+---
+>     typer, tag, [formal affix sequence], actual rule.
+18c17
+<     action symbol.
+---
+>     .
+20c19
+<     function symbol.
+---
+>     .
+22c21
+<     predicate symbol.
+---
+>     .
+24c23
+<     question symbol.
+---
+>     .
+28c27
+<     formal affix symbol, formal.
+---
+>     formal.
+34c33
+<     right symbol, tag.
+---
+>     tag.
+36c35
+<     tag, right symbol.
+---
+>     tag.
+38c37
+<     right symbol, tag, right symbol.
+---
+>     tag.
+40c39
+<     [formal field list pack], tag, sub symbol, bus symbol.
+---
+>     [formal field list pack], tag.
+42c41
+<     sub symbol, bus symbol, [formal field list pack], tag, sub symbol, bus symbol.
+---
+>     [formal field list pack], tag.
+44c43
+<     open symbol, [field list], close symbol.
+---
+>     [field list].
+46c45
+<     quote symbol, quote symbol, tag.
+---
+>     tag.
+50c49
+<     [local affix sequence], colon symbol, rule body.
+---
+>     [local affix sequence], rule body.
+54c53
+<     local affix symbol, local variable.
+---
+>     local variable.
+60c59
+<     alternative, [semicolon symbol, alternative series].
+---
+>     alternative, [alternative series].
+62c61
+<     member, [comma symbol, alternative].
+---
+>     member, [alternative].
+76c75
+<     minus symbol, right symbol, source.
+---
+>     source.
+78c77
+<     source, equals symbol, source.
+---
+>     source, source.
+80c79
+<     of symbol, field transport list, of symbol, tag.
+---
+>     field transport list, tag.
+82c81
+<     field transport, [comma symbol, field transport list].
+---
+>     field transport, [field transport list].
+88c87
+<     minus symbol, right symbol, selector.
+---
+>     selector.
+96c95
+<     actual affix symbol, actual.
+---
+>     actual.
+103c102
+<     selector, of symbol, tag, sub symbol, source, bus symbol.
+---
+>     selector, tag, source.
+105c104
+<     dummy symbol.
+---
+>     .
+111c110
+<     repeat symbol, tag.
+---
+>     tag.
+113c112
+<     exit symbol, expression.
+---
+>     expression.
+115c114
+<     success symbol.
+---
+>     .
+117c116
+<     failure symbol.
+---
+>     .
+121c120
+<     open symbol, [tag], actual rule, close symbol.
+---
+>     [tag], actual rule.
+127c126
+<     box symbol, classifier, box symbol.
+---
+>     classifier.
+131c130
+<     class, [semicolon symbol, class chain].
+---
+>     class, [class chain].
+133c132
+<     area, comma symbol, alternative.
+---
+>     area, alternative.
+135c134
+<     sub symbol, zone series, bus symbol.
+---
+>     zone series.
+137c136
+<     zone, [semicolon symbol, zone series].
+---
+>     zone, [zone series].
+139c138
+<     [expression], up to symbol, [expression]; expression; allzone;
+---
+>     [expression], [expression]; expression; allzone;
+146c145
+<     field, [comma symbol, field list].
+---
+>     field, [field list].
+150c149
+<     selector, [equals symbol, selector chain].
+---
+>     selector, [selector chain].
+158c157
+<     left symbol, left symbol, tag.
+---
+>     tag.
+160c159
+<     right symbol, right symbol, tag.
+---
+>     tag.
+162c161
+<     left symbol, right symbol, tag.
+---
+>     tag.

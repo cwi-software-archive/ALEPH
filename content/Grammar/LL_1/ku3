@@ -1,0 +1,122 @@
+$ 7.2. Symbols
+$ none
+
+$ other primitives
+tag;
+integral denotation;
+character denotation;
+expression.
+
+$ 3.2.1. Rule declarations
+rule declaration:
+    typer, tag, [formal sequence], actual rule.
+typer:
+    action typer; function typer;
+    predicate typer; question typer.
+action typer:
+    .
+function typer:
+    .
+predicate typer:
+    .
+question typer:
+    .
+formal sequence:
+    formal, [formal sequence].
+formal:
+    formal input; formal output; formal inout;
+    formal stack; formal table; formal file.
+formal input:
+    tag.
+formal output:
+    tag.
+formal inout:
+    tag.
+formal table:
+    [formal field list pack], tag.
+formal stack:
+    [formal field list pack], tag.
+formal field list pack:
+    [field list].
+formal file:
+    tag.
+
+$ 3.2.2. Actual rules
+actual rule:
+    [tag sequence], rule body.
+rule body:
+    alternative series; classification.
+alternative series:
+    alternative, [alternative series].
+alternative:
+    member, [alternative].
+
+$ 3.2.3. Members
+member:
+    affix form; transport; identity; extension;
+    compound member; jump; exit; success; failure.
+
+$ 3.4. Operations
+transport:
+    source, source sequence.
+source sequence:
+    source, [source sequence].
+identity:
+    source, source.
+extension:
+    field transport list, tag.
+field transport list:
+    source, tag sequence, [field transport list].
+
+$ 3.5. Affix forms
+affix form:
+    tag, [source sequence].
+source:
+    integral denotation; character denotation; tag;
+    min limit; max limit; calibre;
+    element; dummy.
+element:
+    [tag], tag, source.
+dummy:
+    .
+
+$ 3.6. Terminators
+jump:
+    tag.
+exit:
+    expression.
+success:
+    .
+failure:
+    .
+
+$ 3.7. Compound members
+compound member:
+    [tag], actual rule.
+
+$ 3.8. Classifications
+classification:
+    source, class chain.
+class chain:
+    zone series, alternative, [class chain].
+zone series:
+    zone, [zone series].
+zone:
+    [expression], [expression]; expression; allzone;
+    tag.
+allzone:
+    .
+
+$ 4.1.5. Table declarations
+field list:
+    tag sequence, [field list].
+tag sequence:
+    tag, [tag sequence].
+
+$ 4.1.7. Limits
+min limit:
+    tag.
+max limit:
+    tag.
+calibre:
+    tag.

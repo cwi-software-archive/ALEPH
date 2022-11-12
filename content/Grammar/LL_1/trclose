@@ -1,0 +1,11 @@
+T=
+O=/dev/null
+N=$1
+until
+	cmp -s $O $N
+do
+	T=`expr 0$T + 1`
+	O=$N
+	N=$1$T
+	spread $O >$N
+done

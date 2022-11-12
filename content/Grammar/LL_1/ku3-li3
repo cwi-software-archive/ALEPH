@@ -1,0 +1,95 @@
+12c12
+<     typer, tag, [formal sequence], actual rule.
+---
+>     typer, tag, formal sequence option, actual rule.
+23a24,25
+> formal sequence option:
+>     formal sequence; .
+25c27
+<     formal, [formal sequence].
+---
+>     formal, formal sequence option.
+36c38
+<     [formal field list pack], tag.
+---
+>     formal field list pack option, tag.
+38c40,42
+<     [formal field list pack], tag.
+---
+>     formal field list pack option, tag.
+> formal field list pack option:
+>     formal field list pack; .
+40c44,46
+<     [field list].
+---
+>     field list option.
+> field list option:
+>     field list; .
+46c52,54
+<     [tag sequence], rule body.
+---
+>     tag sequence option, rule body.
+> tag sequence option:
+>     tag sequence; .
+50c58
+<     alternative, [alternative series].
+---
+>     alternative, alternative series option.
+52c60,64
+<     member, [alternative].
+---
+>     member, alternative option.
+> alternative option:
+>     alternative; .
+> alternative series option:
+>     alternative series; .
+63c75,77
+<     source, [source sequence].
+---
+>     source, source sequence option.
+> source sequence option:
+>     source sequence; .
+69c83,85
+<     source, tag sequence, [field transport list].
+---
+>     source, tag sequence, field transport list option.
+> field transport list option:
+>     field transport list; .
+73c89
+<     tag, [source sequence].
+---
+>     tag, source sequence option.
+95c111,113
+<     [tag], actual rule.
+---
+>     tag option, actual rule.
+> tag option:
+>     tag; .
+101c119
+<     zone series, alternative, [class chain].
+---
+>     zone series, alternative, class chain option.
+103c121,123
+<     zone, [zone series].
+---
+>     zone, zone series option.
+> zone series option:
+>     zone series; .
+105c125
+<     [expression], [expression]; expression; allzone;
+---
+>     expression option, expression option; expression; allzone;
+106a127,128
+> expression option:
+>     expression; .
+108a131,132
+> class chain option:
+>     class chain; .
+112c136
+<     tag sequence, [field list].
+---
+>     tag sequence, field list option.
+114c138
+<     tag, [tag sequence].
+---
+>     tag, tag sequence option.

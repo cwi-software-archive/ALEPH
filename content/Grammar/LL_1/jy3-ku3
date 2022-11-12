@@ -1,0 +1,44 @@
+27,29c27,28
+<     formal variable; formal stack; formal table; formal file.
+< formal variable:
+<     formal input; formal output; formal inout.
+---
+>     formal input; formal output; formal inout;
+>     formal stack; formal table; formal file.
+57c56,57
+<     affix form; operation; compound member; terminator.
+---
+>     affix form; transport; identity; extension;
+>     compound member; jump; exit; success; failure.
+60,61d59
+< operation:
+<     transport; identity; extension.
+71,73c69
+<     field transport, [field transport list].
+< field transport:
+<     source, tag sequence.
+---
+>     source, tag sequence, [field transport list].
+79c75,76
+<     integral denotation; character denotation; tag; limit;
+---
+>     integral denotation; character denotation; tag;
+>     min limit; max limit; calibre;
+87,88d83
+< terminator:
+<     jump; exit; success; failure.
+106,108c101
+<     class, [class chain].
+< class:
+<     zone series, alternative.
+---
+>     zone series, alternative, [class chain].
+119,121c112
+<     field, [field list].
+< field:
+<     tag sequence.
+---
+>     tag sequence, [field list].
+126,127d116
+< limit:
+<     min limit; max limit; calibre.

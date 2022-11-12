@@ -1,0 +1,768 @@
+'pred' read line: + + +.
+
+'act' next char:
+    (+;
+         read buffer, :next char; +).
+
+'pred' read buffer:
+    read line.
+
+'act' skip spaces:
+        next char, :skip spaces; +.
+
+'act' skip spaces and comment:
+    skip spaces,
+        ( (L:
+                  (next char, :skip spaces and comment;
+                   :L));
+             (L:
+                  (next char, :skip spaces and comment;
+                   (:L;
+                        :skip spaces and comment))); +).
+
+'pred' r char:
+ next char.
+
+'act' next unit:
+    (L:
+        skip spaces and comment,
+        (read unit;
+         read tag;
+         read integral denotation;
+         read char den or by unit;
+         read string den or quote image unit;
+         read compound unit;
+         read bold;
+         next char, :L)).
+
+'pred' read unit:
+    next char.
+
+'pred' read tag:
+    (L: +,
+                    next char,
+                    skip spaces,
+                    (:L; +)).
+
+'pred' read integral denotation:
+    (L: +,
+                    next char,
+                    skip spaces,
+                    (:L; +)).
+
+'pred' read char den or by unit:
+    r char,
+         (+;
+           ( +),
+            next char,
+              (r char; +)).
+
+'pred' read string den or quote image unit:
+        (next char, skip spaces and comment,
+             (r char; +);
+         next char,
+             (L:
+                  r char,
+                      (r char,
+                           :L; +); +;
+                  next char, :L);
+         next char, next unit).
+
+'pred' read compound unit:
+         next char, skip spaces and comment,
+         (( +;
+ +), next char;
+          next unit);
+         next char, skip spaces and comment,
+         ( next char; +);
+         next char, skip spaces and comment,
+         ( next char; +);
+     next char, skip spaces and comment,
+         ( next char; +).
+
+'pred' read bold:
+        (L: next char,
+                  (:L;
+                   r char; +)),
+        search bold.
+
+'act' search bold:
+        (L: +,
+                  bolds error;
+              + ( + bolds error;
+                      :L; +)).
+
+'act' bolds error: +;
+    (+;
+         skip bold).
+
+'act' skip bold:
+    next unit.
+
+'pred' r unit:
+ next unit.
+
+'act' req unit:
+    r unit; +.
+
+'pred' rd unit:
+ next unit.
+
+'act' reqd unit:
+    rd unit; +.
+
+'act' req point unit:
+        next unit; +.
+
+'pred' r tag:
+    next unit.
+
+'act' req tag:
+    r tag; +.
+
+'act' global tag:
+        (next unit; +).
+
+'pred' r string denotation:
+ next unit.
+
+'act' req string denotation:
+    r string denotation; +.
+
+'act' program:
+    prog,
+        (r unit; +).
+
+'act' prog:
+    text,
+        req unit.
+
+'act' text:
+    (information; recoverable error), :text; +.
+
+'pred' information:
+    declaration;
+    pragmat;
+    root.
+
+'pred' root:
+    r unit,
+        affix form, req point unit.
+
+'act' affix form:
+     req tag,
+        actual affix sequence option.
+
+'pred' declaration:
+    rule declaration;
+    data declaration;
+    external declaration.
+
+'pred' rule declaration
+: rule typer,
+        global tag,
+        formal affix sequence option,
+        actual rule,
+        req point unit.
+
+'pred' rule typer:
+    r unit;
+    r unit;
+    r unit;
+    r unit.
+
+'act' formal affix sequence option:
+       (L:
+            (formal affix;
+             recoverable error
+            ), :L;
+            ( +)).
+
+'pred' formal affix:
+    r unit, formal.
+
+'act' formal:
+    formal after tag;
+    no tag formal; +.
+
+'act' formal after tag:
+    r unit;
+    r unit; +.
+
+'pred' no tag formal:
+    r unit,
+        (r unit; +);
+    r unit,
+      (field list pack; +),
+        req unit;
+    field list pack,
+        req unit;
+    r unit.
+
+'act' actual rule:
+    local affix sequence option,
+        req unit,
+        rule body.
+
+'act' local affix sequence option:
+    (local affix;
+     recoverable error),
+  :local affix sequence option; +.
+
+'pred' local affix:
+    r unit.
+
+'act' rule body:
+    classification;
+    alternative series.
+
+'act' alternative series:
+    alternative,
+        rest of alternative series.
+
+'act' alternative:
+    member,
+        rest of alternative.
+
+'act' rest of alternative:
+    r unit,
+        alternative;
+        alternative;
+    recoverable error,
+        :rest of alternative; +.
+
+'act' rest of alternative series:
+    r unit,
+        alternative series; +.
+
+'act' member:
+    r tag,
+        member after tag;
+    no tag member;
+    req tag.
+
+'act' member after tag:
+    source after tag,
+        req transport or identity tail;
+    transport or identity tail;
+    actual affix sequence option.
+
+'pred' no tag member:
+    extension;
+    compound member;
+    terminator;
+    no tag source,
+        req transport or identity tail.
+
+'pred' transport or identity tail:
+    destination,
+        destination sequence option;
+    r unit,
+        source.
+
+'act' req transport or identity tail:
+    transport or identity tail; +.
+
+'act' destination sequence option:
+    (destination;
+     recoverable error),
+  :destination sequence option; +.
+
+'pred' destination:
+    r unit,
+        source.
+
+'pred' extension:
+    r unit,
+        field transport list,
+        req unit,
+        req tag.
+
+'act' field transport list:
+    field transport,
+        (L:
+             r unit,
+                 :field transport list;
+             recoverable error,
+                 :L; +).
+
+'act' field transport:
+    source,
+        (selector destination; +),
+        (L:
+             selector destination,
+                 :L; +)    .
+
+'pred' selector destination:
+    r unit,
+        req tag.
+
+'act' actual affix sequence option:
+    (actual affix;
+     recoverable error),
+  :actual affix sequence option; +.
+
+'pred' actual affix:
+    r unit,
+        actual.
+
+'act' actual:
+    source.
+
+'act' source:
+    r tag,
+        (source after tag; +);
+    no tag source;
+    req tag.
+
+'pred' source after tag:
+    starred element;
+    non starred element.
+
+'pred' starred element:
+    r unit,
+        req tag,
+        req unit,
+        source,
+        req unit.
+
+'pred' non starred element:
+    r unit,
+        source,
+        req unit.
+
+'pred' no tag source:
+    next unit;
+    (r unit;
+     r unit;
+     r unit),
+  req tag;
+    r unit.
+
+'pred' terminator:
+    jump;
+    exit;
+    r unit;
+    r unit.
+
+'pred' jump:
+    r unit,
+        req tag.
+
+'pred' exit:
+    r unit,
+        expression.
+
+'pred' compound member:
+    r unit,
+        body,
+        req unit.
+
+'act' body:
+    r tag,
+        body after tag;
+    r unit,
+        body after minus unit;
+    rule body.
+
+'act' body after tag:
+    actual rule;
+    body after member tag.
+
+'act' body after member tag:
+    member after tag,
+        rest of alternative,
+        rest of alternative series.
+
+'act' body after minus unit:
+    r tag,
+        local rule;
+    rest of alternative,
+        rest of alternative series.
+
+'act' local rule:
+    actual rule.
+
+'pred' classification:
+    classifier box,
+        class chain.
+
+'pred' classifier box:
+    r unit,
+        classifier,
+        req unit.
+
+'act' classifier:
+    source.
+
+'act' class chain:
+    class,
+        (r unit,
+             :class chain; +)   .
+
+'act' class:
+    area,
+        req unit,
+        alternative;
+    alternative.
+
+'pred' area:
+    r unit,
+        zone series,
+        req unit.
+
+'act' zone series:
+    zone,
+        (r unit,
+             :zone series; +)   .
+
+'act' zone:
+    up to zone;
+    expression,
+        (up to zone; +).
+
+'pred' up to zone:
+    r unit,
+        (+;
+         expression).
+
+'act' expression:
+    expr.
+
+'act' expr:
+    term,
+        ( + +),
+        rest expression.
+
+'act' rest expression
+: plus minus,
+        term,
+        :rest expression;
+    recoverable error,
+        :rest expression; +.
+
+'act' term:
+    base,
+        rest term.
+
+'act' rest term
+: times by,
+        base,
+        :rest term; +.
+
+'act' base:
+    plain value;
+    expression pack; +.
+
+'pred' plain value:
+    next unit;
+    r tag;
+    (r unit;
+     r unit;
+     r unit),
+  req tag.
+
+'pred' expression pack:
+    r unit,
+        expr,
+        (r unit; +).
+
+'pred' plus minus:
+    r unit;
+    r unit.
+
+'pred' times by:
+    r unit;
+    r unit.
+
+'pred' data declaration:
+    constant declaration;
+    variable declaration;
+    stack declaration;
+    table declaration;
+    file declaration.
+
+'pred' constant declaration:
+    r unit,
+        constant description list,
+        req point unit.
+
+'act' constant description list:
+    constant description,
+        (L:
+             r unit,
+                 :constant description list;
+             recoverable error,
+                 :L; +).
+
+'act' constant description:
+    global tag,
+        req unit,
+        expr,
+        ( +).
+
+'pred' variable declaration:
+    r unit,
+        variable description list,
+        req point unit.
+
+'act' variable description list:
+    variable description,
+        (L:
+             r unit,
+                 :variable description list;
+             recoverable error,
+                 :L; +).
+
+'act' variable description:
+    global tag,
+        req unit,
+        expr,
+        ( +).
+
+'pred' table declaration:
+    r unit,
+        table description list,
+        req point unit.
+
+'act' table description list:
+    table description,
+        (L:
+             r unit, :table description list;
+             recoverable error,
+                 :L; +).
+
+'act' table description
+: list head,
+        req unit,
+        filling list pack .
+
+'act' list head
+: (field list pack; +),
+        global tag.
+
+'pred' field list pack:
+    r unit,
+        ((r unit);
+         field list, req unit).
+
+'act' field list:
+    field,
+        (L:
+             r unit, :field list;
+             recoverable error,
+                 :L; +).
+
+'act' field:
+    (r unit, :field; +).
+
+'act' filling list pack
+: req unit,
+        filling list,
+        req unit.
+
+'act' filling list:
+    filling,
+        (pointer initialization; +),
+        (L:
+             r unit, :filling list;
+             recoverable error,
+                 :L; +).
+
+'act' filling expr:
+    expr.
+
+'act' filling:
+    r string denotation,
+        ( +);
+ ( r unit,
+             expr,
+             single or compound;
+         filling  expr),
+        ( +).
+
+'act' single or compound:
+    r unit,
+        expression list,
+        req unit;
+    req unit,
+        rest term,
+        rest expression.
+
+'pred' pointer initialization:
+    r unit,
+        global tag.
+
+'act' expression list:
+    filling expr,
+        (L:
+             r unit,
+                 :expression list;
+             recoverable error,
+                 :L; +).
+
+'pred' stack declaration:
+    r unit,
+        stack description list,
+        req point unit.
+
+'act' stack description list:
+    stack description,
+        (L:
+             r unit,
+                  :stack description list;
+             recoverable error,
+                  :L; +).
+
+'act' stack description
+: (size estimate;
+     may be expr missing; +),
+list head,
+      ( + +),
+      (r unit,
+           filling list pack ; +).
+
+'pred' size estimate:
+    r unit,
+        size,
+        req unit.
+
+'pred' may be expr missing:
+        next unit.
+
+'act' size:
+    r unit,
+ estimate,
+        req unit;
+        estimate.
+
+'act' estimate:
+    expr,
+        ( +).
+
+'pred' file declaration:
+    file typer,
+        file description list,
+        req point unit.
+
+'pred' file typer:
+    r unit;
+    r unit.
+
+'act' file description list:
+    file description,
+        (L:
+             r unit, :file description list;
+             recoverable error,
+                :L; +).
+
+'act' file description:
+    global tag,
+        (area; +),
+        req unit,
+        (r unit; +),
+        req string denotation,
+        (r unit; +).
+
+'pred' external declaration:
+    r unit,
+        rest of external declaration.
+
+'act' rest of external declaration:
+    external rule declaration;
+    external table declaration;
+    external constant declaration; +.
+
+'pred' external rule declaration:
+    rule typer,
+        external rule description list,
+        req point unit.
+
+'act' external rule description list:
+    external rule description,
+        (L:
+             r unit,
+                 :external rule description list;
+             recoverable error,
+                 :L; +).
+
+'act' external rule description:
+    formal affix sequence option,
+        req unit,
+        req string denotation.
+
+'pred' external table declaration:
+    r unit,
+        external table description list,
+        req point unit.
+
+'act' external table description list:
+    external table description,
+        (L:
+             r unit,
+                 :external table description list;
+             recoverable error,
+                 :L; +).
+
+'act' external table description:
+    list head,
+        req unit,
+        req string denotation.
+
+'pred' external constant declaration:
+    r unit,
+        external constant description list,
+        req point unit.
+
+'act' external constant description list:
+    external constant description,
+        (L:
+             r unit,
+                 :external constant description list;
+             recoverable error,
+                 :L; +).
+
+'act' external constant description:
+    global tag,
+        req unit,
+        req string denotation.
+
+'pred' pragmat:
+    r unit,
+        pragmat item list,
+        req point unit.
+
+'act' pragmat item list:
+    pragmat item,
+        (L:
+             r unit,
+                 :pragmat item list;
+             recoverable error,
+                 :L; +).
+
+'act' pragmat item:
+    req tag,
+        pragmat item after tag.
+
+'act' pragmat item after tag:
+    r unit,
+        item; +.
+
+'act' item:
+    next unit;
+    r string denotation;
+    pragmat item;
+    pragmat item list pack; +.
+
+'pred' pragmat item list pack:
+    r unit,
+        pragmat item list,
+        req unit.
+
+'act' scana:
+    next char, next unit,
+        program.
+
+'pred' recoverable error:
+    next unit.
+

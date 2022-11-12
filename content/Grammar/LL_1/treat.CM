@@ -1,0 +1,30 @@
+'variable' char linenumber = zero.
+'action' treat linenumber - number:
+    zero -> number, skip rubble + number + virt last in buff,
+        incr + char linenumber, set char linenumber + number.
+'function' skip rubble + >number> + >p - c:
+    incr + p, line number + number + c + p.
+'function' line number + >number> + >c + >p>:
+    more + p + >>buffer;
+    plus + <<conv + buffer[p] + c, ln char + number + c + p.
+'function' ln char + >number> + >c + >p>:
+    is digit + c, treat digits + number + c + p;
+    :skip rubble.
+'function' treat digits + >number> + >c + >p>:
+    no mult add overflow + number + c, incr + p,
+        rest of line number + number + c + p;
+    zero -> number.
+'function' rest of line number + >number> + >c + >p>:
+    more + p + >>buffer;
+    plus + <<conv + buffer[p] + c, next ln char + number + c + p..
+'function' next ln char + >number> + >c + >p>:
+    is digit + c, treat digits + number + c + p; +.
+'question' no mult add overflow + >number> + >c:
+    no mult overflow + number + 10,
+        no add overflow + number + specials[conv[c]].
+'question' no mult overflow + >number> + >m - head:
+    mult + number + m + head + number, head = zero.
+'question' no add overflow + >number> + >a - head:
+    add + number + a + head + number, head = zero.
+'action' set char linenumber + >number:
+    less + char linenumber + number, number -> char linenumber; +.
