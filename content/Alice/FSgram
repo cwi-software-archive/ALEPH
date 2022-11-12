@@ -1,0 +1,156 @@
+begin file adm symbol, sp, file info, el
+
+call end symbol, sp, true address, el
+
+call id symbol, sp, rule triple, el
+
+char denotation symbol, sp, location, co, character, el
+
+class begin symbol, sp, repr, el
+
+class box end symbol, sp, true address, el
+
+class box id symbol, el
+
+class end symbol, el
+
+communication symbol, sp, repr, co, repr, co, repr, co, string, el
+
+constant source symbol, sp, rep val pair, el
+
+copy a_reg symbol, sp, formal, el
+
+copy address symbol, el
+
+copy from input gate symbol, sp, formal, el
+
+copy v_reg symbol, sp, formal, el
+
+end file adm symbol, sp, file info, el
+
+end index symbol, el
+
+end list symbol, sp, repr, co, list type, co, valref, el
+
+end symbol, sp, string, el
+
+end values symbol, el
+
+exit symbol, sp, rep val pair, el
+
+ext call end symbol, sp, true address, el
+
+ext constant decl symbol, sp, repr, co, string, el
+
+ext fcall id symbol, sp, repr, co, stag, co, false address, el
+
+ext fcall symbol, sp, repr, co, stag, co, false address, el
+
+ext rule decl symbol, sp, repr, co, stag, el
+
+ext scall id symbol, sp, repr, co, stag, el
+
+ext scall symbol, sp, repr, co, stag, el
+
+ext table decl symbol, sp, list info, co, string, el
+
+ext table length symbol, sp, location, co, string, el
+
+extension call symbol, el
+
+extension end symbol, sp, true address, el
+
+extension id symbol, el
+
+extension start symbol, el
+
+fail tail id symbol, sp, repr, co, rule triple, el
+
+fallow symbol, sp, valref, el
+
+fcall symbol, sp, repr, co, false address, el
+
+free w_reg symbol, el
+
+index symbol, el
+
+input gate symbol, sp, size of input gate, el
+
+int fill symbol, sp, valref, el
+
+int symbol, sp, location, co, integer, el
+
+jump symbol, sp, repr, el
+
+label symbol, sp, repr, el
+
+list adm symbol, sp, list info, el
+
+list symbol, sp, repr, co, list type, co, valref, el
+
+loada global symbol, sp, repr, el
+
+loada stack var symbol, sp, position on stack, el
+
+loadv constant symbol, sp, rep val pair, el
+
+loadv limit symbol, sp, limit type, el
+
+loadv list elem symbol, sp, integer, el
+
+loadv stack var symbol, sp, position on stack, el
+
+loadv variable symbol, sp, repr, el
+
+loadw symbol, sp, formal, el
+
+manifest constant symbol, sp, location, co, manco, el
+
+numerical symbol, sp, valref, co, valref, el
+
+operator, sp, location, co, valref, co, valref, el
+
+output gate symbol, sp, size of output gate, el
+
+pointer symbol, sp, repr, el
+
+program id symbol, sp, string, el
+
+restore to output gate symbol, sp, formal, el
+
+root symbol, sp, integer, co, string, el
+
+rule id symbol, sp, rule triple, co, string, el
+
+scall symbol, sp, repr, el
+
+source line symbol, sp, line number, el
+
+stack frame symbol, sp, stack frame sizes, el
+
+status symbol, sp, integer, co, integer, co, integer, co, integer, co, integer, co, integer, co, integer, co, integer, el
+
+storew list element symbol, sp, integer, el
+
+storew stack var symbol, sp, position on stack, el
+
+storew variable symbol, sp, repr, el
+
+string fill symbol, sp, string, el
+
+string length symbol, sp, location, co, integer, el
+
+success tail id symbol, sp, repr, co, rule triple, el
+
+unstack and return false symbol, sp, stack frame sizes, el
+
+unstack and return true symbol, sp, stack frame sizes, el
+
+unstack and swap symbol, sp, stack frame sizes, el
+
+variable symbol, sp, rep val pair, co, repr, co, string, el
+
+zone bounds symbol, sp, minbound, co, maxbound, co, true address, el
+
+zone value symbol, sp, rep val pair, co, true address, el
+

@@ -1,0 +1,41 @@
+FILE gram VERSUS gr.old
+
+AT 1
+NEW:	$ ALICE grammar: 810609.
+---
+OLD:	
+OLD:	$ ALICE grammar: 800729.
+
+AT 60
+NEW:	extension call symbol;		$ exc
+---
+OLD:	extension call symbol;		$ etc
+OLD:	extension copy symbol;		$ exc
+
+AT 695
+NEW:	class			: class begin symbol, sp, repr, el,
+---
+OLD:	class			: class begin symbol, sp, repr, co,
+OLD:				  optimize, el,
+
+AT 697
+NEW:				  class end symbol, el.
+---
+OLD:				  class end symbol, sp, optimize, el.
+
+AT 712
+OLD:	optimize		: integer.
+OLD:				  $ 0: no optimizing allowed
+OLD:				  $ 1: may be optimized
+
+AT 718
+NEW:				  restores from output gate,
+---
+OLD:				  extension copies,
+
+AT 725
+OLD:	
+OLD:	extension copies	: extension copy, [extension copies].
+OLD:	
+OLD:	extension copy		: extension copy symbol, sp, formal,
+OLD:				  co, integer, el. $ number of uses to follow

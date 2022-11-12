@@ -1,0 +1,852 @@
+
+$ ALICE grammar: 800729.
+$ ALICE consists of a set of macros, comment lines, and pragmat lines.
+
+$ A comment line starts with "xxx " and should be ignored.
+
+$ A pragmat line starts with "prg "; the rest of the line
+$ is at the discretion of the user.
+$ A portable program contains no pragmat lines.
+
+$ A macro has the form:
+
+$ macro			 : macro name, [sp, parameters], el.
+$ macro name		 : ALICE terminal symbol.
+$ parameters		 : parameter, [co, parameters].
+$ parameter		 : string;
+$			   integer;
+$			   character;
+$			   ALICE terminal symbol.
+
+$ A string is represented as an exact copy of the ALEPH string including
+$ the surrounding quotes.
+
+
+
+$ ALICE terminal symbols	representation
+
+$ macro names:
+add symbol;			$ add
+begin file adm symbol;		$ bfa
+call id symbol;			$ cll
+call end symbol;		$ cle
+class box id symbol;		$ cbi
+class box end symbol;		$ cbe
+class begin symbol;		$ csb
+class end symbol;		$ cse
+char denotation symbol;		$ chd
+constant source symbol;		$ css
+communication symbol;		$ cmm
+copy address symbol;		$ cad
+copy a_reg symbol;		$ car
+copy from input gate symbol;	$ cig
+copy v_reg symbol;		$ cvr
+divide symbol;			$ dvd
+end file adm symbol;		$ efa
+end list symbol;		$ els
+end index symbol;		$ eix
+end symbol;			$ end
+end values symbol;		$ eva
+exit symbol;			$ ext
+ext constant decl symbol;	$ ecd
+ext fcall symbol;		$ efc
+ext scall symbol;		$ esc
+ext table length symbol;	$ etl
+ext table decl symbol;		$ etd
+ext call end symbol;		$ ece
+ext scall id symbol;		$ esi
+ext fcall id symbol;		$ efi
+extension id symbol;		$ exi
+extension start symbol;		$ exs
+extension call symbol;		$ etc
+extension copy symbol;		$ exc
+extension end symbol;		$ exe
+ext rule decl symbol;		$ erl
+fail tail id symbol;		$ fti
+fallow symbol;			$ flw
+fcall symbol;			$ fcl
+free w_reg symbol;		$ frw
+index symbol;			$ ind
+input gate symbol;		$ igt
+int symbol;			$ int
+int fill symbol;		$ itf
+jump symbol;			$ jmp
+label symbol;			$ lab
+list adm symbol;		$ ldm
+list symbol;			$ lst
+loada global symbol;		$ lag
+loada stack var symbol;		$ las
+loadv constant symbol;		$ lvc
+loadv limit symbol;		$ lvl
+loadv list elem symbol;		$ lvi
+loadv stack var symbol;		$ lvs
+loadv variable symbol;		$ lvv
+loadw symbol;			$ ldw
+manifest constant symbol;	$ mcn
+multiply symbol;		$ mul
+rule id symbol;			$ rli
+numerical symbol;		$ num
+output gate symbol;		$ ogt
+pointer symbol;			$ ptr
+program id symbol;		$ pid
+restore to output gate symbol;	$ rog
+root symbol;			$ rut
+source line symbol;		$ srl
+scall symbol;			$ scl
+stack frame symbol;		$ sfr
+status symbol;			$ sts
+storew variable symbol;		$ swv
+storew list element symbol;	$ swi
+storew stack var symbol;	$ sws
+string length symbol;		$ sln
+string fill symbol;		$ str
+subtract symbol;		$ sub
+success tail id symbol;		$ sti
+unstack and return true symbol; $ unt
+unstack and return false symbol;$ unf
+unstack and swap symbol;	$ unw
+variable symbol;		$ var
+zone bounds symbol;		$ znb
+zone value symbol;		$ znv
+
+$ delimiters:
+space symbol;			$ " "
+comma symbol;			$  ,
+end of line;			$ medium-dependent
+
+$ parameters:
+max int symbol;			$ mxi
+min int symbol;			$ mni
+int size symbol;		$ isz
+word size symbol;		$ wsz
+max char symbol;		$ mxc
+max string length symbol;	$ msl
+new line symbol;		$ nln
+same line symbol;		$ sln
+new page symbol;		$ npg
+rest line symbol;		$ rln
+numerical-tag symbol;		$ num
+pointer-tag symbol;		$ ptr
+
+comma-tag symbol;		$ com
+space-tag symbol;		$ spc
+min addr symbol;		$ mna
+max addr symbol;		$ mxa
+
+transport symbol;		$ trp
+add-tag symbol;			$ add
+subtr symbol;			$ sub
+mult symbol;			$ mul
+divrem symbol;			$ div
+plus symbol;			$ pls
+minus symbol;			$ min
+times symbol;			$ tms
+incr symbol;			$ inc
+decr symbol;			$ dec
+less symbol;			$ les
+lseq symbol;			$ lsq
+more symbol;			$ mor
+mreq symbol;			$ mrq
+equal symbol;			$ eql
+noteq symbol;			$ ntq
+random symbol;			$ rnd
+set random symbol;		$ srn
+set real random symbol;		$ srr
+sqrt symbol;			$ sqr
+pack int symbol;		$ pki
+unpack int symbol;		$ upi
+date symbol;			$ dte
+time symbol;			$ tim
+bool invert symbol;		$ biv
+bool and symbol;		$ bnd
+bool or symbol;			$ bor
+bool xor symbol;		$ xor
+left circ symbol;		$ lci
+left clear symbol;		$ lcl
+right circ symbol;		$ rci
+right clear symbol;		$ rcl
+is elem symbol;			$ isl
+is true symbol;			$ itr
+is false symbol;		$ isf
+set elem symbol;		$ sel
+clear elem symbol;		$ cll
+extract bits symbol;		$ exb
+first true symbol;		$ ftr
+pack bool symbol;		$ pkb
+unpack bool symbol;		$ upb
+to ascii symbol;		$ tsc
+from ascii symbol;		$ fsc
+pack string symbol;		$ pks
+unpack string symbol;		$ ups
+string elem symbol;		$ ste
+string length-tag symbol;	$ stl
+compare string symbol;		$ cms
+unstack string symbol;		$ uns
+previous string symbol;		$ pvs
+may be string pointer symbol;	$ myp
+was symbol;			$ was
+next symbol;			$ nxt
+previous symbol;		$ prv
+list length symbol;		$ lsl
+unstack symbol;			$ utk
+unstack to symbol;		$ ust
+unqueue symbol;			$ unq
+unqueue to symbol;		$ uqt
+scratch symbol;			$ scr
+delete symbol;			$ del
+get line symbol;		$ gln
+put line symbol;		$ pln
+get char symbol;		$ gch
+put char symbol;		$ pch
+put string symbol;		$ pst
+get int symbol;			$ gnt
+put int symbol;			$ pnt
+get data symbol;		$ gdt
+put data symbol;		$ pdt
+back char symbol;		$ bkc
+back data symbol;		$ bkd
+back line symbol;		$ bkl
+back file symbol;		$ bkf
+
+$ other primitives used as parameters:
+string;				$ character sequence delimited by quotes;
+				$ quotes in the string are represented by
+				$ quote images ("").
+character;			$ except space and comma.
+integer.			$ unsigned digit sequence.
+
+
+ALICE program		: program id symbol, sp, string, el,
+			  status information,
+			  values,
+			  end values symbol, el,
+			  data,
+			  communication area,
+			  rules,
+			  end symbol, sp, string, el.
+
+data			: [constant sources],
+			  [ext constant decls],
+			  [variable decls],
+			  [list areas],
+			  [ext table decls],
+			  [list administrations],
+			  [file administrations].
+
+rules			: ext rule decls,
+			  rules and root.
+
+
+sp			: space symbol.
+co			: comma symbol.
+el			: end of line.
+
+
+status information	: status symbol, sp,
+			  integer, co, $ maximum of all size-of-input-gates
+				       $ and size-of-output-gates
+			  integer, co, $ number of values
+			  integer, co, $ number of variables
+			  integer, co, $ number of files
+			  integer, co, $ number of breathing lists
+			  integer, co, $ number of non-breathing lists
+			  integer, co, $ background:
+				       $ 0: No lists on background
+				       $ 1: Lists on background
+			  integer, el. $ dump:
+				       $ 0: no dump
+				       $ 1: rule dump
+				       $ 2: global dump
+				       $ 4: member dump
+
+
+values			: value, [values].
+
+value			: value definition;
+			  calculation.
+
+value definition	: int denotation;
+			  manifest constant;
+			  char denotation;
+			  string length;
+			  ext table length.
+
+int denotation		: int symbol, sp, location, co, integer, el.
+
+manifest constant	: manifest constant symbol, sp,
+			  location, co, manco, el.
+
+manco			: new line symbol;
+			  same line symbol;
+			  rest line symbol;
+			  new page symbol;
+			  max char symbol;
+			  max string length symbol;
+			  word size symbol;
+			  max int symbol;
+			  min int symbol;
+			  int size symbol;
+			  comma-tag symbol;
+			  space-tag symbol;
+			  min addr symbol;
+			  max addr symbol;
+			  numerical-tag symbol;
+			  pointer-tag symbol.
+
+char denotation		: char denotation symbol, sp, location, co,
+			  character, el.
+
+string length		: string length symbol, sp,
+			  location, co, integer, el.
+
+ext table length	: ext table length symbol, sp, location,
+			  co, string, el.
+
+
+calculation		: operator, sp, location, co,
+			  valref, co, valref, el.
+
+operator		: add symbol;
+			  subtract symbol;
+			  multiply symbol;
+			  divide symbol.
+
+location		: integer.
+			  $ This integer denotes where to put a certain
+			  $ value in the table the ALICE processor builds.
+			  $ The location will be referred to by valrefs.
+
+valref			: integer.
+			  $ A valref references the location of an already
+			  $ defined value in the table the ALICE processor
+			  $ is building up.
+
+
+$ data:
+constant sources	: constant source,
+			  [constant sources].
+
+constant source		: constant source symbol, sp, rep val pair, el.
+
+rep val pair		: repr, co, valref.
+
+repr			: integer.
+			  $ A repr either represents an ALICE object
+			  $ uniquely (>0) or it indicates the absence
+			  $ of an ALICE object (=0).
+
+
+ext constant decls	: ext constant decl, [ext constant decls].
+
+ext constant decl	: ext constant decl symbol, sp,
+			  repr, co, string, el. $ ALEPH string
+
+
+variable decls		: variable decl, [variable decls].
+
+variable decl		: variable symbol, sp, rep val pair, co,
+			  repr, co, $ of next variable
+			  string, el. $ ALEPH tag in quotes
+
+
+list areas		: list area,
+			  [list areas].
+
+list area		: list symbol, sp, repr, co,	$ of list
+			  list type, co,
+			  valref, el,	$ number of virtual addresses
+			  [list fillings],
+			  end list symbol, sp, repr, co,
+			  list type, co, valref, el.
+			  $ The parameters of end list are the same as
+			  $ those of list.
+
+list fillings		: list filling, [list fillings].
+
+list filling		: int fill symbol, sp, valref, el;
+			  string fill symbol, sp, string, el;
+			  fallow symbol, sp, valref, el.
+			  $ fallow stands for uninitialized space to be
+			  $ grabbed for a stack with an absolute size
+			  $ estimate.
+
+
+ext table decls		: ext table decl, [ext table decls].
+
+ext table decl		: ext table decl symbol, sp,
+			  list info, co,
+			  string, el. $ ALEPH string
+
+
+list administrations	: list administration, [list administrations].
+
+list administration	: list adm symbol, sp,
+			  list info, el.
+
+list info		: repr, co,	$ of the list
+			  list type, co,
+			  valref, co,	$ virtual min
+			  valref, co,	$ virtual max
+			  valref, co,	$ virtual left
+			  valref, co,	$ virtual right
+			  valref, co,	$ calibre
+			  repr, co,	$ next list adm or 0
+			  string.	$ ALEPH tag in quotes
+
+list type		: integer.
+			  $ 0: not breathing, no background pragmat
+			  $ 1: not breathing,	 background pragmat
+			  $ 2:	   breathing, no background pragmat
+			  $ 3:	   breathing,	 background pragmat
+
+
+file administrations	: file administration, [file administrations].
+
+file administration	: begin file adm symbol, sp, file info, el,
+			  [pointer area],
+			  [numerical area],
+			  end file adm symbol, sp, file info, el.
+
+file info		: repr, co,
+			  file type, co,
+			  repr, co,	$ next file administration or 0
+			  string.	$ ALEPH string
+
+file type		: integer.
+			  $ 0: scratch charfile
+			  $ 1: scratch datafile
+			  $ 2: input charfile
+			  $ 3: input datafile
+			  $ 4: output charfile
+			  $ 5: output datafile
+			  $ 6: input-output charfile
+			  $ 7: input-output datafile
+
+pointer area		: pointer symbol, sp, repr, el, $ of a list
+			  [pointer area].
+
+numerical area		: numerical symbol, sp,
+			  valref, co,	$ lower bound
+			  valref, el,	$ upper bound
+			  [numerical area].
+
+
+
+communication area	: communication symbol, sp,
+			  repr, co,  $ first list
+			  repr, co,  $ first file
+			  repr, co,  $ first variable
+			  string, el,
+			  status information.
+
+
+ext rule decls		: ext rule decl, [ext rule decls].
+
+ext rule decl		: ext rule decl symbol, sp, repr, co, stag, el.
+
+stag			: string;
+			  extag.
+			  $ If the external is a standard external,
+			  $ the stag is an extag; the externals of a
+			  $ portable program must be standard externals.
+
+extag			: transport symbol;
+			  add-tag symbol;
+			  subtr symbol;
+			  mult symbol;
+			  divrem symbol;
+			  plus symbol;
+			  minus symbol;
+			  times symbol;
+			  incr symbol;
+			  decr symbol;
+			  less symbol;
+			  lseq symbol;
+			  more symbol;
+			  mreq symbol;
+			  equal symbol;
+			  noteq symbol;
+			  random symbol;
+			  set random symbol;
+			  set real random symbol;
+			  sqrt symbol;
+			  pack int symbol;
+			  unpack int symbol;
+			  date symbol;
+			  time symbol;
+			  bool invert symbol;
+			  bool and symbol;
+			  bool or symbol;
+			  bool xor symbol;
+			  left circ symbol;
+			  left clear symbol;
+			  right circ symbol;
+			  right clear symbol;
+			  is elem symbol;
+			  is true symbol;
+			  is false symbol;
+			  set elem symbol;
+			  clear elem symbol;
+			  extract bits symbol;
+			  first true symbol;
+			  pack bool symbol;
+			  unpack bool symbol;
+			  to ascii symbol;
+			  from ascii symbol;
+			  pack string symbol;
+			  unpack string symbol;
+			  string elem symbol;
+			  string length-tag symbol;
+			  compare string symbol;
+			  unstack string symbol;
+			  previous string symbol;
+			  may be string pointer symbol;
+			  was symbol;
+			  next symbol;
+			  previous symbol;
+			  list length symbol;
+			  unstack symbol;
+			  unstack to symbol;
+			  unqueue symbol;
+			  unqueue to symbol;
+			  scratch symbol;
+			  delete symbol;
+			  get line symbol;
+			  put line symbol;
+			  get char symbol;
+			  put char symbol;
+			  put string symbol;
+			  get int symbol;
+			  put int symbol;
+			  get data symbol;
+			  put data symbol;
+			  back char symbol;
+			  back data symbol;
+			  back line symbol;
+			  back file symbol.
+
+
+rules and root		: [rule decls], root, [rule decls].
+
+rule decls		: rule decl, [rule decls].
+
+root			: root symbol, sp, integer,
+					  $ number of actuals of call
+			  co, string, el, $ title
+			  source line,
+			  affix form,
+			  exit.
+
+
+affix form		: call;
+			  ext call.
+
+
+rule decl		: rule head, rule body, rule tail.
+
+rule head		: rule id,
+			  stack frame,
+			  [copies from input gate].
+
+rule id			: rule id symbol, sp, rule triple, co, string, el.
+
+rule triple		: repr, co, rule type, co, recursion.
+
+rule type		: integer.
+			  $ 0: cannot fail
+			  $ 1: can fail
+
+recursion		: integer.
+			  $ 0: not recursive
+			  $ 1: recursive
+
+stack frame		: stack frame symbol, sp, stack frame sizes, el.
+
+stack frame sizes	: integer, co, $ number of parameters
+			  integer, co, $ number of locals
+			  integer.     $ maximum number of parameters in
+				       $ any call or ext-call in this rule
+
+
+rule tail		: success tail,
+			  [fail tail].
+
+success tail		: success tail id,
+			  output gate creation,
+			  [restores to output gate],
+			  unstack and return true.
+
+success tail id		: success tail id symbol, sp, repr, co,
+			  rule triple, el.
+
+output gate creation	: output gate symbol, sp, size of output gate, el.
+
+size of output gate	: integer.
+
+unstack and return true : unstack and return true symbol, sp,
+			  stack frame sizes, el.
+
+fail tail		: fail tail id,
+			  unstack and return false.
+
+fail tail id		: fail tail id symbol, sp, repr, co,
+			  rule triple, el.
+
+unstack and return false: unstack and return false symbol, sp,
+			  stack frame sizes, el.
+
+
+$ gate handling in rules:
+copies from input gate	: copy from input gate, [copies from input gate].
+
+copy from input gate	: copy from input gate symbol, sp, formal, el.
+formal			: position on gate, co, position on stack.
+
+position on gate	: integer.
+position on stack	: integer.
+
+restores to output gate : restore to output gate,
+			  [restores to output gate].
+
+restore to output gate	: restore to output gate symbol, sp, formal, el.
+
+
+$ rule bodies:
+rule body		: statements.
+
+statements		: statement, [statements].
+
+statement		: call;
+			  ext call;
+			  primitive.
+
+primitive		: label definition;
+			  jump;
+			  source line;
+			  exit;
+			  class box;
+			  class;
+			  extension.
+
+call			: call id,
+			  [unstack and swap],
+			  input gate creation,
+			  [copies to input gate],
+			  scall or fcall,
+			  [restores from output gate],
+			  call end.
+
+call id			: call id symbol, sp, rule triple, el.
+
+unstack and swap	: unstack and swap symbol, sp,
+			  stack frame sizes, el.
+
+input gate creation	: input gate symbol, sp, size of input gate, el.
+
+size of input gate	: integer.
+
+scall or fcall		: scall symbol, sp, repr, el;
+			  fcall symbol, sp, repr, co,
+			  false address, el.
+
+call end		: call end symbol, sp, true address, el.
+
+false address		: repr.	 $ of a label
+
+true address		: repr.	 $ of a label
+
+
+ext call		: ext call id,
+			  [unstack and swap],
+			  input gate creation,
+			  [copies to input gate],
+			  ext scall or ext fcall,
+			  [restores from output gate],
+			  ext call end.
+
+ext call id		: ext scall id;
+			  ext fcall id.
+
+ext scall id		: ext scall id symbol, sp, repr, co, stag, el.
+
+ext fcall id		: ext fcall id symbol, sp, repr, co, stag, co,
+			  false address, el.
+
+ext scall or ext fcall	: ext scall symbol, sp, repr, co, stag, el;
+			  ext fcall symbol, sp, repr, co, stag, co,
+			  false address, el.
+
+ext call end		: ext call end symbol, sp, true address, el.
+
+
+jump			: jump symbol, sp, repr, el.
+
+
+source line		: source line symbol, sp, line number, el.
+
+line number		: integer.
+
+
+class box		: class box id symbol, el,
+			  load val in v_reg,
+			  class box end symbol, sp, true address, el.
+			  $ true address = repr of class
+
+
+class			: class begin symbol, sp, repr, co,
+			  optimize, el,
+			  zones,
+			  class end symbol, sp, optimize, el.
+
+zones			: zone bounds, [zones];
+			  zone value,  [zones].
+
+zone bounds		: zone bounds symbol, sp,
+			  minbound, co, maxbound, co,
+			  true address, el.
+
+minbound		: rep val pair.
+
+maxbound		: rep val pair.
+
+zone value		: zone value symbol, sp, rep val pair, co,
+			  true address, el.
+
+optimize		: integer.
+			  $ 0: no optimizing allowed
+			  $ 1: may be optimized
+
+
+extension		: extension id,
+			  input gate creation,
+			  copies to input gate,
+			  extension call,
+			  extension copies,
+			  extension end.
+
+extension id		: extension id symbol, el,
+			  load addr in a_reg,  $ stack adm
+			  extension start symbol, el.
+
+extension call		: extension call symbol, el.
+
+extension copies	: extension copy, [extension copies].
+
+extension copy		: extension copy symbol, sp, formal,
+			  co, integer, el. $ number of uses to follow
+
+extension end		: extension end symbol, sp, true address, el.
+
+
+exit			: exit symbol, sp, rep val pair, el.
+
+
+label definition	: label symbol, sp, repr, el.
+
+
+$ affix handling:
+copies to input gate	: copy to input gate,
+			  [copies to input gate].
+
+copy to input gate	: copy val to input gate;
+			  copy addr to input gate.
+
+copy val to input gate	: load val in v_reg,
+			  copy v_reg to input gate.
+
+load val in v_reg	: load simple in v_reg;
+			  load indexed element in v_reg.
+
+load simple in v_reg	: load constant in v_reg;
+			  load variable in v_reg;
+			  load stack var in v_reg;
+			  load limit in v_reg.
+
+
+copy v_reg to input gate: copy v_reg symbol, sp, formal, el.
+
+copy addr to input gate : copy address symbol, el,
+			  load addr in a_reg,
+			  copy a_reg to input gate.
+
+load addr in a_reg	: load global addr in a_reg;
+			  load stack var in a_reg.
+
+copy a_reg to input gate: copy a_reg symbol, sp, formal, el.
+
+
+load constant in v_reg	: loadv constant symbol, sp, rep val pair, el.
+
+load variable in v_reg	: loadv variable symbol, sp, repr, el.
+
+load limit in v_reg	: load addr in a_reg,
+			  loadv limit symbol, sp, limit type, el.
+
+limit type		: integer.
+			  $ 0: left
+			  $ 1: right
+			  $ 2: calibre
+
+
+load stack var in v_reg : loadv stack var symbol, sp,
+			  position on stack, el.
+
+load indexed element
+	in v_reg	: load index sequence,
+			  load list element in v_reg.
+
+load index sequence	: index symbol, el,
+			  load simple in v_reg,
+			  [load list element in v_reg sequence],
+			  end index symbol, el.
+
+load list element in
+	v_reg sequence	: load list element in v_reg,
+			  [load list element in v_reg sequence].
+
+load list element
+	in v_reg	: load addr in a_reg,
+			  loadv list elem symbol, sp, integer, el.
+			  $ 0: right most element of indexed block
+			  $ i: (i-1)-th right most element
+
+load global addr
+	in a_reg	: loada global symbol, sp, repr, el.
+
+load stack var
+	in a_reg	: loada stack var symbol, sp,
+			  position on stack, el.
+
+
+restores from
+	output gate	: restore from output gate,
+			  [restores from output gate].
+
+restore from output gate: copy gate val to w_reg,
+			  [store w_reg sequence],
+			  free w_reg.
+
+copy gate val to w_reg	: loadw symbol, sp, formal, el.
+
+store w_reg sequence	: store w_reg, [store w_reg sequence].
+
+store w_reg		: store w_reg in variable;
+			  store w_reg in indexed element;
+			  store w_reg in stack var.
+
+store w_reg in variable : storew variable symbol, sp, repr, el.
+
+store w_reg in
+	indexed element : load index sequence,
+			  store w_reg in list element.
+
+store w_reg in
+	list element	: load addr in a_reg,
+			  storew list element symbol, sp, integer, el.
+
+store w_reg in
+	stack var	: storew stack var symbol, sp,
+			  position on stack, el.
+
+
+free w_reg		: free w_reg symbol, el.

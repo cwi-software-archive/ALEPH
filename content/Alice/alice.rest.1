@@ -1,0 +1,2580 @@
+.c2|
+.ll 75
+.lt 75
+.pl 60
+.de qq
+.if o .tl '''%'
+.if e .tl '%'''
+.c2 |
+|sp 2
+.ns
+..
+.wh 0 qq
+.nh
+.na
+.de p0
+.ti 6
+..
+.de p1
+
+.ti 6
+..
+.de p2
+
+
+.ti 6
+..
+3.3  Rules
+
+
+3.3.1  Introduction
+.p2
+In order to indicate the reasons behind the various ALICE constructs,
+the semantics of a call in ALEPH will be discussed first.
+The ALEPH version
+of a subroutine call differs
+from calls in most programming languages in that the result of a
+call influences the flow of control.
+An affix form
+(subroutine call) identifies a rule (subroutine) to be executed
+and describes the actual parameters.
+The execution of the rule starts with copying the actual
+input parameters of the affix form to the private stack frame of
+the rule. Then the actual rule is executed. The
+execution of the actual rule can succeed or fail. If it
+succeeds the output parameters are restored to the
+output parameters of the affix form. If it fails
+the output parameters will not be restored. The affix form
+succeeds or fails if the rule called succeeds
+or fails, respectively.
+.p1
+The basic building blocks of an ALEPH rule are called "member"s.
+The term member covers affix forms as well as language primitives such as
+assignment.
+Primitives
+obey the same laws in terms of flow of control as affix forms.
+Every member is
+connected to two positions in the rule: a
+position for a successful execution of the member
+and a position for a failing execution.
+Such a position in a rule can either be a member or the end of
+a rule body.
+In the latter case the execution of the rule
+has come to an end, and the result is passed to its caller.
+If the position is a member, the success or
+failure of the member is of no further interest; control simply
+continues. A member calling an
+action or a function needs only be connected to one position,
+because actions and functions never fail.
+.p1
+Compound members have not been taken into account yet.
+In the semantics of ALEPH a
+compound member is merely a call to an implicitly defined rule.
+This does not mean that compound members are translated as such.
+There are no compound statements in ALICE. An ALEPH compiler must
+use other facilities to translate them.
+Consider, for example, the ALEPH rule
+
+
+'predicate' p: q1, a1, a2;
+	       (q2; q3), a3, q4, :p;
+	       q5.
+
+
+where the qi's stand for members that can fail and the ai's for
+members that cannot fail.
+The table below states the connections between the various
+members of this rule.
+
+.bp
+.nf
+		true	false
+		address address
+
+
+q1		a1	q2
+q2		a3	q3
+q3		a3	q5
+q4		:p	.
+q5		.	.
+a1		a2
+a2		.
+a3		q4
+:p		q1
+.fi
+
+The dot "." means the end of the rule body.
+.p1
+ALEPH rules are translated to ALICE rules.
+An ALICE rule consists of a rule head, a rule body,
+and a rule tail.
+The rule head identifies the rule and copies input parameters to the
+private stack frame of the rule.
+The rule body consists of a sequence of statements with explicit flow of control
+using labels, jumps, and true and false-addresses
+in calls.
+Rules and labels have unique integer representations, like
+all ALICE objects.
+The rule tail either
+restores output parameters from the private stack frame of the
+rule and returns success to the caller or it returns failure to the caller.
+.p1
+The following is a sketch of the translation of the ALEPH 'predicate' p
+above. The macros for rule identification, call, and rule termination
+have not been worked out in detail. They represent groups of ALICE macros.
+A group of ALICE macros describing a call has been written down symbolically
+as:
+
+call <rule called>, <true address>, <false address>
+
+where the false address is omitted if the call cannot
+fail and the representation of the address of the next sequential
+instruction is zero.
+
+.nf
+rule <p>
+label 1
+call <q1>,0,4
+call <a1>,0
+call <a2>,2
+label 4
+call <q2>,5,0
+call <q3>,0,6
+label 5
+call <a3>,0
+call <q4>,0,3
+jump 1
+label 6
+call <q5>,0,3
+success-tail 2
+fail-tail 3
+
+.fi
+.bp
+3.3.2  The ALICE abstract machine
+.p2
+The semantics of ALICE will be described in terms
+of an abstract machine, the ALICE ABSTRACT MACHINE (A.A.M.).
+The parts of the A.A.M. will be introduced now.
+.p1
+The A.A.M. has a memory in which machine code and
+the data structures described in
+section 3.2 are allocated. These data structures are addressed via
+their representation.
+.p1
+Furthermore, the A.A.M. has a stack, called the "run-time stack".
+On this run-time stack the formal and local parameters of the
+rules in execution, and the return addresses to their callers are kept.
+Formals and locals are addressed by means of integers, called "stack
+position".
+.p1
+A sequence of machine words is used to pass parameters to and from
+the run-time stack.
+In real machines
+this can be a contiguous sequence of memory locations,
+or a number of registers, or the run-time
+stack itself.
+In the A.A.M. a special
+device is used for this purpose. It is called the "gate", and
+it is manipulated in stack fashion. Elements on the gate have integer addresses
+starting from one. These addresses are, strictly spoken, superfluous
+because the gate is treated like a stack,
+but when the gate is mapped on a real
+machine these integers can be practical.
+When the gate is used to pass parameters to the run-time stack, it
+is called the "input gate". When it is used to pass parameters back to the
+caller, the gate is called the "output gate".
+.p1
+To load the actual parameters from memory and
+to stack them on contiguous positions of the
+gate, two abstract machine registers are used. One register, the "v-register"
+can hold an integer value.
+The other one, called "a-register", can hold the address of an administration.
+The description of an input parameter consists of one or more statements
+to load the a-register or v-register, followed by one statement to store
+the contents of the a-register or v-register on a specific position of the
+gate.
+.p1
+During the execution of a call,
+one position on the gate corresponds to one position on the run-time stack.
+For some implementations it may well be
+that the position on the run-time stack must be known by the caller, for
+instance because the actual parameters are pushed directly on the run-time
+stack.
+Therefore, both gate position and run-time stack position are given in the
+statements to store the contents of the a-register or v-register on the gate.
+Gate position and stack position form a pair of integers, which are always
+supplied together. This pair of integers is called a "formal".
+.p1
+To unstack an output parameter from the gate another
+abstract machine register is needed. This register, called the "w-register"
+can hold an integer value.
+The description of an output parameter consists of one or more statements
+to load the w-register, eventually with the aid of the a-register or
+v-register, followed by one statement to store the contents of the w-register
+into memory.
+
+.bp
+.nf
+
+
+
+
+
+
+			 M	 a-reg		    r
+						    u
+			 E	 v-reg	     g	    n
+					     a	    -
+			 M		     t	    t
+				 w-reg	     e	    i
+			 O			    m
+						    e
+			 R
+						    s
+			 Y			    t
+						    a
+						    c
+						    k
+
+
+
+			 The ALICE abstract machine
+
+
+.fi
+.bp
+3.3.3  Outline of an ALICE rule
+
+
+Syntax:
+
+.nf
+rule decls		: rule decl, [rule decls].
+
+rule decl		: rule head, rule body, rule tail.
+
+rule head		: rule id,
+			  stack frame,
+			  [copies from input gate].
+
+
+rule body		: statements.
+
+statements		: statement,
+			  [statements].
+
+statement		: call;
+			  ext call;
+			  primitive.
+
+rule tail		: success tail,
+			  [fail tail].
+
+.fi
+.p2
+The ALICE macros making up a rule are divided in three groups:
+rule head macros, rule body macros, and rule tail macros. The rule
+head macros identify the rule, supply debugging information and
+describe the correspondence between the input gate and the run-time
+stack frame of the rule. The rule body consists of a sequence of
+statements. A statements is either a call to another ALICE rule, or a
+call to an external rule, or an ALICE primitive.
+If the rule cannot fail, the rule tail consists of one section: a success
+tail.
+If the rule can fail, the rule tail consists of a success tail and a fail
+tail. In the success tail the correspondence between run-time stack frame
+and output gate, unstacking, and returning success is described.
+In the fail tail unstacking and returning failure is described.
+
+
+3.3.4  Rule head
+
+
+Syntax:
+
+.nf
+rule id			: rule id symbol, sp, repr, co,
+			  rule type, co, recursion, co, string, el.
+
+rule type		: integer.
+
+recursion		: integer.
+
+stack frame		: stack frame symbol, sp,
+			  integer, co, integer, el.
+
+copies from input gate	: copy from input gate,
+			  [copies from input gate].
+
+
+copy from input gate	: copy from input gate symbol, sp,
+			  formal, el.
+
+formal			: integer, co, integer.
+
+
+
+.fi
+Semantics:
+.p1
+The parameters of a rule id macro have the following meaning:
+.br
+First parameter, repr: the representation of the rule.
+.br
+Second parameter, rule type: an integer:
+	0: the rule cannot fail
+	1: the rule can fail
+.br
+Third parameter, recursion: an integer:
+	0: non recursive rule
+	1: recursive rule
+.br
+Fourth parameter, string: The ALEPH rule tag and formal affix sequence
+in quotes.
+.p1
+A stack frame macro declares the number of formals and
+locals to be allocated on the run-time stack. The first parameter denotes
+the number of formals, the second denotes the number of locals.
+.p1
+For every input parameter there will be one copy from input gate macro.
+A copy from input macro causes popping of one value from the gate
+and copying it to a position of the run-time stack.
+The first parameter denotes the position one the gate, the second parameter
+denotes the position one the run-time stack. The position on gate parameters
+form a descending row, from the number of input parameters
+to one.
+
+Installation hints:
+
+hint 1.
+.p0
+The representation of the rule serves to generate a label. The string of
+a rule id macro is needed when debugging information must be generated, because
+a global dump is requested (see section 3.4  status macro).
+
+.p1
+How the stack frame and copy from input gate macros are used depends
+on the implementation of the calling mechanism. Throughout this section
+two models for the implementation of the calling mechanism will be described:
+In the first model the role of the gate is played by registers r1, r2 , ...
+In the second model the parameters are passed directly on the run-time stack,
+that is, the way from v-register (or a-register), via gate, to run-time
+stack is cut short.
+
+
+hint 2.
+.p0
+If the parameters are passed in registers, the stack frame macro causes
+the allocation of a number of machine words for the formals and locals
+on the run-time stack, and the pushing of the return address, passed by
+the caller, on the run-time stack.
+.p0
+A copy from input gate macro causes a move from the register
+indicated by the first parameter
+to the run-time stack position addressed by the second parameter.
+
+
+hint 3.
+.p0
+If the parameters are passed directly on the run-time stack, the caller
+will do that. The only thing that may be done in the rule head
+is pushing the return
+address on the run-time stack.
+
+
+3.3.5  Rule tail
+
+
+Syntax:
+
+
+.nf
+rule tail		: success tail,
+			  [fail tail].
+
+success tail		: success tail id,
+			  [output gate creation],
+			  [restores to output gate],
+			  unstack and return true.
+
+success tail id		: success tail id symbol, sp, repr, co,
+			  rule type, co, recursion, el.
+
+output gate creation	: output gate symbol, sp, integer, el.
+
+restores to output gate : restore to output gate,
+			  [restores to output gate].
+
+restore to output gate	: restore to output gate symbol, sp,
+			  formal, el.
+
+unstack and return true : unstack and return symbol, sp,
+			  integer, co, integer, co, true symbol, el.
+
+fail tail		: fail tail id,
+			  unstack and return false.
+
+fail tail id		: fail tail id symbol, sp, repr, co,
+			  rule type, co, recursion, el.
+
+unstack and return false: unstack and return symbol, sp,
+			  integer, co, integer, co, false symbol, el.
+
+.fi
+Semantics:
+.p1
+The parameters of a success tail macro have the following meaning:
+.br
+First parameter, repr: the representation of the success tail.
+.br
+Second parameter, rule type: see rule id macro.
+.br
+Third parameter, recursion: see rule id macro.
+.p1
+An output gate macro declares the number of output parameters, and
+consequently the size of the output gate.
+.p1
+For every output parameter there will be one restore to output gate
+macro. A restore to output gate macro causes stacking of one formal
+output parameter on the gate. The first parameter denotes the position
+on the gate, the second parameter denotes the position on the run-time
+stack.
+.p1
+The parameters of an unstack and
+return macro, have the following meaning:
+.br
+First parameter, integer: the number of formals on the run-time stack.
+.br
+Second parameter, integer: the number of locals on the run-time stack.
+.br
+Third parameter, true or false: result of the execution of the rule.
+
+.p0
+The parameters of a fail tail macro have the following meaning:
+.br
+First parameter, representation of the fail tail.
+.br
+Second parameter, rule type: see rule id macro.
+.br
+Third parameter, recursion: see rule id macro.
+
+
+Installation hints:
+
+hint 1.
+.p0
+The representations of success tail and fail tail serve to generate labels.
+In the code generated by jump macros and call macros there will
+be jumps to these labels.
+
+hint 2.
+.p0
+If the parameters are passed in registers, the create output gate
+macro informs how many registers will be needed for that. A restore
+to output gate macro causes a move from the run time stack position addressed
+by the second parameter to register r<first parameter>.
+
+hint 3.
+.p0
+If the parameters are passed on the run-time stack, the caller will restore
+the output parameters.
+
+hint 4.
+.p0
+The result of the execution of a rule (success or failure) can be reported
+to the caller in two ways:
+.br
+a) There is a register or memory location allocated for this purpose. The
+rule tail assigns true or false to it, and the caller tests it.
+.br
+b) Depending on success or failure the rule returns to a different address.
+For instance, in the fail tail a jump to the return address is
+generated, while in the success tail a return to the next instruction is
+generated.
+
+hint 5.
+.p0
+The tricks in hint 4 are only needed if the rule can fail (rule type).
+
+
+
+.bp
+Example:
+
+ALEPH:
+
+'predicate' p + >i + o> + >io> - l:
+
+p is a recursive rule.
+.p1
+The table below shows the corresponding ALICE rule head and tail.
+Instead of the three-letter representations for the
+macro names, more readable tags are used.
+
+
+.nf
+rule-id 1000,1,1,"p+>i+o>+>io>"
+stack-frame 3,1
+copy-from-gate 2,3
+copy-from-gate 1,1
+
+succ-tail-id 1015,1,1
+output-gate 2
+restore-to-gate 1,3
+restore-to-gate 2,2
+unstack-return 3,1,true
+fail-tail-id 1016
+unstack-return 3,1,false
+
+
+.bp
+.fi
+
+3.3.6. Calling a rule
+
+
+Calling a rule proceeds as follows:
+.nf
+
+1. Identification of the rule to be called.
+2. Stacking the actual input parameters on the (input) gate.
+3. (subroutine) jumping to the rule.
+4. Upon return:
+   if the rule has failed
+      continuing at the false address
+   else
+      unstacking the output parameters from the output gate
+      continuing at the true address
+
+
+.fi
+.p0
+The macros concerning parameter passing will be discussed in detail in
+the next section.
+
+
+Syntax:
+
+.nf
+call			: call id,
+			  input gate creation,
+			  target stack frame,
+			  [copies to input gate],
+			  scall or fcall,
+			  [restores from output gate],
+			  link.
+
+
+call id			: call id symbol, sp, repr, co, rule type, co,
+			  recursion, el.
+
+input gate creation	: input gate symbol, sp, integer, el.
+
+target stack frame	: target stack frame symbol, sp,
+			  integer, co, integer, el.
+
+scall or fcall		: scall symbol, sp, repr, el;
+			  fcall symbol, sp, repr, co, repr, el.
+
+link			: link symbol, sp, repr, el.
+
+.fi
+
+Semantics:
+.p2
+The parameters of a call id macro have the following meaning:
+
+First parameter, repr: representation of the rule to be called.
+Second parameter, rule type: an integer:
+	0: the rule to be called cannot fail
+	1: the rule to be called can fail
+.br
+Third parameter, recursion: an integer:
+	0: the rule to be called is not recursive
+	1: the rule to be called is recursive
+.p1
+An input gate macro declares the number of input parameters, and consequently
+the size of the input gate.
+.p1
+A target stack frame macro declares the number of formals and locals of the
+rule to be called. The first parameter denotes the number of formals,
+the second denotes the number of locals.
+.p1
+If there is a scall macro, the rule to be called cannot fail (rule type	 = 0).
+If there is a fcall macro the rule to be called can fail (rule type = 1).
+The first parameter of a scall macro or fcall macro is the representation
+of the rule to be called. The second parameter of a fcall macro
+is the representation of the false address of the call.
+.po1
+.p1
+The parameter of a link macro is the true address of the call.
+
+
+
+Installation hints:
+
+
+hint 1.
+.p0
+If the parameters are passed in registers, the input gate macro informs
+how many registers will be needed for that.
+
+hint 2.
+.p0
+If the parameters are passed directly on the run-time stack, the target
+stack frame macro supplies the necessary information to build up the
+stack frame of the rule to be called.
+
+hint 3.
+.p0
+The scall macro will generate code to pass the return address to the rule
+to be called, and to jump to the rule.
+
+hint 4.
+.p0
+The fcall macro will generate code to pass the return address to the rule
+to be called, and to jump to the rule. The code on the return address depends
+on how the result (success or failure) of the execution of the called rule
+is returned to the caller.
+If it is returned in a register or memory location (hint 4 a in the previous
+section), there will be a test and a conditional jump to the false address.
+In the other case (hint 4 b in the previous section) there will be just a jump
+to the false address.
+
+
+
+.bp
+3.3.7  Parameter passing
+
+
+
+3.3.7.1	 Actual input parameters
+.p2
+To stack the actual input parameters on the gate, the v-register
+and a-register are used.
+
+
+Syntax:
+
+.nf
+copies to input gate	: copy to input gate,
+			  [copies to input gate].
+
+copy to input gate	: copy val to input gate;
+			  copy addr to input gate.
+
+copy val to input gate	: load val in v reg,
+			  copy v reg to input gate.
+
+load val in v reg	: load simple in v reg;
+			  load indexed element in v reg.
+
+load simple in v reg	: load constant in v reg;
+			  load variable in v reg;
+			  load stack var in v reg;
+			  load limit in v reg.
+
+
+copy v reg to input gate: copy v reg symbol, sp, formal, el.
+
+copy addr to input gate : load addr in a reg,
+			  copy a reg to input gate.
+
+load addr in a reg	: load global addr in a reg;
+			  load stack var in a reg.
+
+copy a reg to input gate: copy a reg symbol, sp, formal, el.
+
+formal			: integer, co, integer.
+
+
+
+
+load constant in v reg	: loadv constant symbol, sp, repr, co, valref, el.
+
+load variable in v reg	: loadv variable symbol, sp, repr, el.
+
+load stack var in v reg : loadv stack var symbol, sp,
+			  position on stack, el.
+position on stack	: integer.
+
+load limit in v reg	: load addr in a reg,
+			  loadv limit symbol, sp, limit type, el.
+limit type		: integer.
+
+
+
+load indexed element
+	in v reg	: indexed input parameter symbol, el,
+			  load simple in v reg,
+			  load list element in v reg sequence.
+
+load list element in
+	v reg sequence	: load list element in v reg,
+			  [load list element in v reg sequence].
+
+
+load list element
+	in v reg	: load addr in a reg,
+			  loadv list elem symbol, sp, integer, el.
+
+
+load global addr
+	in a reg	: loada global symbol, sp, repr, el.
+
+load stack var
+	in a reg	: loada stack var symbol, sp,
+			  position on stack, el.
+
+.fi
+Semantics:
+.p2
+A loadv constant macro causes the value of the constant source, described by the
+parameters of the macro, to be loaded in the v-register.
+The valref in the loadv constant macro refers to a
+location in the value table.
+The repr in the loadv constant macro is the representation of the constant
+source.
+.p1
+A loadv variable macro causes the value of the variable, represented by
+the repr parameter of the macro, to be loaded in the v-register.
+.p1
+A loadv stack var macro causes the value of the stack variable (formal or
+local parameter) of the caller, addressed by the position on stack parameter
+of the macro, to be loaded in the v-register.
+.p1
+A loada global macro causes the address of the administration of a list
+or file, represented by the repr parameter of the macro, to be loaded in
+the a-register.
+.p1
+A loada stack var macro causes the value of the stack variable (formal or
+local parameter) of the caller, addressed by the position on stack parameter
+of the macro, to be loaded in the a-register.
+.p1
+A loadv limit macro causes the value of a limit to be loaded in the v-register.
+The a-register contains the address of the list administration from which
+this value must be retrieved. The limit type parameter indicates which limit
+has to be retrieved:
+	0: left
+	1: right
+	2: calibre
+.p1
+An indexed input parameter macro has no effect on the ALICE abstract machine. It
+announces that an list element is going to be loaded in the v-register.
+.p1
+A loadv list elem macro causes the v-register to be loaded with a list
+element. The a-register contains the address of the list administration.
+The v-register contains the virtual address of the block containing the
+list element. The integer parameter indicates which element of the block
+has to be selected:
+	0: right most element
+	i: (i-1)-th right most element
+.p1
+A copy v reg to input gate macro causes the contents of the v-register to
+be stacked on the gate. The first integer parameter of this macro denotes
+on which gate position the v-register must be stacked. The second integer
+parameter denotes on which run-time stack position
+the contents of the v-register
+will be copied.
+.p1
+A copy a reg to input gate macro causes the contents of the a-register to
+be stacked on the gate. The first integer parameter of this macro denotes
+on which gate position the a-register must be stacked. The second integer
+parameter denotes on which run-time stack position
+the contents of the a-register
+will be copied.
+.p1
+The value of the a-register and v-register can not be used more
+than once.
+
+
+Installation hints:
+
+
+hint 1.
+.p0
+If the parameters are passed in registers use can be made of the stack
+wise treatment of the gate. The register allocated for the v-register
+or a-register can be the same as the one that will be allocated for
+the next position of the gate, so that a copy to gate macro will generate
+no code at all.
+In that case it is necessary to know which register will be copied to the
+gate before the copy to gate macro is read.
+Because of the simple structure of ALICE this can indeed be known. The figures
+below shows which registers have to be allocated for the a-register and
+v-register when the first parameter is stacked on the gate.
+
+.bp
+.nf
+
+
+
+
+
+	    repr		  r1
+		    loadv		  copy
+		    constant	 v-reg	  v-reg	     r1
+	   valref			  to gate
+				 1,stpos
+
+
+
+
+
+
+
+
+				  r1
+	    repr    loadv		  copy
+		    var		 v-reg	  v-reg	     r1
+					  to gate
+				 1,stpos
+
+
+
+
+
+
+
+
+				  r1
+	   stpos    loadv		  copy
+		    stack	 v-reg	  v-reg	     r1
+		    var			  to gate
+				 1,stpos
+
+
+
+
+
+
+
+
+		      r1
+					    r1
+     repr   loada    a-reg    loadv		    copy
+	    global	      limit	   v-reg    v-reg      r1
+		     limit			    to gate
+		     type		   1,stpos
+
+.bp
+
+
+
+
+
+
+
+		      r1
+					    r1
+     stpos  loada    a-reg    loadv		    copy
+	    stack	      limit	   v-reg    v-reg      r1
+	    var	     limit			    to gate
+		     type		   1,stpos
+
+
+
+
+
+
+
+		    r1
+
+     load simple   v-reg    loadv    r1		 r1
+							copy
+		  integer   list    v-reg . . . v-reg	v-reg	   r1
+							to gate
+			    element	      1,stpos
+     repr  loada   a-reg
+	   global
+		    r2
+
+
+
+
+
+		    r1
+
+     load simple   v-reg    loadv    r1		 r1
+							copy
+		  integer   list    v-reg . . . v-reg	v-reg	   r1
+							to gate
+			    element	      1,stpos
+    stpos  loada   a-reg
+	   stack
+	   var	    r2
+
+
+
+.fi
+.bp
+hint 2.
+.p0
+If the parameters are passed directly on the run-time stack and the
+machine provides moves from memory to memory, no registers at all
+have to be allocated for the a-register and v-register. for instance,
+from the macros:
+
+loadv-var	11
+.br
+copy-v-reg	1,3
+
+an ALICE translator could generate:
+
+move v11,stackpointer-3
+
+hint 3.
+.p0
+Because
+the values of the a-register and v-register do not have to be remembered,
+efficient code can be generated.
+For instance when a limit has to be retrieved, the register playing the
+role of the a-register firstly, can be used to play the role of the
+v-register later on
+(see hint 1).
+
+
+
+3.3.7.2	 Actual output parameters
+.p2
+To store an output gate element in an indexed element
+first the address of that indexed element must be calculated. This is described
+by the same macros as for an indexed input parameter.
+From the above it is clear that both a-register and v-register are needed
+for this purpose.
+This is why a special output register, the w-register, is needed in the abstract machine.
+
+Syntax:
+
+
+.nf
+restores from
+	output gate	: restore from output gate,
+			  [restores from output gate].
+
+restore from output gate: copy gate elem to w reg,
+			  store w reg sequence,
+			  free w reg.
+
+store w reg sequence	: store w reg, [store w reg sequence].
+
+copy gate elem to w reg : loadw symbol, sp, formal, el.
+
+store w reg		: store w reg in variable;
+			  store w reg in list element;
+			  store w reg in stack var.
+
+store w reg in variable : storew variable symbol, sp, repr, el.
+
+store w reg in
+	list element	: indexed output parameter symbol, el,
+			  load simple in v reg,
+			  [load list element in v reg sequence],
+			  load addr in a reg,
+			  storew list element symbol, sp, integer, el.
+
+store w reg in
+	stack var	: storew stack var symbol, sp,
+			  position on stack, el.
+
+free w reg		: free w reg symbol, el.
+.fi
+
+
+Semantics:
+.p2
+A copy gate elem to w reg macro causes the top element of the gate to be
+popped from the gate and to be loaded in the w-register. The first
+integer parameter denotes the
+position
+of the output parameter on the gate, the second integer parameter
+denotes the position on the run-time stack.
+.p1
+A storew variable macro causes the w-register to be stored in the
+variable, represented by the repr parameter of the macro.
+.p1
+A storew stack var macro causes the w-register to be stored in a stack
+variable (formal or local parameter of the caller), addressed by
+the position on stack parameter of the macro.
+.p1
+An indexed output parameter has no effect on the ALICE abstract machine.
+.p1
+A storew list element macro causes the w-register to be stored in
+a list element. The a-register contains the address of the administration
+of the list. The v-register contains the virtual address of the block
+containing the list element. The integer parameter of the macro indicates
+which element of the block has to be selected just
+as the integer parameter of a loadv list elem macro.
+
+.bp
+Installation hint:
+
+
+hint 1.
+.p0
+If the parameters are passed in registers, the register allocated
+for the w-register can the same as the register allocated for the
+top of the gate. If there are, e.g., two output parameters, the
+gate consists of r1 and r2. When restoring the first output parameter,
+which is located in r2, the role of the w-register is played by r2, too.
+The figure below shows the register allocation in case of a list
+element as actual output parameter.
+
+
+.nf
+
+
+
+
+
+
+
+		    r2
+	    copy
+  2,stpos   gate   w-reg			    store     free
+
+			     r3			    w-reg     w-reg
+
+		  load	    v-reg		    in
+		  simple	     r4
+						    list
+			    loada   a-reg
+		      repr  global		    elem
+
+					 integer
+
+
+
+
+
+.fi
+.bp
+Example:
+
+ALEPH:
+'predicate' p + >i + o> + >io> - l:
+
+'stack' [1](s1,s2)st.
+
+'variable' res = 0.
+
+
+.p1
+The table below shows the ALICE call macros corresponding to
+the ALEPH affix form "p + <<st + res + s1*st[>>st]".
+Instead of the three-letter ALICE symbols, more readable tags are
+used.
+
+
+.nf
+call-id		1000,1,1
+input-gate	2
+target-st-frame 3,1
+loada-global	50
+loadv-limit	0
+copy-v-reg	1,1
+indexed-input-parameter
+loada-global	50
+loadv-limit	1
+loada-global	50
+loadv-list-el	0
+copy-v-reg	2,3
+fcall		1000,510
+copy-gt-to-w	2,2
+storew-var	100
+freew
+indexed-output-parameter
+copy-gt-to-w	1,3
+loada-global	50
+loadv-limit	1
+loada-global	50
+storew-list-el	0
+freew
+link		0
+
+
+
+
+
+.fi
+.bp
+3.3.8  Primitive rules
+.p2
+ALICE has "externals" and "primitives". They can be considered as the
+operations of ALICE.
+Primitives are not declared, externals are.
+The ALICE-primitives are the operations that have
+parameters that cannot be described as the parameters of ALICE
+calls. The externals have exactly the same
+parameter descriptors as the ALICE calls.
+.p1
+The parameter mechanism for externals can be implemented the same as
+for rules, although that is not likely to happen.
+Externals do not need a stack frame in most implementations, so their
+parameters can be kept in, for instance, registers.
+
+
+3.3.8.1	 External rules
+.p2
+ALICE externals are declared to make it easy
+to implement them as subroutines. In most implementations however
+in-line code will be generated for them.
+Standard external rules are identified by both an integer representation
+and an ALICE symbol.
+User externals are identified by an integer representation and a
+string. What is in the string depends on the implementation of user externals.
+User externals will therefore not appear in portable ALICE programs.
+
+
+Syntax:
+
+.nf
+ext rule decls		: ext rule decl, [ext rule decls].
+
+ext rule decl		: ext rule decl symbol, sp, repr, co, stag, el.
+
+stag			: string;
+			  extag.
+
+
+extag			: .	 .	.
+			  subtr symbol;
+			  mult symbol;
+			  get char symbol;
+			  .	 .	.
+			  .	 .	.
+			  .	 .	.
+			  .	 .	.
+			  put char symbol;
+			  put string symbol;
+			  get int symbol;
+			  put int symbol;
+			  get data symbol;
+			  put data symbol.
+
+ext call		: ext call id,
+			  [copies to input gate],
+			  ext scall or ext fcall,
+			  [restores from output gate],
+			  ext call end.
+
+ext call id		: ext scall id;
+			  ext fcall id.
+ext scall id		: ext scall id symbol, sp, repr, co, stag, el.
+ext fcall id		: ext fcall id symbol, sp,
+			  repr, co, stag, co, repr, el.
+
+ext scall or ext fcall	: ext scall symbol, sp, repr, co, stag, el;
+			  ext fcall symbol, sp,
+			  repr, co,  stag, co, repr, el.
+
+ext call end		: ext call end symbol, co, repr, el.
+
+.fi
+
+Semantics:
+
+.p1
+An external rule declaration macro declares an external represented
+by the repr parameter of the macro. If the second parameter is a string,
+the external is a user external with implementation dependent semantics.
+If the second parameter is an ALICE symbol, the external is a
+standard external.
+The semantics of such a standard external are defined in the ALEPH manual.
+The name of the ALICE symbol is equal to the name of the ALEPH external
+(e.g. the ALICE "get char symbol" stands for the ALEPH standard external
+"get char").
+.p1
+A group of ext call macros causes a standard external to be executed
+with actual parameters as described by the copies to input gate macros
+and the copies to output gate macros.
+.p1
+The parameters of a scall id and a scall macro have the same meaning
+as those of a external rule declaration macro.
+.p1
+The first two parameters of a fcall id and a fcall macro have the same
+meaning as those of an ext call decl macro.
+The third parameter is the false address of the fcall.
+.p1
+The parameter of an ext call end macro is the true address of the
+ext call.
+
+
+Installation hints:
+
+hint 1.
+.p0
+The false address and true address of the external call are supplied
+in the first macro such that, if in-line code
+instead of a subroutine call is generated,
+this information is available in time.
+Gate and stack macros are left out, because the information they
+carry is already available by means of the ALICE symbol.
+
+hint 2.
+.p0
+Implement the gate in registers. Don't use the run-time stack for an external
+but let it transform the input gate into the output gate.
+
+hint 3.
+.p0
+A smart ALICE processor could read all macros for an external
+call before generating any code for it. It could also parse the
+parameter descriptors to handle simple cases (such as constant parameters)
+specially.
+
+3.3.8.2	 ALICE primitives
+.p2
+ALICE primitives can be divided in two classes.
+In the first place there are low level operations
+such as jumping to a label or
+halting.
+In the second place there are high level operations such as building a
+jump table and extending a stack, that cannot be described in terms of
+an ALICE external, because the parameters of such an operation
+are of a different nature.
+
+
+3.3.8.2.1  Low level primitives
+
+
+Syntax:
+.nf
+
+primitive		: label definition;
+			  jump;
+			  source line;
+			  exit;
+			  class box;
+			  class;
+			  extension.
+
+
+jump			: jump symbol, sp, repr, el.
+
+label definition	: label symbol, sp, repr, el.
+
+source line		: source line symbol, sp,
+			  integer, el.
+
+exit			: exit symbol, sp, repr, co, valref, el.
+
+
+.fi
+Semantics:
+.p2
+A label macro causes the generation of a label, uniquely represented
+by the repr parameter of the macro.
+.p1
+A jump macro causes the generation of a jump to the label, represented
+by the repr parameter of the macro. This label can by generated
+by means of a label macro, a success tail macro, or a fail tail macro.
+.p1
+A source line macro causes the generation of code, such that the integer
+parameter of the macro is stored in a memory location, especially allocated
+for this purpose.
+.p1
+An exit macro causes the generation of code that halts execution and
+passes the constant, described by the
+parameters of the macro to the operating system.
+
+
+.bp
+Installation hints:
+
+
+hint 1.
+.p0
+The source line macro serves the run-time system to provide the
+source line number of the original ALEPH program in error messages.
+The simplest implementation is to generate a move to a register
+or memory location. This is of course a time consuming business. Another
+way is to build from all source line macros a table giving the correspondence
+between machine addresses and source line numbers.
+
+
+
+3.3.8.2.2  Classification primitives
+.p2
+Class box and class macros occur in ALICE as the translation
+of the ALEPH classifier box respectively the ALEPH areas of a
+classification.
+.p1
+The ALEPH classifier box is translated to a class box.
+.p1
+The ALEPH areas prefixing the alternatives of the classification are
+gathered. The alternatives are translated as usual.
+After the translation of the alternatives the ALEPH areas are translated
+to a class. A class consists of a class begin macro, a number
+of zone macros, and a class end macro.
+
+
+Syntax:
+.nf
+
+
+class box		: class box id symbol, el,
+			  load val in v reg,
+			  end class box symbol, sp, repr, el.
+
+
+class			: class begin symbol, sp, repr, co,
+			  optimize, el,
+
+			  zones,
+
+			  class end symbol, sp, optimize, el.
+
+zones			: zone bounds, [zones];
+			  zone value, [zones].
+
+zone bounds		: zone bounds symbol, sp,
+			  minbound, co, maxbound, co,
+			  repr, el.
+
+minbound		: repr, co, valref.
+maxbound		: repr, co, valref.
+
+zone value		: zone value symbol, sp,
+			  repr, co, valref, co,
+			  repr, el.
+
+optimize		: true symbol;
+			  false symbol.
+
+
+
+.fi
+Semantics:
+
+.p1
+A class box macro has no effect on the ALICE machine. It announces that
+macros to load the v-register will follow.
+.p1
+A class box end macro causes the generation jump to the label
+generated by a class begin macro.
+.p1
+A class begin macro causes generation of a label, represented by the
+repr parameter of the macro.
+The optimize parameter has the following meaning:
+.in 7
+true: the value in the v-register will always fit in one of the
+zones that follow.
+
+false: it is not guaranteed that the value in the v-register will
+fit in one of the zones. If not an error handling run-time routine has to
+be executed.
+.in 0
+.p1
+A zone value macro causes the generation of code to test whether the contents of
+the
+v-register equals the constant source referred to in that macro.
+If the test succeeds flow of control resumes at the address, represented
+by the repr parameter of the macro.
+.p1
+A zone bounds macro causes the generation of a test whether the
+contents of the v-register
+lies between the min bound a the max bound (bounds included).
+These bounds are constant sources.
+If the test succeeds flow of control resumes at the address, represented
+by the repr parameter of the macro.
+.p1
+The optimize parameter of a class end macro has the same meaning as the one
+of a class begin macro.
+
+
+Installation hints:
+
+
+hint 1.
+.p0
+If it is known that the value in the v-register will always fit in one
+of the zones, efficient code can be generated such that
+few tests really have to be done.
+Consider for example a class with three zone bounds macros
+with the following bounds and reprs
+
+.nf
+min bound	max bound	repr
+
+      -32	      128	 121
+	0	      256	 121
+      512	     1024	 133
+.fi
+.p2
+The ALICE processor could
+generate the following code
+if optimization is allowed:
+.nf
+
+
+if v-reg < 257	goto l121 else goto l133
+
+.fi
+
+.p1
+The ALICE processor is allowed to generate this kind of optimized
+code if the optimize parameter in the class begin and class end macro
+is true.
+If the optimize parameter in these macros is false, a (jump to
+an) error routine must be generated at the end of the tests.
+In that case from the same three zone bounds macros as above the following code
+could be generated:
+
+
+.nf
+if (v-reg > -33 and v-reg < 257) goto l121
+else if (v-reg > 511 and v-reg < 1025) goto l133
+     else goto classerror
+
+.fi
+
+
+
+
+3.3.8.2.3  Extension primitives
+.p2
+Extension macros are the translation of an ALEPH extension.
+The sources are put on the gate as input parameters.
+The a-register is loaded with the address of the administration of the
+stack that must be extended. Then the administration of the stack
+can be updated. The formals in the extension copy macros indicate the
+position of the new elements.
+
+
+Syntax:
+
+
+
+.nf
+extension		: extension id,
+			  input gate creation,
+			  copies to input gate,
+			  load addr in a reg,
+			  extension call,
+			  extension copies,
+			  extension end.
+
+extension id		: extension id symbol, el.
+
+extension call		: extension call symbol, el.
+
+extension copies	: extension copy, [extension copies].
+
+extension copy		: extension copy symbol, sp,
+			  integer, co, integer, el.
+
+extension end		: extension end symbol, sp, repr, el.
+.fi
+
+
+.bp
+Semantics:
+.p2
+An extension id macro has no effect on the ALICE abstract machine. It
+announces that the gate will be filled with sources to extend a list.
+.p1
+An extension call macro causes the generation of code for the initiation
+of an extension:
+room is made to push a new block on the list.
+The gate contains the sources to extend the list with. The
+a-register contains the address of the administration of the list that
+will be extended.
+.p1
+An extension copy macro causes the copying of a gate element to a
+position in the new block of the list. The first integer parameter
+of the macro denotes the position on the gate. The second integer
+parameter indicates which element of the block has to be selected
+just as the integer parameter of a loadv list elem macro.
+.p1
+The repr parameter of an extension end macro is the representation of the
+true address of the extension.
+
+
+
+Installation hint:
+
+
+hint 1.
+.p0
+An extension consists of:
+.br
+1. Stacking the sources on the gate.
+.br
+2. Ensuring the extension.
+.br
+3. Updating the list administration.
+.br
+4. Transporting the sources to the selected positions.
+
+
+ad 2. If not all virtual addresses are mapped in the physical address space,
+check whether the extension is still possible in the physical address space.
+If not, re-allot the lists or swap in a new page, depending
+on the list allocation.
+
+ad 3. Update the right limit and implementation dependent core limits, if any.
+
+ad 4. The gate is not used stackwise here. One gate element can be copied
+to more stack positions.
+.bp
+3.4. Program structure
+.p2
+This section is concerned with macros other than value, data, and
+rule macros. Their purpose is to provide global information and to
+separate groups of macros, such as data and rule macros, from each other.
+
+
+Syntax:
+
+
+.nf
+ALICE program		: program id symbol, sp, string, el,
+			  status information,
+			  values,
+			  end values symbol, el,
+			  data,
+			  communication area,
+			  rules,
+			  end symbol, sp, string, el.
+
+sp			: space symbol.
+co			: comma symbol.
+el			: end of line.
+
+status information	: status symbol, sp,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, co,
+			  integer, el.
+
+communication area	: communication symbol, sp,
+			  repr, co,
+			  repr, co,
+			  repr, co,
+			  string, el,
+
+			  status information.
+
+
+rules			: ext rule decls,
+			  rules and root.
+
+
+rules and root		: [rule decls], root, [rule decls].
+
+root			: root symbol, sp, string, el,
+			  source line,
+			  affix form,
+			  exit.
+
+affix form		: call;
+			  ext call.
+.fi
+
+
+.bp
+Semantics:
+.p2
+The parameters of a status macro have the following meaning:
+.br
+First parameter, integer: maximal number of parameters of a call (formals
++ locals).
+.br
+Second parameter, integer: maximal number of input or output parameters
+to be put on the gate.
+.br
+Third parameter, integer: number of locations needed in the value table.
+.br
+Fourth parameter, integer: number of variables to be declared.
+.br
+Fifth parameter, integer: number of files to be declared.
+.br
+Sixth parameter, integer: number of breathing lists to be declared.
+.br
+Seventh parameter, integer: number of non-breathing lists to be declared.
+.br
+Eighth parameter, integer: background:
+	0: the original ALEPH program contains no background pragmats.
+	1: the original ALEPH program contains background pragmats.
+.br
+Ninth parameter, integer: dump:
+	0: no dump is requested
+	1: a rule dump is requested
+	2: a global dump is requested
+	3: a member dump is requested
+.p1
+The meaning of the dump parameter is explained in detail in the ALEPH
+manual (dump pragmat).
+.p2
+The string parameters of the program id macro, the communication macro,
+the root macro, and the end macro of an ALICE program are identical. They
+contain the "title" of the program.
+.p1
+The parameters of the communication macro have the following meaning:
+.br
+First parameter, repr: representation of the first list in the chain
+of list administrations.
+.br
+Second parameter, repr: representation of the first file in the chain
+of file administrations.
+.br
+Third parameter, repr: representation of the first variable in the chain
+of variable declarations.
+.br
+Fourth parameter, string: the title of the program.
+.p1
+The execution of an ALICE program starts at the affix form (call or
+ext call) following the root macro.
+
+
+.bp
+Installation hints:
+
+
+hint 1.
+.p0
+The title string parameter in the
+root macro can serve to generate an entry point.
+The first thing
+to do in most implementations will be initialization of file administrations
+and maybe of list administrations. Code for this can be generated from the
+communication macro. In that case a call to that code will be generated
+from the root macro.
+
+
+hint 2.
+.p0
+The status macro informs the ALICE processor what kind of ALICE
+program it is going to have to translate. If, for example, parameters
+are passed in registers and the maximal gate is greater
+than the number of registers available for parameter passing, the ALICE
+processor is warned in advance so that it can take appropriate action.
+
+
+.bp
+3.5  ALICE grammar
+
+
+.nf
+$ALICE grammar october 77
+ ALICE consists of a set of macros,
+ comment lines, and pragmat lines.
+
+ A comment line starts with "xxx " and should be ignored.
+ A pragmat line has the format:
+
+ pragmat symbol,  sp, string, el.
+
+ It is supposed to be passed on to the assembler
+ A portable program contains no pragmat lines
+
+ A macro has the form:
+
+ macro			: mac name, [sp, parameters], el.
+ mac name		: ALICE terminal symbol.
+ parameters		: parameter, [co, parameters].
+ parameter		: string;
+			  integer;
+			  character;
+			  ALICE terminal symbol.
+
+$
+$ALICE terminal symbols		representation	$
+
+
+
+$macro names$
+add symbol;			$	add	$
+begin file adm symbol;		$	bfa	$
+call id symbol;			$	cll	$
+class begin symbol;		$	csb	$
+class end symbol;		$	cse	$
+char denotation symbol;		$	chd	$
+constant source symbol;		$	css	$
+communication symbol;		$	cmm	$
+copy a reg symbol;		$	car	$
+copy from input gate symbol;	$	cig	$
+copy v reg symbol;		$	cvr	$
+divide symbol;			$	dvd	$
+end file adm symbol;		$	efa	$
+end list symbol;		$	els	$
+end symbol;			$	end	$
+end values symbol;		$	eva	$
+exit symbol;			$	ext	$
+ext fcall symbol;		$	efc	$
+ext scall symbol;		$	esc	$
+ext table length symbol;	$	etl	$
+ext table decl symbol;		$	etd	$
+ext call end symbol;		$	ece	$
+ext scall id symbol;		$	esi	$
+ext fcall id symbol;		$	efi	$
+extension call symbol;		$	etc	$
+extension copy symbol;		$	exc	$
+extension end symbol;		$	exe	$
+extension id symbol;		$	exi	$
+ext rule decl symbol;		$	erl	$
+fail tail id symbol;		$	fti	$
+fallow symbol;			$	flw	$
+fcall symbol;			$	fcl	$
+class box id symbol;		$	cbi	$
+end class box symbol;		$	ebx	$
+free w reg symbol;		$	frw	$
+indexed input parameter symbol; $	iip	$
+indexed output parameter symbol;$	iop	$
+input gate symbol;		$	igt	$
+int symbol;			$	int	$
+int fill symbol;		$	itf	$
+jump symbol;			$	jmp	$
+label symbol;			$	lab	$
+link symbol;			$	lnk	$
+list adm symbol;		$	ldm	$
+list symbol;			$	lst	$
+loada global symbol;		$	lag	$
+loada stack var symbol;		$	las	$
+loadv constant symbol;		$	lvc	$
+loadv limit symbol;		$	lvl	$
+loadv list elem symbol;		$	lvi	$
+loadv stack var symbol;		$	lvs	$
+loadv variable symbol;		$	lvv	$
+loadw symbol;			$	ldw	$
+manifest constant symbol;	$	mcn	$
+multiply symbol;		$	mul	$
+rule id symbol;			$	rli	$
+numerical symbol;		$	num	$
+output gate symbol;		$	ogt	$
+pointer symbol;			$	ptr	$
+program id symbol;		$	pid	$
+restore to output gate symbol;	$	rog	$
+root symbol;			$	rut	$
+source line symbol;		$	srl	$
+scall symbol;			$	scl	$
+stack frame symbol;		$	sfr	$
+status symbol;			$	sts	$
+storew variable symbol;		$	swv	$
+storew list element symbol;	$	swi	$
+storew stack var symbol;	$	sws	$
+string length symbol;		$	sln	$
+string fill symbol;		$	str	$
+subtract symbol;		$	sub	$
+success tail id symbol;		$	sti	$
+target stack frame symbol;	$	tsf	$
+unstack and return symbol;	$	unr	$
+variable symbol;		$	var	$
+zone bounds symbol;		$	znb	$
+zone value symbol;		$	znv	$
+
+$delimiters$
+space symbol;			$	" "	$
+comma symbol;			$	 ,	$
+end of line;			$medium dependent$
+
+$parameters$
+new line symbol;		$	nln	$
+same line symbol;		$	sln	$
+rest line symbol;		$	rln	$
+new page symbol;		$	npg	$
+max char symbol;		$	mxc	$
+word size symbol;		$	wsz	$
+max int symbol;			$	mxi	$
+min int symbol;			$	mni	$
+int size symbol;		$	isz	$
+comma-tag symbol;		$	com	$
+space-tag symbol;		$	spc	$
+min addr symbol;		$	mna	$
+max addr symbol;		$	mxa	$
+virt length symbol;		$	vln	$
+nil symbol;			$	nil	$
+false symbol;			$	fls	$
+true symbol;			$	tru	$
+
+add-tag symbol;			$	add	$
+subtr symbol;			$	sub	$
+mult symbol;			$	mul	$
+divrem symbol;			$	div	$
+plus symbol;			$	pls	$
+minus symbol;			$	min	$
+times symbol;			$	tms	$
+incr symbol;			$	inc	$
+decr symbol;			$	dec	$
+less symbol;			$	les	$
+lseq symbol;			$	lsq	$
+more symbol;			$	mor	$
+mreq symbol;			$	mrq	$
+equal symbol;			$	eql	$
+noteq symbol;			$	ntq	$
+random symbol;			$	rnd	$
+set random symbol;		$	srn	$
+set real random symbol;		$	srr	$
+sqrt symbol;			$	sqr	$
+pack int symbol;		$	pki	$
+unpack int symbol;		$	upi	$
+bool invert symbol;		$	biv	$
+bool and symbol;		$	bnd	$
+bool or symbol;			$	bor	$
+bool xor symbol;		$	xor	$
+left circ symbol;		$	lci	$
+right circ symbol;		$	rci	$
+right clear symbol;		$	rcl	$
+is elem symbol;			$	isl	$
+is true symbol;			$	itr	$
+is false symbol;		$	isf	$
+set elem symbol;		$	stl	$
+clear elem symbol;		$	cll	$
+extract bits symbol;		$	exb	$
+first true symbol;		$	ftr	$
+pack bool symbol;		$	pkb	$
+unpack bool symbol;		$	upb	$
+to ascii symbol;		$	tsc	$
+from ascii symbol;		$	fsc	$
+pack string symbol;		$	pks	$
+unpack string symbol;		$	ups	$
+string elem symbol;		$	ste	$
+string length-tag symbol;	$	stl	$
+compare string symbol;		$	cms	$
+unstack string symbol;		$	uns	$
+previous string symbol;		$	pvs	$
+was symbol;			$	was	$
+next symbol;			$	nxt	$
+previous symbol;		$	prv	$
+list length symbol;		$	lsl	$
+unstack symbol;			$	utk	$
+unstack to symbol;		$	ust	$
+unqueue symbol;			$	unq	$
+scratch symbol;			$	scr	$
+get line symbol;		$	gln	$
+put line symbol;		$	pln	$
+get char symbol;		$	gch	$
+put char symbol;		$	pch	$
+put string symbol;		$	pst	$
+get int symbol;			$	gnt	$
+put int symbol;			$	pnt	$
+get data symbol;		$	gdt	$
+put data symbol;		$	pdt	$
+$other primitives used as parameters$
+string;				$character sequence
+				 delimited by quotes.
+				 quotes in the string are represented by
+				 quote images ("")
+				$
+
+character;
+integer.			$unsigned digit sequence$
+
+
+
+
+ALICE program		: program id symbol, sp, string, el,
+
+			  status information,
+
+			  values,
+			  end values symbol, el,
+
+			  data,
+
+			  communication area,
+
+			  rules,
+
+			  end symbol, sp, string, el.
+
+
+data			: [constant sources],
+			  [variable decls],
+			  [lists],
+			  [files].
+
+
+lists			: list areas,
+			  [ext table decls],
+			  list administrations.
+
+files			: file administrations.
+
+rules			: ext rule decls,
+			  rules and root.
+
+
+
+sp			: space symbol.
+co			: comma symbol.
+el			: end of line.
+status information	: status symbol, sp,
+			  integer, co, $maximal stack frame$
+			  integer, co, $maximal gate size$
+			  integer, co, $number of expressions$
+			  integer, co, $number of variables$
+			  integer, co, $number of files$
+			  integer, co, $number of breathing lists$
+			  integer, co, $number of non-breathing lists$
+			  integer, co, $background:
+					0: No lists on background
+					1: Lists on background$
+			  integer, el. $dump:
+					0: no dump
+					1: rule dump
+					2: global dump
+					4: member dump$
+
+values			: value, [values].
+
+value			: value definition;
+			  calculation.
+
+value definition	: int denotation;
+			  manifest constant;
+			  char denotation;
+			  string length;
+			  ext table length.
+
+
+int denotation		: int symbol, sp, location, co, integer, el.
+
+manifest constant	: manifest constant symbol, sp,
+			  location, co, manco, el.
+
+manco			: new line symbol;
+			  same line symbol;
+			  rest line symbol;
+			  new page symbol;
+			  max char symbol;
+			  word size symbol;
+			  max int symbol;
+			  min int symbol;
+			  int size symbol;
+			  comma-tag symbol;
+			  space-tag symbol;
+			  min addr symbol;
+			  max addr symbol;
+			  virt length symbol;
+			  nil symbol.
+
+char denotation		: char denotation symbol, sp, location, co,
+			  character, el.
+
+string length		: string length symbol, sp,
+			  location, co, integer, el.
+
+
+
+ext table length	: ext table length symbol, sp, location,
+			  co, string, el.
+
+$ The string is an exact copy of the ALEPH string including
+  the surrounding quotes$
+
+
+
+calculation		: operator, sp, location, co,
+			  valref, co, valref, el.
+
+operator		: add symbol;
+			  subtract symbol;
+			  multiply symbol;
+			  divide symbol.
+
+location		: integer.
+$ This integer denotes where to put a certain value in the
+  table the ALICE processor is building.
+  The location will be referred to by valrefs$
+
+valref			: integer.
+$ A valref references the location of an already defined
+  value in the table the ALICE processor is building up$
+constant sources	: constant source,
+			  [constant sources].
+
+constant source		: constant source symbol, sp, repr, co, valref, el.
+
+
+repr			: integer.
+
+$ represents ALICE object uniquely $
+
+
+list areas		: list area,
+			  [list areas].
+
+list area		: list symbol, sp, repr, co,	$of list$
+			  list type, co,
+			  valref, el,	$ number of virtual addresses $
+			  [list fillings],
+			  end list symbol, sp, repr, co,
+			  list type, co, valref, el.
+
+			  $The parameters of end list are the same as those
+			  of list$
+
+list fillings		: list filling, [list fillings].
+list filling		: int fill symbol, sp, valref, el;
+			  string fill symbol, sp, string, el;
+			  fallow symbol, sp, valref, el.
+
+			  $fallow stands for uninitialized space
+			  to be grabbed; for instance for a stack
+			  with an absolute size estimate$
+
+variable decls		: variable decl, [variable decls].
+
+variable decl		: variable symbol, sp, repr, co, valref, co,
+			  repr, co, $of next variable$
+			  string, el. $ALEPH variable tag in quotes$
+file administrations	: file administration, [file administrations].
+
+file administration	: begin file adm symbol, sp, file info, el,
+			  [pointer area],
+			  [numerical area],
+			  end file adm symbol, sp, file info, el.
+
+file info		: repr, co,
+			  file type, co,
+			  $an integer:
+			   0: scratch charfile
+			   1: scratch datafile
+			   2: input charfile
+			   3: input datafile
+			   4: output charfile
+			   5: output datafile
+			   6: input-output charfile
+			   7: input-output datafile
+			  $
+
+			  repr, co,	$next file administration or 0$
+			  string.	$file name$
+
+file type		: integer.
+
+
+
+
+
+numerical area		: numerical symbol, sp,
+			  valref, co,	$lower bound$
+			  valref, el,	$upper bound$
+			  [numerical area].
+
+pointer area		: pointer symbol, sp, repr, el, $of a list$
+			  [pointer area].
+
+
+
+
+
+list administrations	: list administration, [list administrations].
+
+list administration	: list adm symbol, sp,
+			  list info, el.
+
+
+list info		: repr, co,	$of the list$
+			  list type, co,
+			  valref, co,	$virtual min	$
+			  valref, co,	$virtual max	$
+			  valref, co,	$virtual left	$
+			  valref, co,	$virtual right	$
+			  valref, co,	$calibre	$
+			  repr, co,	$next list adm or 0 $
+			  string.	$name of the list$
+
+list type		: integer.
+
+$ 0: not breathing, no background pragmat
+  1: not breathing,    background pragmat
+  2:	 breathing, no background pragmat
+  3:	 breathing,    background pragmat
+$
+
+ext table decls		: ext table decl, [ext table decls].
+
+ext table decl		: ext table decl symbol, sp,
+			  list info, co,
+			  string, el. $ ALEPH string $
+
+
+
+communication area	: communication symbol, sp,
+			  repr, co,  $first list$
+			  repr, co,  $first file$
+			  repr, co,  $first variable$
+			  string, el,
+
+			  status information.
+
+
+
+
+
+ext rule decls		: ext rule decl, [ext rule decls].
+
+
+ext rule decl		: ext rule decl symbol, sp, repr, co, stag, el.
+
+stag			: string;
+			  extag.
+
+
+$If the external is a standard external, the stag is an extag;
+ The externals of a portable program must be standard externals$
+
+extag			: add-tag symbol;
+			  subtr symbol;
+			  mult symbol;
+			  divrem symbol;
+			  plus symbol;
+			  minus symbol;
+			  times symbol;
+			  incr symbol;
+			  decr symbol;
+			  less symbol;
+			  lseq symbol;
+			  more symbol;
+			  mreq symbol;
+			  equal symbol;
+			  noteq symbol;
+			  random symbol;
+			  set random symbol;
+			  set real random symbol;
+			  sqrt symbol;
+			  pack int symbol;
+			  unpack int symbol;
+			  bool invert symbol;
+			  bool and symbol;
+			  bool or symbol;
+			  bool xor symbol;
+			  left circ symbol;
+			  right circ symbol;
+			  right clear symbol;
+			  is elem symbol;
+			  is true symbol;
+			  is false symbol;
+			  set elem symbol;
+			  clear elem symbol;
+			  extract bits symbol;
+			  first true symbol;
+			  pack bool symbol;
+			  unpack bool symbol;
+			  to ascii symbol;
+			  from ascii symbol;
+			  pack string symbol;
+			  unpack string symbol;
+			  string elem symbol;
+			  string length-tag symbol;
+			  compare string symbol;
+			  unstack string symbol;
+			  previous string symbol;
+			  was symbol;
+			  next symbol;
+			  previous symbol;
+			  list length symbol;
+			  unstack symbol;
+			  unstack to symbol;
+			  unqueue symbol;
+			  scratch symbol;
+			  get line symbol;
+			  put line symbol;
+			  get char symbol;
+			  put char symbol;
+			  put string symbol;
+			  get int symbol;
+			  put int symbol;
+			  get data symbol;
+			  put data symbol.
+
+
+
+
+
+rules and root		: [rule decls], root, [rule decls].
+
+
+rule decls		: rule decl, [rule decls].
+
+root			: root symbol, sp, string, el,		$title$
+			  source line,
+			  affix form,
+			  exit.
+
+
+affix form		: call;
+			  ext call.
+
+rule decl		: rule head, rule body, rule tail.
+rule head		: rule id,
+			  stack frame,
+			  [copies from input gate].
+
+
+rule id			: rule id symbol, sp, repr, co, rule type, co,
+			  recursion, co, string, el.
+
+
+rule type		: integer.
+			  $ 0: cannot fail
+			    1: can fail
+			  $
+
+recursion		: integer.
+			  $ 0: not recursive
+			    1: recursive
+			  $
+
+
+stack frame		: stack frame symbol, sp, number of parameters,
+			  co, number of locals, el.
+
+
+rule tail		: success tail,
+			  [fail tail].
+
+success tail		: success tail id,
+			  [output gate creation],
+			  [restores to output gate],
+			  unstack and return true.
+
+success tail id		: success tail id symbol, sp, repr, co,
+			  rule type, co, recursion, el.
+
+output gate creation	: output gate symbol, sp, size of output gate, el.
+size of output gate	: integer.
+
+unstack and return true : unstack and return symbol, sp,
+			  number of parameters, co, number of locals, co,
+			  true symbol, el.
+
+
+fail tail		: fail tail id,
+			  unstack and return false.
+
+fail tail id		: fail tail id symbol, sp, repr, co,
+			  rule type, co,
+			  recursion, el.
+
+unstack and return false: unstack and return symbol, sp,
+			  number of parameters, co, number of locals, co,
+			  false symbol, el.
+
+
+copies from input gate	: copy from input gate, [copies from input gate].
+copy from input gate	: copy from input gate symbol, sp, formal, el.
+formal			: position on gate, co, position on stack.
+position on gate	: integer.
+position on stack	: integer.
+
+restores to output gate : restore to output gate,
+			  [restores to output gate].
+restore to output gate	: restore to output gate symbol, sp, formal, el.
+
+
+
+rule body		: statements.
+statements		: statement, [statements].
+statement		: call;
+			  ext call;
+			  primitive.
+
+primitive		: label definition;
+			  jump;
+			  source line;
+			  exit;
+			  class box;
+			  class;
+			  extension.
+
+call			: call id,
+			  input gate creation,
+			  target stack frame,
+			  [copies to input gate],
+			  scall or fcall,
+			  [restores from output gate],
+			  link.
+
+
+call id			: call id symbol, sp, repr, co,
+			  rule type, co, recursion, el.
+
+input gate creation	: input gate symbol, sp, size of input gate, el.
+size of input gate	: integer.
+
+target stack frame	: target stack frame symbol, sp,
+			  number of parameters, co,
+			  number of locals, el.
+number of parameters	: integer.
+number of locals	: integer.
+
+
+scall or fcall		: scall symbol, sp, repr, el;
+
+			  fcall symbol, sp, repr, co,
+			  false address, el.
+
+
+false address		: repr.
+			  $of a label$
+
+link			: link symbol, sp, true address, el.
+
+true address		: repr.
+
+ext call		: ext call id,
+			  [copies to input gate],
+			  ext scall or ext fcall,
+			  [restores from output gate],
+			  ext call end.
+
+ext call id		: ext scall id;
+			  ext fcall id.
+ext scall id		: ext scall id symbol, sp, repr, co, stag, el.
+
+ext fcall id		: ext fcall id symbol, sp,
+			  repr, co, stag, co, false address, el.
+
+ext scall or ext fcall	: ext scall symbol, sp, repr, co, stag, el;
+			  ext fcall symbol, sp,
+			  repr, co,  stag, co, false address, el.
+
+ext call end		: ext call end symbol, co, true address, el.
+
+
+jump			: jump symbol, sp, repr, el.
+
+source line		: source line symbol, sp, line number, el.
+line number		: integer.
+
+
+class box		: class box id symbol, el,
+			  load val in v reg,
+			  end class box symbol, sp, true address, el.
+			  $true address = repr of class$
+
+
+
+class			: class begin symbol, sp, repr, co,
+			  optimize, el,
+
+			  zones,
+			  class end symbol, sp, optimize, el.
+zones			: zone bounds, [zones];
+			  zone value,  [zones].
+
+zone bounds		: zone bounds symbol, sp,
+			  minbound, co, maxbound, co,
+			  true address, el.
+
+minbound		: repr, co, valref.
+maxbound		: repr, co, valref.
+
+zone value		: zone value symbol, sp, repr, co, valref, co,
+			  true address, el.
+
+optimize		: true symbol;
+			  false symbol.
+
+
+extension		: extension id,
+			  input gate creation,
+			  copies to input gate,
+			  load addr in a reg,  $ stack adm $
+			  extension call,
+			  extension copies,
+			  extension end.
+
+extension id		: extension id symbol, el.
+
+extension call		: extension call symbol, el.
+
+extension copies	: extension copy, [extension copies].
+
+extension copy		: extension copy symbol, sp, formal, el.
+
+extension end		: extension end symbol, sp, true address, el.
+
+
+exit			: exit symbol, sp, repr, co, valref, el.
+
+label definition	: label symbol, sp, repr, el.
+
+
+
+
+copies to input gate	: copy to input gate,
+			  [copies to input gate].
+
+copy to input gate	: copy val to input gate;
+			  copy addr to input gate.
+
+copy val to input gate	: load val in v reg,
+			  copy v reg to input gate.
+
+load val in v reg	: load simple in v reg;
+			  load indexed element in v reg.
+
+load simple in v reg	: load constant in v reg;
+			  load variable in v reg;
+			  load stack var in v reg;
+			  load limit in v reg.
+
+
+copy v reg to input gate: copy v reg symbol, sp, formal, el.
+
+copy addr to input gate : load addr in a reg,
+			  copy a reg to input gate.
+
+load addr in a reg	: load global addr in a reg;
+			  load stack var in a reg.
+
+copy a reg to input gate: copy a reg symbol, sp, formal, el.
+
+
+
+
+
+
+load constant in v reg	: loadv constant symbol, sp, repr, co, valref, el.
+
+load variable in v reg	: loadv variable symbol, sp, repr, el.
+
+load limit in v reg	: load addr in a reg,
+			  loadv limit symbol, sp, limit type, el.
+limit type		: integer.
+			  $
+			  0: left
+			  1: right
+			  2: calibre
+			  $
+
+load stack var in v reg : loadv stack var symbol, sp,
+			  position on stack, el.
+position on stack	: integer.
+
+load indexed element
+	in v reg	: indexed input parameter symbol, el,
+			  load simple in v reg,
+			  load list element in v reg sequence.
+
+load list element in
+	v reg sequence	: load list element in v reg,
+			  [load list element in v reg sequence].
+
+
+load list element
+	in v reg	: load addr in a reg,
+			  loadv list elem symbol, sp, integer, el.
+			  $0: right most element of indexed block
+
+			   i: (i-1)-th right most element$
+
+
+
+
+load global addr
+	in a reg	: loada global symbol, sp, repr, el.
+
+load stack var
+	in a reg	: loada stack var symbol, sp,
+			  position on stack, el.
+
+
+
+
+restores from
+	output gate	: restore from output gate,
+			  [restores from output gate].
+
+restore from output gate: copy gate elem to w reg,
+			  store w reg sequence,
+			  free w reg.
+
+store w reg sequence	: store w reg, [store w reg sequence].
+
+copy gate elem to w reg : loadw symbol, sp, formal, el.
+
+store w reg		: store w reg in variable;
+			  store w reg in list element;
+			  store w reg in stack var.
+
+store w reg in variable : storew variable symbol, sp, repr, el.
+
+store w reg in
+	list element	: indexed output parameter symbol, el,
+			  load simple in v reg,
+			  [load list element in v reg sequence],
+			  load addr in a reg,
+			  storew list element symbol, sp, integer, el.
+
+store w reg in
+	stack var	: storew stack var symbol, sp,
+			  position on stack, el.
+
+
+free w reg		: free w reg symbol, el.
+
+
+.bp
+
+
+.pn 96
+.nf
+4  References
+
+
+
+1  D. Grune, R. Bosch & L.G.L.T. Meertens
+   ALEPH Manual, Report IW 17/75
+   Mathematisch Centrum Amsterdam  1975
+
+
+2  Waite, W. M.
+   Hints on distributing Portable Software
+   Software - Practice and Experience, vol. 5, 295-308 (1975)
+
+
+3  P.J. Brown
+   ML/1 user's manual (fourth edition)
+   University of Kent at Canterbury, 1970
+
+
+4  Waite, W.M.
+   The mobile programming system: STAGE2
+   Comm. ACM 13,7, pp. 415-421 (1973)
+
+
+5  W.J. Hansen & H. Boom
+   The report on the standard hardware representation for ALGOL 68
+   SIGPLAN Notices, Vol 12, Number 5, 80-87 (1977)
+
+
+6  Poole, P.C. & Waite, W.M.
+   Portability and Adaptability, __in
+   F.L. Bauer (Ed.), Advanced course on Software Engineering,
+   Springer-Verlag, Berlin, 183-277 (1973)
+
+
+7  Waite, W.M.
+   Implementing Software for non-numeric applications
+   Prentice-Hall, Englewood Cliffs, N.J., 1973
+
+
+8  P.J. Brown
+   Macro processors and techniques for Portable Software
+   John Wiley	1974
+
+
+9  P.J. Brown (Ed.)
+   Software Portability	 An advanced Course
+   Cambridge University Press	1977
+
+
+10 A.S. Tanenbaum, P. Klint & W. Bohm
+   Guidelines for Program Portability, Report IW 88/77
+   Mathematisch Centrum Amsterdam   1977
+.bp
+
+
+
