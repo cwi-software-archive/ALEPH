@@ -1,6 +1,0 @@
-
-          IDENT  TEMPIES     PARAMETER OVERFLOW AREA
-*
- TEMPIES  BSS    20
-          ENTRY  TEMPIES
-          END
