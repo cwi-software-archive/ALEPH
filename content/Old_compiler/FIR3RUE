@@ -1,0 +1,26 @@
+
+          IDENT  FIR3RUE
+          SST
+          ENTRY  FIR3RUE
+ FIR2     BSS    0           IN LAST 12 BITS
+          NX4    B5,X1
+          NE     B5,B4,FIR3  IF PRESENT
+          MX0    1
+*         EQ     FIR3RUE
+ FIR3RUE  JP     *+1S17      FIRST TRUE + >X + N>:
+          MX0    0
+          NG     X1,FIR1
+          BX2    X1
+          AX2    12          FILLS WITH 0'S
+          NX5,B5 X2
+          SB4    48D
+          EQ     B5,B4,FIR2  IN LAST 12 BITS
+          SB4    SIGNBIT
+          SX1    B4-B5
+          EQ     FIR3RUE
+ FIR1     SX1    WORDSIZE-1
+          EQ    FIR3RUE
+ FIR3     SB4    B4-B1       47
+          SX1    B4-B5
+          EQ     FIR3RUE
+          END

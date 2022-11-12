@@ -1,0 +1,14 @@
+
+          IDENT  RIG4EAR
+          SST
+          ENTRY  RIG4EAR
+ RIG4EAR  JP     *+1S17      RIGHT CLEAR + >X> + >N
+          ZR,X2  RIG4EAR     DUMMY, FOR N = 0
+          SB5    X2
+          AX1    B5          SIGN-EXTENDING RIGHT SHIFT
+          MX4    1
+          SB5    B5-B1
+          AX4    B5          MASK OF LENGTH N
+          BX1    -X4*X1      REMOVE SIGN BITS
+          EQ     RIG4EAR
+          END

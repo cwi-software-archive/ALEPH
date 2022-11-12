@@ -1,0 +1,43 @@
+
+          IDENT  PUT1INE
+          SST
+          ENTRY  PUT1INE
+* VARIABLES
+ FILE
+ A
+ PNT
+
+ PUT1INE  JP     *+1S17      PUT LINE + ''FILE + A[] + >CINT - PNT:
+*
+*         PUT CHAR + FILE + CINT, <<A -> PNT,
+*         (COPY: MORE + PNT + >>A;
+*             PUT CHAR + FILE + A[PNT], INCR + PNT, :COPY).
+*
+* SINCE A CALL OF PUT CHAR MAY CAUSE LIST RELOCATION, ALL ADDRESSES HAVE
+* TO BE KEPT IN RELATIVE FORM.
+          BX6    X1
+          BX7    X2
+          SA6    FILE
+          SA7    A6+B1       A
+          BX2    X3          CINT
+          RJ     =XPUT1HAR    WRITE CINT
+          SA1    FILE
+          SA3    A1+B1       A
+          SA4    X3+<<       <<A, INITIAL VALUE OF PNT
+* X1 =FILE, X3 = A, X4 = PNT
+ COPY     BSS    0
+          SA5    X3+>>       >>A
+          IX6    X5-X4
+          NG,X6  PUT1INE     MORE + PNT + >>A
+          SA2    X3          OFFSET
+          IX2    X2+X4       ADDRESS
+          SA2    X2          CHAR
+          MX6    -1          -1
+          IX6    X4-X6       INCR + PNT
+          SA6    PNT         SAVE PNT
+          RJ     =XPUT1HAR
+          SA1    FILE
+          SA3    A1+B1       A
+          SA4    A3+B1       PNT
+          EQ     COPY
+          END

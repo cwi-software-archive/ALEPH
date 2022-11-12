@@ -1,0 +1,30 @@
+
+          IDENT  PAC2OOL
+          SST
+          ENTRY  PAC2OOL
+ PAC2OOL  JP     *+1S17      + A[] + >N + RES>:
+          RJ     =XX2<=      TEST N
+          SA4    X1+>>       >>LIST
+          SA5    A4-B1       <<PRE
+          IX6    X4-X5       LIST LENGTH-N
+          IX6    X6-X2
+          PL     X6,PAC1
+          ERREXT (PACKBOOL, STACK TOO SMALL),(L1,D2)
+
+ PAC1     SA5    X1          OFFSET
+          IX3    X4+X5       @(>>LIST)
+          IX3    X3-X2       @(>>LIST)-N
+          MX1    0           RESULT
+          SA3    X3          SET PRE-START ADDRESS
+          SB5    X2          SET COUNTER
+ LOOP     ZR,B5  PAC2OOL
+          SA3    A3+B1       GET WORD
+          SB5    B5-B1       COUNT IT
+          LX1    1           POSITION RESULT
+          CX3    X3          MAX. 60, FOR - 0
+          CX3    X3          MAX.  5, FOR 31
+          CX3    X3          MAX.  2, FOR  3
+          CX3    X3          MAX.  1, FOR  1
+          BX1    X1+X3       ENTER BIT
+          EQ     LOOP
+          END

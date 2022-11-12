@@ -1,0 +1,82 @@
+
+          IDENT  GET.ATA     OLD AND INCORRECT VERSION OF GET1ATA
+          SST
+          ENTRY  GET.ATA
+
+ GET.ATA  JP     *+1S17      GET DATA + ''FILE + ITEM> + TYPE>
+ FILE     =      1           X.FILE
+ WORD     =      2           X.WORD, FROM GET WORD
+ LISTSPNT =      3           X.LISTSPNT
+ PNT      =      4           X.PNT
+          SA2    X.FILE      FILE NAME
+          MX0    1           MAY FAIL
+          ZR,X2  RETURN      IS DUMMY + FILE, -;
+          MX0    0
+          SA4    X.FILE+FILETYPE
+          BX5    X4
+          LX4    SIGNBIT-CHDATBIT POS IF NOT DATA FILE
+          LX5    SIGNBIT-READBIT POS IF NOT READ FILE
+          BX5    X4*X5       POS IF EITHER,
+          PL,X5  BADFILE     ERROR + BAD FILE;
+*OBTWORD  BSS    0           OBTAIN WORD:
+          SA5    X.FILE+FILECH# STATUS -> X5,
+          MX0    1
+          NG,X5  RETURN      [:-1],-$ END OF RECORD $;
+          MX0    0
+          ZR,X5  OBTNEW      [1:],
+          SA.WORD X.FILE+FILEWORD FILE WORD * FILE ADM[FILE] -> WORD,
+          MX6    0           0
+          SA6    X.FILE+FILECH# -> STATUS;
+          EQ     EOOBTW
+
+ OBTNEW   BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE
+          BX=    WORD,2      + WORD
+          ZR,X3  EOOBTW      ;
+          SB5    X3-1        SET
+          SX6    EORSTAT     EOR
+          PX6    B5          STAT
+          SA6    X.FILE+FILECH# + FILE,
+          MX0    1           -
+          EQ     RETURN      .
+
+ EOOBTW   BSS    0           WORD OBTAINED IN X.WORD
+          SA5    X.FILE+FILETYPE IS SIMPLE FILE
+          LX5    SIGNBIT-SIMPBIT                + FILE,
+          NG,X5  SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE;
+          ISNOTPNT X.WORD,SIMPLE IS POINTER + WORD,
+          BX5    X.WORD
+          LX5    SIGNBIT-47  IS ELEM +
+          PL,X5  NOMARKER              WORD + 47,
+          BX=    1,FILE
+          RJ     PROTGW      GET WORD + FILE + WORD,
+          BX=    WORD,2
+          EQ     SIMPLE      WORD -> ITEM, NUMERICAL -> TYPE.
+
+ NOMARKER MX.PNT -24         DECOMPOSE:
+          BX.PNT X.PNT*X.WORD ALL EXCEPT OFFSET
+          BX.WORD X.WORD-X.PNT OFFSET
+          AX.PNT 24          BITS
+          SX.PNT X.PNT       41-24,
+          LISTSPNT LISTSPNT  GET LISTS PNT + LISTSPNT,
+          IX.PNT X.LISTSPNT+X.PNT PLUS + LISTS PNT + PNT + PNT,
+          SA5    X.PNT+B1    '<<PRE' * FILE ADM[PNT] -> X5,
+          IX1    X.WORD+X5   PLUS + WORD + X5 + ITEM,
+          SX2    B.POINTER   POINTER -> TYPE
+          EQ     RETURN      ;
+
+ SIMPLE   BSS    0
+          BX1    X.WORD      WORD -> ITEM,
+          SX2    B.NUMERIC   NUMERICAL -> TYPE
+          EQ     RETURN      .
+
+ RETURN   EQU    GET.ATA
+ PROTGW   JP     *+1S17      PROTECTED GETWORD
+          DOWNCPU
+          RJ     =XGETWORD
+          UPCPU
+          EQ     PROTGW
+
+ BADFILE  ERREXT (GET DATA, BAD FILE),F.FILE
+
+          END

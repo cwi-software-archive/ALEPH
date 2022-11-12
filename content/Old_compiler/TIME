@@ -1,0 +1,17 @@
+
+          IDENT  TIME
+          SST
+          ENTRY  TIME
+ TIME     JP     *+1S17      'FUNCTION' TIME + N>
+          TIME   =SSTATUS
+          SA1    STATUS      GET RESULT
+          MX2    -36
+          BX3    -X2*X1      LEAVE RIGHT-MOST 36 BITS
+          MX2    -12
+          BX2    -X2*X3      MILLI-SECONDS, M
+          AX3    12          SECONDS, S
+          SX4    1000D
+          IX1    X3*X4       1000 * S
+          IX1    X1+X2       1000 * S + M
+          EQ     TIME
+          END

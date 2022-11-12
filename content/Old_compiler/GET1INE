@@ -1,0 +1,66 @@
+
+          IDENT  GET1INE
+          SST
+          ENTRY  GET1INE
+* VARIABLES
+ FILE
+ ST
+ CINT
+ SYMB
+
+ NOSYM    SA1    FILE
+          RJ     =XBAC.HAR   RESTORE LAST CHAR
+ END      MX0    0           SUCCESS
+          SA1    CINT
+*         EQ     GET1INE
+
+ GET1INE  JP     *+1S17      'PRED' GETLINE + ''FILE + []ST[] +CINT>
+                             - SYMB:
+*
+*'PRED' GET LINE + ""FILE + []ST[] + CINT> - SYMB:
+*  GET CHAR + FILE + CINT,
+*    (IF NOT CINT + CINT, OUTSYM + CINT + ST, REST LINE -> CINT;
+*     +),
+*    (COPY: GET CHAR + FILE + SYMB,
+*      (IF NOT CINT + SYMB, OUTSYM + SYMB + ST, : COPY;
+*       BACK LAST CHAR + FILE);
+*     +).
+*
+*'ACTION' OUTSYM + >SYMB + []ST[]:
+*  * SYMB -> ST * ST.
+*
+* SINCE THE EXTENSIONS MAY CAUSE LIST RELOCATION, ALL ADDRESSES HAVE
+* TO BE KEPT IN RELATIVE FORM.
+*
+          BX6    X1          FILE
+          BX7    X2          ST
+          SA6    FILE
+          SA7    A6+B1       ST
+          GETCHAR GET1INE    GET CHAR + FILE + CINT,
+          IFCINT X1,ISCINT   IF NOT CINT + CINT,
+          RJ     OUTSYM      OUTSYM + SYMB + ST + SPCNT,
+          SX1    RESTLINE
+ ISCINT   BX6    X1
+          SA6    CINT
+
+ COPY     SA1    FILE
+          GETCHAR END        GET CHAR + FILE + SYMB,
+          IFCINT X1,NOSYM    IF NOT CINT + SYMB,
+          RJ     OUTSYM      OUTSYM + SYMB + ST + SPCNT,
+          EQ     COPY
+
+ OUTSYM   JP     *+1S17      OUTSYM + >SYMB + []ST[]:
+          SX2    B1          LENGTH OF ONE ENTRY
+          BX6    X1          SAVE
+          SA6    SYMB             SYMBOL
+          SA1    ST          STACK ADDRESS
+          EXTEND12           EXTEND + ST + 1,
+          SA5    SYMB        SYMB
+          BX6    X5               ->
+          SA4    X1+>>       >>ST, SOFT
+          SA5    X1          OFFSET
+          IX5    X4+X5       @ OF TOP OF STACK
+          SA6    X5                  ST[>>ST], $ A6 = ADDR $
+          EQ     OUTSYM      .
+
+          END

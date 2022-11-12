@@ -1,0 +1,44 @@
+
+          IDENT  MAYCTER     ALEPH EXTERNAL RULE
+          SST
+          ENTRY  MAYCTER
+ MAYCTER  JP     *+1S17      MAY BE STRING POINTER + TEXT[] + >P:
+* CHECKS:
+*  A. WHETHER THE WHOLE DESCRIBED STRING LIES IN TEXT,
+*  B. WHETHER ALL WORDS BUT THE LAST END IN 0000,
+*  C. WHETHER UNUSED PLACES IN THE LAST WORD ARE FILLED WITH ZEROES.
+          MX0    1
+          IFNOT  X1,X2,MAYCTER TEST ORIGINAL POSITION
+          SA3    X1
+          IX3    X3+X2       ADDRESS OF LAST WORD
+          SA3    X3          LAST WORD
+          MX4    -11
+          BX4    -X4*X3      LENGTH OF STRING
+          AX4    3                            IN WORDS - 1
+          SB5    X4          KEEP COUNT
+          IX2    X2-X4       POINTER TO FIRST WORD
+          IFNOT  X1,X2,MAYCTER TEST IT
+          MX0    0
+          BX5    X3          SAVE LAST WORD
+* LOOP FOR TESTING LAST 4 BITS, LENGTH IN B5
+          ZR     B5,.LOOP4
+ LOOP4    SA3    A3-B1       PREVIOUS WORD
+          BX0    X0+X3       COLLECT BITS
+          SB5    B5-B1       COUNT DOWN
+          NZ     B5,LOOP4
+ .LOOP4   BSS    0
+          MX4    -4
+          BX0    -X4*X0      CLEAR ALL BITS EXCEPT LOWER 4
+* TAKE LAST WORD (IN X5) APART
+          MX4    -3          -7
+          BX4    -X4*X5      LENGTH OF LAST WORD IN CHARACTERS
+          MX3    -11
+          BX3    X3*X5       MASK OUT CHARACTER PART
+          LX5    X4,B3       B5:= X4
+          IX5    X5-X4               *
+          SB5    X5                    7
+          LX3    B5          RUB OFF
+          AX3    B5                  SIGNIFICANT CHARACTERS
+          BX0    X0+X3       SHOULD BE ZERO (CANNOT PRODUCE -0)
+          EQ     MAYCTER     RETURN
+          END

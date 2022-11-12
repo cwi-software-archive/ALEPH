@@ -1,0 +1,14 @@
+
+          IDENT  LEF3EAR
+          SST
+          ENTRY  LEF3EAR
+ LEF3EAR  JP     *+1S17      LEFT CLEAR + >X> + >N:
+          SB5    X2          N
+          EQ     B5,B0,LEF3EAR
+          MX4    1           MASK
+          SB4    B5-B1             OF LENGTH
+          AX4    B4                           N
+          BX1    -X4*X1      CLEAR BITS
+          LX1    B5          AND SHIFT
+          EQ     LEF3EAR
+          END
